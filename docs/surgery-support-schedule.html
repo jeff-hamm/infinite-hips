@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Surgery Support Schedule - Jump Hip</title>
+    <link rel="stylesheet" href="../assets/dark-theme.css">
+    <style>
+        .schedule-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            background: #161b22;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .schedule-table th,
+        .schedule-table td {
+            border: 1px solid #30363d;
+            padding: 0.75rem;
+            text-align: left;
+            color: #e9ecef;
+            font-size: 0.9em;
+        }
+        .schedule-table th {
+            background: linear-gradient(145deg, #4a4a4a 0%, #6c6c6c 100%);
+            font-weight: 600;
+            color: #ff69b4;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        .schedule-table tr:nth-child(even) {
+            background: #0d1117;
+        }
+        .timeline-group {
+            background: linear-gradient(145deg, #2d1b69 0%, #3d2b7a 100%) !important;
+            border: 1px solid #ff69b4 !important;
+            font-weight: bold;
+        }
+        .category-medical { border-left: 4px solid #ff69b4; }
+        .category-home { border-left: 4px solid #ffb3da; }
+        .category-equipment { border-left: 4px solid #ff1a8c; }
+        .category-administrative { border-left: 4px solid #ff8eb3; }
+        .category-transportation { border-left: 4px solid #ff4da6; }
+        .category-shopping { border-left: 4px solid #ffcce5; }
+        .category-technology { border-left: 4px solid #e60073; }
+        .category-supplies { border-left: 4px solid #cc0066; }
+        .category-personal { border-left: 4px solid #ff0080; }
+        .category-recovery { border-left: 4px solid #ff3399; }
+        .category-daily { border-left: 4px solid #ff66b3; }
+        .category-projects { border-left: 4px solid #ff99cc; }
+        .category-emergency { border-left: 4px solid #ff0000; }
+        .category-activity { border-left: 4px solid #ff6600; }
+        
+        .checkbox {
+            width: 20px;
+            height: 20px;
+            background: #30363d;
+            border: 2px solid #ff69b4;
+            border-radius: 4px;
+            display: inline-block;
+            position: relative;
+            cursor: pointer;
+        }
+        
+        .checkbox.checked {
+            background: #ff69b4;
+        }
+        
+        .checkbox.checked::after {
+            content: '✓';
+            color: white;
+            position: absolute;
+            top: -2px;
+            left: 3px;
+            font-weight: bold;
+        }
+        
+        .filter-buttons {
+            margin: 1rem 0;
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .filter-btn {
+            padding: 0.5rem 1rem;
+            background: #30363d;
+            color: #e9ecef;
+            border: 1px solid #ff69b4;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .filter-btn:hover, .filter-btn.active {
+            background: #ff69b4;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="nav">
+        <a href="../index.html">← Back to Main Index</a>
+    </div>
+
+    <div class="header">
+        <h1>📅 Surgery Support Schedule</h1>
+    </div>
+
+    <div class="content">
+        <p>This comprehensive schedule covers all tasks from 7 days before surgery through your complete recovery. Use the checkboxes to track completion and coordinate with your support team.</p>
+        
+        <div class="filter-buttons">
+            <button class="filter-btn active" onclick="filterTasks('all')">All Tasks</button>
+            <button class="filter-btn" onclick="filterTasks('pre-surgery')">Pre-Surgery</button>
+            <button class="filter-btn" onclick="filterTasks('surgery-day')">Surgery Day</button>
+            <button class="filter-btn" onclick="filterTasks('post-surgery')">Post-Surgery</button>
+            <button class="filter-btn" onclick="filterTasks('medical')">Medical</button>
+            <button class="filter-btn" onclick="filterTasks('support-needed')">Support Needed</button>
+        </div>
+
+        <table class="schedule-table" id="scheduleTable">
+            <thead>
+                <tr>
+                    <th>Timeline</th>
+                    <th>Category</th>
+                    <th>Task</th>
+                    <th>Who Can Help</th>
+                    <th>Notes</th>
+                    <th>✓</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- 7 DAYS BEFORE SURGERY -->
+                <tr class="timeline-group">
+                    <td colspan="6"><strong>7 DAYS BEFORE SURGERY</strong></td>
+                </tr>
+                <tr class="category-medical">
+                    <td>7 Days Before</td>
+                    <td>Medical Prep</td>
+                    <td>Stop vitamins/supplements (Turmeric Fish Oil Ibuprofen Motrin Advil Naprosyn Aleve Meloxicam Diclofenac)</td>
+                    <td></td>
+                    <td>OK to continue Tylenol and Vitamin D</td>
+                    <td><span class="checkbox" onclick="toggleCheck(this)"></span></td>
+                </tr>
+                <tr class="category-medical">
+                    <td>7 Days Before</td>
+                    <td>Medical Prep</td>
+                    <td>Avoid alcohol</td>
+                    <td></td>
+                    <td>Continue until surgery</td>
+                    <td><span class="checkbox" onclick="toggleCheck(this)"></span></td>
+                </tr>
+                <tr class="category-home">
+                    <td>7 Days Before</td>
+                    <td>Home Prep</td>
+                    <td>Remove trip hazards from home</td>
+                    <td>Family/Friends</td>
+                    <td>Clear pathways for walker</td>
+                    <td><span class="checkbox" onclick="toggleCheck(this)"></span></td>
+                </tr>
+                <tr class="category-equipment">
+                    <td>7 Days Before</td>
+                    <td>Equipment</td>
+                    <td>Order/arrange Game Ready cold therapy unit if desired</td>
+                    <td></td>
+                    <td>Contact Amy Weiner (619) 823-2691 amy@therapedix.com - $325 for 2 weeks</td>
+                    <td><span class="checkbox" onclick="toggleCheck(this)"></span></td>
+                </tr>
+                <tr class="category-administrative">
+                    <td>7 Days Before</td>
+                    <td>Administrative</td>
+                    <td>Submit disability claim paperwork for work</td>
+                    <td>Family/Friends</td>
+                    <td>Research requirements and deadlines</td>
+                    <td><span class="checkbox" onclick="toggleCheck(this)"></span></td>
+                </tr>
+                <tr class="category-administrative">
+                    <td>7 Days Before</td>
+                    <td>Administrative</td>
+                    <td>Determine time off needed from work</td>
+                    <td>Family/Friends</td>
+                    <td>Plan for 6-8 weeks recovery minimum</td>
+                    <td><span class="checkbox" onclick="toggleCheck(this)"></span></td>
+                </tr>
+                <tr class="category-administrative">
+                    <td>7 Days Before</td>
+                    <td>Administrative</td>
+                    <td>Fill out DMV form for handicapped placard</td>
+                    <td>Family/Friends</td>
+                    <td>Temporary placard for recovery period</td>
+                    <td><span class="checkbox" onclick="toggleCheck(this)"></span></td>
+                </tr>
+                <tr class="category-equipment">
+                    <td>7 Days Before</td>
+                    <td>Equipment</td>
+                    <td>Look at/test ice machine options</td>
+                    <td></td>
+                    <td>Alternative to Game Ready for cold therapy</td>
+                    <td><span class="checkbox" onclick="toggleCheck(this)"></span></td>
+                </tr>
+                <tr class="category-personal">
+                    <td>7 Days Before</td>
+                    <td>Personal</td>
+                    <td>Get 3 gallon water jugs</td>
+                    <td>Family/Friends</td>
+                    <td>For easy hydration during recovery</td>
+                    <td><span class="checkbox" onclick="toggleCheck(this)"></span></td>
+                </tr>
+                <tr class="category-home">
+                    <td>7 Days Before</td>
+                    <td>Home Prep</td>
+                    <td>Deep clean tub and shower drain</td>
+                    <td>Family/Friends</td>
+                    <td>Prevent bacteria - ensure good drainage</td>
+                    <td><span class="checkbox" onclick="toggleCheck(this)"></span></td>
+                </tr>
+                <tr class="category-administrative">
+                    <td>7 Days Before</td>
+                    <td>Administrative</td>
+                    <td>Get new CA ID</td>
+                    <td>Family/Friends</td>
+                    <td>Update identification if needed</td>
+                    <td><span class="checkbox" onclick="toggleCheck(this)"></span></td>
+                </tr>
+                <tr class="category-administrative">
+                    <td>7 Days Before</td>
+                    <td>Administrative</td>
+                    <td>Get new passport</td>
+                    <td>Family/Friends</td>
+                    <td>If travel plans during recovery</td>
+                    <td><span class="checkbox" onclick="toggleCheck(this)"></span></td>
+                </tr>
+                <tr class="category-medical">
+                    <td>7 Days Before</td>
+                    <td>Medical Prep</td>
+                    <td>Ask Mom about genetic conditions for medical history</td>
+                    <td></td>
+                    <td>Cholesterol disorder poly seronegative arthritis metal wrist issue</td>
+                    <td><span class="checkbox" onclick="toggleCheck(this)"></span></td>
+                </tr>
+                
+                <!-- 6 DAYS BEFORE SURGERY -->
+                <tr class="timeline-group">
+                    <td colspan="6"><strong>6 DAYS BEFORE SURGERY</strong></td>
+                </tr>
+                <tr class="category-medical">
+                    <td>6 Days Before</td>
+                    <td>Medical Prep</td>
+                    <td>Confirm surgery time and location</td>
+                    <td></td>
+                    <td>Scripps Mission Valley - Check in 7:30am</td>
+                    <td><span class="checkbox" onclick="toggleCheck(this)"></span></td>
+                </tr>
+                <tr class="category-transportation">
+                    <td>6 Days Before</td>
+                    <td>Transportation</td>
+                    <td>Arrange ride to hospital</td>
+                    <td>Family/Friends</td>
+                    <td>Surgery day morning</td>
+                    <td><span class="checkbox" onclick="toggleCheck(this)"></span></td>
+                </tr>
+                <tr class="category-transportation">
+                    <td>6 Days Before</td>
+                    <td>Transportation</td>
+                    <td>Arrange ride home from hospital</td>
+                    <td>Family/Friends</td>
+                    <td>May need assistance getting in/out of car</td>
+                    <td><span class="checkbox" onclick="toggleCheck(this)"></span></td>
+                </tr>
+                
+                <!-- 5 DAYS BEFORE SURGERY -->
+                <tr class="timeline-group">
+                    <td colspan="6"><strong>5 DAYS BEFORE SURGERY</strong></td>
+                </tr>
+                <tr class="category-medical">
+                    <td>5 Days Before</td>
+                    <td>Medical Prep</td>
+                    <td>Start Mupirocin antibiotic ointment in nostrils 2x daily</td>
+                    <td></td>
+                    <td>Prescription sent to pharmacy - continue through surgery morning</td>
+                    <td><span class="checkbox" onclick="toggleCheck(this)"></span></td>
+                </tr>
+                <tr class="category-medical">
+                    <td>5 Days Before</td>
+                    <td>Medical Prep</td>
+                    <td>Start Hibiclens soap daily washing</td>
+                    <td></td>
+                    <td>Wash neck down emphasizing operative site - avoid face/genitals</td>
+                    <td><span class="checkbox" onclick="toggleCheck(this)"></span></td>
+                </tr>
+                <tr class="category-medical">
+                    <td>5 Days Before</td>
+                    <td>Medical Prep</td>
+                    <td>Complete pre-op lab work if needed</td>
+                    <td>Family/Friends</td>
+                    <td>2nd Floor Geisel Pavilion</td>
+                    <td><span class="checkbox" onclick="toggleCheck(this)"></span></td>
+                </tr>
+                <tr class="category-shopping">
+                    <td>5 Days Before</td>
+                    <td>Shopping</td>
+                    <td>Pick up post-surgery medications from pharmacy</td>
+                    <td>Family/Friends</td>
+                    <td>Oxycodone Celebrex Dexamethasone Acetaminophen</td>
+                    <td><span class="checkbox" onclick="toggleCheck(this)"></span></td>
+                </tr>
+                <tr class="category-technology">
+                    <td>5 Days Before</td>
+                    <td>Technology</td>
+                    <td>Backup and reset phone</td>
+                    <td>Family/Friends</td>
+                    <td>Prepare for surgery day and recovery period</td>
+                    <td><span class="checkbox" onclick="toggleCheck(this)"></span></td>
+                </tr>
+                <tr class="category-administrative">
+                    <td>5 Days Before</td>
+                    <td>Administrative</td>
+                    <td>Submit RAT (if work-related)</td>
+                    <td></td>
+                    <td>Complete before surgery</td>
+                    <td><span class="checkbox" onclick="toggleCheck(this)"></span></td>
+                </tr>
+                <tr class="category-home">
+                    <td>5 Days Before</td>
+                    <td>Home Prep</td>
+                    <td>Create calendar entries for pre/post-op care steps</td>
+                    <td>Family/Friends</td>
+                    <td>Set medication and care reminders</td>
+                    <td><span class="checkbox" onclick="toggleCheck(this)"></span></td>
+                </tr>
+
+                <!-- 4 DAYS BEFORE SURGERY -->
+                <tr class="timeline-group">
+                    <td colspan="6"><strong>4 DAYS BEFORE SURGERY</strong></td>
+                </tr>
+                <tr class="category-medical">
+                    <td>4 Days Before</td>
+                    <td>Medical Prep</td>
+                    <td>Continue medication restrictions</td>
+                    <td></td>
+                    <td>No ibuprofen/NSAIDs except Tylenol</td>
+                    <td><span class="checkbox" onclick="toggleCheck(this)"></span></td>
+                </tr>
+                <tr class="category-home">
+                    <td>4 Days Before</td>
+                    <td>Home Prep</td>
+                    <td>Set up recovery area</td>
+                    <td>Family/Friends</td>
+                    <td>Comfortable chair with leg elevation well-supported</td>
+                    <td><span class="checkbox" onclick="toggleCheck(this)"></span></td>
+                </tr>
+                <tr class="category-shopping">
+                    <td>4 Days Before</td>
+                    <td>Shopping</td>
+                    <td>Stock up on groceries and easy meals</td>
+                    <td>Family/Friends</td>
+                    <td>Focus on anti-inflammatory foods</td>
+                    <td><span class="checkbox" onclick="toggleCheck(this)"></span></td>
+                </tr>
+
+                <!-- 3 DAYS BEFORE SURGERY -->
+                <tr class="timeline-group">
+                    <td colspan="6"><strong>3 DAYS BEFORE SURGERY</strong></td>
+                </tr>
+                <tr class="category-medical">
+                    <td>3 Days Before</td>
+                    <td>Medical Prep</td>
+                    <td>Continue Hibiclens washing and Mupirocin</td>
+                    <td></td>
+                    <td>Daily routine</td>
+                    <td><span class="checkbox" onclick="toggleCheck(this)"></span></td>
+                </tr>
+                <tr class="category-supplies">
+                    <td>3 Days Before</td>
+                    <td>Supplies</td>
+                    <td>Gather wound care supplies</td>
+                    <td>Family/Friends</td>
+                    <td>Sterile gauze clean ace wrap bandages</td>
+                    <td><span class="checkbox" onclick="toggleCheck(this)"></span></td>
+                </tr>
+                <tr class="category-home">
+                    <td>3 Days Before</td>
+                    <td>Home Prep</td>
+                    <td>Prepare fresh bed linens and towels</td>
+                    <td>Family/Friends</td>
+                    <td>Change sheets after first Hibiclens wash</td>
+                    <td><span class="checkbox" onclick="toggleCheck(this)"></span></td>
+                </tr>
+                <tr class="category-personal">
+                    <td>3 Days Before</td>
+                    <td>Personal</td>
+                    <td>Get card/flowers for Cheri</td>
+                    <td></td>
+                    <td>Thank you gesture</td>
+                    <td><span class="checkbox" onclick="toggleCheck(this)"></span></td>
+                </tr>
+                <tr class="category-equipment">
+                    <td>3 Days Before</td>
+                    <td>Equipment</td>
+                    <td>Pimp cane/walker for comfort</td>
+                    <td>Family/Friends</td>
+                    <td>Make equipment more comfortable/personalized</td>
+                    <td><span class="checkbox" onclick="toggleCheck(this)"></span></td>
+                </tr>
+                <tr class="category-equipment">
+                    <td>3 Days Before</td>
+                    <td>Equipment</td>
+                    <td>Make cane clink less if using</td>
+                    <td>Family/Friends</td>
+                    <td>Noise reduction modifications</td>
+                    <td><span class="checkbox" onclick="toggleCheck(this)"></span></td>
+                </tr>
+
+                <!-- 2 DAYS BEFORE SURGERY -->
+                <tr class="timeline-group">
+                    <td colspan="6"><strong>2 DAYS BEFORE SURGERY</strong></td>
+                </tr>
+                <tr class="category-medical">
+                    <td>2 Days Before</td>
+                    <td>Medical Prep</td>
+                    <td>Start Tylenol 1000mg 2x daily</td>
+                    <td></td>
+                    <td>Pre-surgery pain management</td>
+                    <td><span class="checkbox" onclick="toggleCheck(this)"></span></td>
+                </tr>
+                <tr class="category-medical">
+                    <td>2 Days Before</td>
+                    <td>Medical Prep</td>
+                    <td>Start Celebrex 200mg 2x daily</td>
+                    <td></td>
+                    <td>Anti-inflammatory preparation</td>
+                    <td><span class="checkbox" onclick="toggleCheck(this)"></span></td>
+                </tr>
+                <tr class="category-administrative">
+                    <td>2 Days Before</td>
+                    <td>Hospital Prep</td>
+                    <td>Pack hospital bag</td>
+                    <td>Family/Friends</td>
+                    <td>ID insurance meds toiletries comfortable clothes</td>
+                    <td><span class="checkbox" onclick="toggleCheck(this)"></span></td>
+                </tr>
+                <tr class="category-transportation">
+                    <td>2 Days Before</td>
+                    <td>Transportation</td>
+                    <td>Confirm surgery day transportation</td>
+                    <td></td>
+                    <td>Double-check pickup time and contact info</td>
+                    <td><span class="checkbox" onclick="toggleCheck(this)"></span></td>
+                </tr>
+
+                <!-- 1 DAY BEFORE SURGERY -->
+                <tr class="timeline-group">
+                    <td colspan="6"><strong>1 DAY BEFORE SURGERY</strong></td>
+                </tr>
+                <tr class="category-medical">
+                    <td>1 Day Before</td>
+                    <td>Medical Prep</td>
+                    <td>Continue medication routine</td>
+                    <td></td>
+                    <td>Tylenol Celebrex Hibiclens Mupirocin</td>
+                    <td><span class="checkbox" onclick="toggleCheck(this)"></span></td>
+                </tr>
+                <tr class="category-medical">
+                    <td>1 Day Before</td>
+                    <td>Medical Prep</td>
+                    <td>Follow fasting instructions</td>
+                    <td></td>
+                    <td>Nothing to eat/drink after midnight</td>
+                    <td><span class="checkbox" onclick="toggleCheck(this)"></span></td>
+                </tr>
+                <tr class="category-medical">
+                    <td>1 Day Before</td>
+                    <td>Medical Prep</td>
+                    <td>Final Hibiclens shower</td>
+                    <td></td>
+                    <td>No lotions powders deodorant perfume hair products makeup after</td>
+                    <td><span class="checkbox" onclick="toggleCheck(this)"></span></td>
+                </tr>
+
+                <!-- SURGERY DAY -->
+                <tr class="timeline-group">
+                    <td colspan="6"><strong>SURGERY DAY</strong></td>
+                </tr>
+                <tr class="category-medical">
+                    <td>Surgery Day</td>
+                    <td>Medical Prep</td>
+                    <td>Apply Mupirocin one final time before leaving</td>
+                    <td></td>
+                    <td>Morning application</td>
+                    <td><span class="checkbox" onclick="toggleCheck(this)"></span></td>
+                </tr>
+                <tr class="category-transportation">
+                    <td>Surgery Day</td>
+                    <td>Transportation</td>
+                    <td>Ride to hospital</td>
+                    <td>Family/Friends</td>
+                    <td>Arrive by 7:30am check-in time</td>
+                    <td><span class="checkbox" onclick="toggleCheck(this)"></span></td>
+                </tr>
+                <tr class="category-daily">
+                    <td>Surgery Day</td>
+                    <td>Medical Support</td>
+                    <td>Surgery companion/advocate</td>
+                    <td>Family/Friends</td>
+                    <td>Someone to receive updates and drive you home</td>
+                    <td><span class="checkbox" onclick="toggleCheck(this)"></span></td>
+                </tr>
+
+                <!-- DAY 1 POST-OP -->
+                <tr class="timeline-group">
+                    <td colspan="6"><strong>DAY 1 POST-OP</strong></td>
+                </tr>
+                <tr class="category-medical">
+                    <td>Day 1 Post-Op</td>
+                    <td>Medical Care</td>
+                    <td>Start post-surgery medications as prescribed</td>
+                    <td>Family/Friends</td>
+                    <td>Oxycodone Celebrex Dexamethasone Acetaminophen</td>
+                    <td><span class="checkbox" onclick="toggleCheck(this)"></span></td>
+                </tr>
+                <tr class="category-medical">
+                    <td>Day 1 Post-Op</td>
+                    <td>Medical Care</td>
+                    <td>Remove hospital bandage after 24 hours</td>
+                    <td>Family/Friends</td>
+                    <td>Leave incision open to air</td>
+                    <td><span class="checkbox" onclick="toggleCheck(this)"></span></td>
+                </tr>
+                <tr class="category-medical">
+                    <td>Day 1 Post-Op</td>
+                    <td>Medical Care</td>
+                    <td>Ice hip 5-10 times daily for 20 minutes</td>
+                    <td>Family/Friends</td>
+                    <td>Wrap ice pack in towel - any cold item works</td>
+                    <td><span class="checkbox" onclick="toggleCheck(this)"></span></td>
+                </tr>
+                <tr class="category-recovery">
+                    <td>Day 1 Post-Op</td>
+                    <td>Recovery</td>
+                    <td>Begin short frequent walks</td>
+                    <td>Family/Friends</td>
+                    <td>Focus on range of motion</td>
+                    <td><span class="checkbox" onclick="toggleCheck(this)"></span></td>
+                </tr>
+                <tr class="category-daily">
+                    <td>Day 1 Post-Op</td>
+                    <td>Daily Support</td>
+                    <td>Help with meals and basic needs</td>
+                    <td>Family/Friends</td>
+                    <td>Limit sitting to 30-60 minute intervals</td>
+                    <td><span class="checkbox" onclick="toggleCheck(this)"></span></td>
+                </tr>
+                <tr class="category-equipment">
+                    <td>Day 1 Post-Op</td>
+                    <td>Medical Equipment</td>
+                    <td>Set up Game Ready if ordered</td>
+                    <td>Family/Friends</td>
+                    <td>Follow training instructions</td>
+                    <td><span class="checkbox" onclick="toggleCheck(this)"></span></td>
+                </tr>
+
+                <!-- DAYS 2-7 POST-OP -->
+                <tr class="timeline-group">
+                    <td colspan="6"><strong>DAYS 2-7 POST-OP</strong></td>
+                </tr>
+                <tr class="category-medical">
+                    <td>Days 2-7 Post-Op</td>
+                    <td>Medical Care</td>
+                    <td>Keep incision covered in shower</td>
+                    <td>Family/Friends</td>
+                    <td>Use waterproof bandage or plastic wrap</td>
+                    <td><span class="checkbox" onclick="toggleCheck(this)"></span></td>
+                </tr>
+                <tr class="category-medical">
+                    <td>Days 2-7 Post-Op</td>
+                    <td>Medical Care</td>
+                    <td>Continue icing routine</td>
+                    <td>Family/Friends</td>
+                    <td>5-10 times daily for 20 minutes</td>
+                    <td><span class="checkbox" onclick="toggleCheck(this)"></span></td>
+                </tr>
+                <tr class="category-recovery">
+                    <td>Days 2-7 Post-Op</td>
+                    <td>Recovery</td>
+                    <td>Physical therapy sessions</td>
+                    <td>Family/Friends</td>
+                    <td>Home health PT 2-3 times per week</td>
+                    <td><span class="checkbox" onclick="toggleCheck(this)"></span></td>
+                </tr>
+                <tr class="category-daily">
+                    <td>Days 2-7 Post-Op</td>
+                    <td>Daily Support</td>
+                    <td>Help with bathing/showering</td>
+                    <td>Family/Friends</td>
+                    <td>Assistance getting in/out and safety</td>
+                    <td><span class="checkbox" onclick="toggleCheck(this)"></span></td>
+                </tr>
+                <tr class="category-daily">
+                    <td>Days 2-7 Post-Op</td>
+                    <td>Daily Support</td>
+                    <td>Meal preparation and delivery</td>
+                    <td>Family/Friends</td>
+                    <td>Easy nutritious meals</td>
+                    <td><span class="checkbox" onclick="toggleCheck(this)"></span></td>
+                </tr>
+                <tr class="category-daily">
+                    <td>Days 2-7 Post-Op</td>
+                    <td>Daily Support</td>
+                    <td>Help with laundry and cleaning</td>
+                    <td>Family/Friends</td>
+                    <td>Reduce physical strain</td>
+                    <td><span class="checkbox" onclick="toggleCheck(this)"></span></td>
+                </tr>
+                <tr class="category-daily">
+                    <td>Days 2-7 Post-Op</td>
+                    <td>Daily Support</td>
+                    <td>Medication reminders</td>
+                    <td>Family/Friends</td>
+                    <td>Proper timing and dosages</td>
+                    <td><span class="checkbox" onclick="toggleCheck(this)"></span></td>
+                </tr>
+
+                <!-- WEEK 2 POST-OP -->
+                <tr class="timeline-group">
+                    <td colspan="6"><strong>WEEK 2 POST-OP</strong></td>
+                </tr>
+                <tr class="category-medical">
+                    <td>Week 2 Post-Op</td>
+                    <td>Medical Care</td>
+                    <td>Remove steri-strips after 2 weeks</td>
+                    <td>Family/Friends</td>
+                    <td>Incision care</td>
+                    <td><span class="checkbox" onclick="toggleCheck(this)"></span></td>
+                </tr>
+                <tr class="category-medical">
+                    <td>Week 2 Post-Op</td>
+                    <td>Medical Care</td>
+                    <td>May shower normally after day 7</td>
+                    <td></td>
+                    <td>Incision can get wet but no soaking</td>
+                    <td><span class="checkbox" onclick="toggleCheck(this)"></span></td>
+                </tr>
+                <tr class="category-recovery">
+                    <td>Week 2 Post-Op</td>
+                    <td>Recovery</td>
+                    <td>Continue physical therapy</td>
+                    <td>Family/Friends</td>
+                    <td>Home health PT then transition to outpatient</td>
+                    <td><span class="checkbox" onclick="toggleCheck(this)"></span></td>
+                </tr>
+                <tr class="category-daily">
+                    <td>Week 2 Post-Op</td>
+                    <td>Daily Support</td>
+                    <td>Grocery shopping and errands</td>
+                    <td>Family/Friends</td>
+                    <td>Bank post office prescriptions</td>
+                    <td><span class="checkbox" onclick="toggleCheck(this)"></span></td>
+                </tr>
+                <tr class="category-recovery">
+                    <td>Week 2 Post-Op</td>
+                    <td>Recovery</td>
+                    <td>May try stationary bike if can safely get on/off</td>
+                    <td></td>
+                    <td>Low resistance at 3-4 weeks</td>
+                    <td><span class="checkbox" onclick="toggleCheck(this)"></span></td>
+                </tr>
+                <tr class="category-technology">
+                    <td>Week 2 Post-Op</td>
+                    <td>Technology</td>
+                    <td>Teach Snick how to add media to JumpFlix</td>
+                    <td>Family/Friends</td>
+                    <td>Delegate entertainment management</td>
+                    <td><span class="checkbox" onclick="toggleCheck(this)"></span></td>
+                </tr>
+                <tr class="category-projects">
+                    <td>Week 2 Post-Op</td>
+                    <td>Home Projects</td>
+                    <td>Work on mini-build for suitcase-sized BAP booth</td>
+                    <td></td>
+                    <td>Light construction as tolerated</td>
+                    <td><span class="checkbox" onclick="toggleCheck(this)"></span></td>
+                </tr>
+
+                <!-- WEEK 3-4 POST-OP -->
+                <tr class="timeline-group">
+                    <td colspan="6"><strong>WEEK 3-4 POST-OP</strong></td>
+                </tr>
+                <tr class="category-medical">
+                    <td>Week 3-4 Post-Op</td>
+                    <td>Medical Care</td>
+                    <td>Begin weaning off opioids</td>
+                    <td>Family/Friends</td>
+                    <td>Goal to be off narcotics by 1 month</td>
+                    <td><span class="checkbox" onclick="toggleCheck(this)"></span></td>
+                </tr>
+                <tr class="category-recovery">
+                    <td>Week 3-4 Post-Op</td>
+                    <td>Recovery</td>
+                    <td>Transition from walker to cane if ready</td>
+                    <td></td>
+                    <td>When feeling safe and steady</td>
+                    <td><span class="checkbox" onclick="toggleCheck(this)"></span></td>
+                </tr>
+                <tr class="category-activity">
+                    <td>Week 3-4 Post-Op</td>
+                    <td>Recovery</td>
+                    <td>May begin swimming once incision healed</td>
+                    <td></td>
+                    <td>Around 4-5 weeks</td>
+                    <td><span class="checkbox" onclick="toggleCheck(this)"></span></td>
+                </tr>
+                <tr class="category-transportation">
+                    <td>Week 3-4 Post-Op</td>
+                    <td>Transportation</td>
+                    <td>May resume driving</td>
+                    <td></td>
+                    <td>When off narcotics and not using walker</td>
+                    <td><span class="checkbox" onclick="toggleCheck(this)"></span></td>
+                </tr>
+
+                <!-- WEEK 4-6 POST-OP -->
+                <tr class="timeline-group">
+                    <td colspan="6"><strong>WEEK 4-6 POST-OP</strong></td>
+                </tr>
+                <tr class="category-medical">
+                    <td>Week 4-6 Post-Op</td>
+                    <td>Medical Care</td>
+                    <td>Continue outpatient physical therapy</td>
+                    <td>Family/Friends</td>
+                    <td>3-4 weeks of outpatient PT</td>
+                    <td><span class="checkbox" onclick="toggleCheck(this)"></span></td>
+                </tr>
+                <tr class="category-recovery">
+                    <td>Week 4-6 Post-Op</td>
+                    <td>Recovery</td>
+                    <td>Gradually increase activity</td>
+                    <td></td>
+                    <td>Short frequent walks</td>
+                    <td><span class="checkbox" onclick="toggleCheck(this)"></span></td>
+                </tr>
+
+                <!-- WEEK 8-12 POST-OP -->
+                <tr class="timeline-group">
+                    <td colspan="6"><strong>WEEK 8-12 POST-OP</strong></td>
+                </tr>
+                <tr class="category-activity">
+                    <td>Week 8-12 Post-Op</td>
+                    <td>Recovery</td>
+                    <td>May resume golfing hiking dancing</td>
+                    <td></td>
+                    <td>Higher impact activities</td>
+                    <td><span class="checkbox" onclick="toggleCheck(this)"></span></td>
+                </tr>
+                <tr class="category-projects">
+                    <td>Week 8-12 Post-Op</td>
+                    <td>Home Projects</td>
+                    <td>Install tin can doorbell if desired</td>
+                    <td></td>
+                    <td>Fun project for later recovery</td>
+                    <td><span class="checkbox" onclick="toggleCheck(this)"></span></td>
+                </tr>
+                <tr class="category-projects">
+                    <td>Week 8-12 Post-Op</td>
+                    <td>Home Projects</td>
+                    <td>Make ixi frame awesome</td>
+                    <td></td>
+                    <td>Creative project when feeling better</td>
+                    <td><span class="checkbox" onclick="toggleCheck(this)"></span></td>
+                </tr>
+                <tr class="category-projects">
+                    <td>Week 8-12 Post-Op</td>
+                    <td>Home Projects</td>
+                    <td>Consider remote blinds installation</td>
+                    <td></td>
+                    <td>Home improvement project</td>
+                    <td><span class="checkbox" onclick="toggleCheck(this)"></span></td>
+                </tr>
+
+                <!-- FOLLOW-UP VISIT -->
+                <tr class="timeline-group">
+                    <td colspan="6"><strong>FOLLOW-UP VISIT</strong></td>
+                </tr>
+                <tr class="category-medical">
+                    <td>Follow-up Visit</td>
+                    <td>Medical Care</td>
+                    <td>Post-op appointment with Dr. Wilde</td>
+                    <td>Family/Friends</td>
+                    <td>10/07/25 at 10:00am - Mission Valley office</td>
+                    <td><span class="checkbox" onclick="toggleCheck(this)"></span></td>
+                </tr>
+                <tr class="category-medical">
+                    <td>Follow-up Visit</td>
+                    <td>Medical Care</td>
+                    <td>Post-op X-ray</td>
+                    <td>Family/Friends</td>
+                    <td>Same day as follow-up visit</td>
+                    <td><span class="checkbox" onclick="toggleCheck(this)"></span></td>
+                </tr>
+
+                <!-- ONGOING -->
+                <tr class="timeline-group">
+                    <td colspan="6"><strong>ONGOING</strong></td>
+                </tr>
+                <tr class="category-emergency">
+                    <td>Ongoing</td>
+                    <td>Emergency</td>
+                    <td>Contact office for incision drainage or openings</td>
+                    <td></td>
+                    <td>Phone or MyScripps Portal message</td>
+                    <td><span class="checkbox" onclick="toggleCheck(this)"></span></td>
+                </tr>
+                <tr class="category-emergency">
+                    <td>Ongoing</td>
+                    <td>Medical Alert</td>
+                    <td>Watch for signs of infection</td>
+                    <td>Family/Friends</td>
+                    <td>Fever increased pain drainage unusual swelling</td>
+                    <td><span class="checkbox" onclick="toggleCheck(this)"></span></td>
+                </tr>
+                <tr class="category-activity">
+                    <td>Ongoing</td>
+                    <td>Activity</td>
+                    <td>Avoid high-impact activities long-term</td>
+                    <td></td>
+                    <td>Tennis running to prevent implant loosening</td>
+                    <td><span class="checkbox" onclick="toggleCheck(this)"></span></td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <div class="instructions">
+            <h3>📝 How to Use This Schedule</h3>
+            <ul>
+                <li><strong>Check off tasks</strong> as you complete them using the ✓ column</li>
+                <li><strong>Coordinate with helpers</strong> using the "Who Can Help" column</li>
+                <li><strong>Use filters</strong> to focus on specific time periods or categories</li>
+                <li><strong>Share this page</strong> with your support team for coordination</li>
+            </ul>
+        </div>
+
+        <div class="contact-box">
+            <h3>📞 Important Contacts</h3>
+            <p><strong>Dr. Jeffrey Wilde:</strong> (858) 554-7993</p>
+            <p><strong>Game Ready (Amy Weiner):</strong> (619) 823-2691</p>
+            <p><strong>Luna PT:</strong> (619) 966-3822</p>
+        </div>
+    </div>
+
+    <script>
+        function toggleCheck(element) {
+            element.classList.toggle('checked');
+        }
+        
+        function filterTasks(filter) {
+            const table = document.getElementById('scheduleTable');
+            const rows = table.getElementsByTagName('tr');
+            const buttons = document.getElementsByClassName('filter-btn');
+            
+            // Update active button
+            for (let btn of buttons) {
+                btn.classList.remove('active');
+            }
+            event.target.classList.add('active');
+            
+            // Show/hide rows based on filter
+            for (let i = 1; i < rows.length; i++) { // Skip header row
+                const row = rows[i];
+                const timeline = row.cells[0]?.textContent || '';
+                const category = row.cells[1]?.textContent || '';
+                const whoCanHelp = row.cells[3]?.textContent || '';
+                
+                let show = true;
+                
+                if (filter === 'pre-surgery') {
+                    show = timeline.includes('Before') || timeline.includes('Day Before');
+                } else if (filter === 'surgery-day') {
+                    show = timeline.includes('Surgery Day');
+                } else if (filter === 'post-surgery') {
+                    show = timeline.includes('Post-Op') || timeline.includes('Week') || timeline.includes('Follow-up') || timeline.includes('Ongoing');
+                } else if (filter === 'medical') {
+                    show = category.includes('Medical') || category.includes('Recovery');
+                } else if (filter === 'support-needed') {
+                    show = whoCanHelp.includes('Family') || whoCanHelp.includes('Friends') || whoCanHelp.length > 0;
+                }
+                
+                row.style.display = show ? '' : 'none';
+            }
+        }
+    </script>
+</body>
+</html>

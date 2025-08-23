@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Friends & Family Support List - Jump Hip</title>
+    <link rel="stylesheet" href="../assets/dark-theme.css">
+    <style>
+        .support-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 1.5rem;
+            margin: 1rem 0;
+        }
+        
+        .support-category {
+            background: #161b22;
+            border-radius: 8px;
+            border: 1px solid #30363d;
+            padding: 1.5rem;
+            border-left: 4px solid #ff69b4;
+        }
+        
+        .category-header {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #ff69b4;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .support-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            background: #0d1117;
+            border-radius: 6px;
+            border: 1px solid #30363d;
+            transition: all 0.2s ease;
+        }
+        
+        .support-item:hover {
+            border-color: #ff69b4;
+            background: #161b22;
+        }
+        
+        .need-text {
+            color: #e9ecef;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+        
+        .helper-section {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .helper-input {
+            background: #30363d;
+            border: 1px solid #ff69b4;
+            border-radius: 4px;
+            padding: 0.5rem;
+            color: #e9ecef;
+            font-size: 0.9em;
+        }
+        
+        .helper-input:focus {
+            outline: none;
+            border-color: #ffb3da;
+            background: #21262d;
+        }
+        
+        .helper-input::placeholder {
+            color: #6b7280;
+        }
+        
+        .notes-input {
+            background: #30363d;
+            border: 1px solid #6b7280;
+            border-radius: 4px;
+            padding: 0.5rem;
+            color: #e9ecef;
+            font-size: 0.85em;
+            min-height: 60px;
+            resize: vertical;
+        }
+        
+        .notes-input:focus {
+            outline: none;
+            border-color: #ff69b4;
+            background: #21262d;
+        }
+        
+        .assigned {
+            border-left-color: #28a745 !important;
+        }
+        
+        .assigned .helper-input {
+            border-color: #28a745;
+            background: #0f2419;
+        }
+        
+        .urgent {
+            border-left-color: #ff1a8c !important;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+            margin: 1rem 0;
+            flex-wrap: wrap;
+        }
+        
+        .action-btn {
+            padding: 0.5rem 1rem;
+            background: #30363d;
+            color: #e9ecef;
+            border: 1px solid #ff69b4;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .action-btn:hover {
+            background: #ff69b4;
+            color: white;
+        }
+        
+        .contact-section {
+            background: #161b22;
+            border-radius: 8px;
+            border: 1px solid #30363d;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+        }
+        
+        .contact-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem;
+            border-bottom: 1px solid #30363d;
+        }
+        
+        .contact-item:last-child {
+            border-bottom: none;
+        }
+        
+        .contact-name {
+            font-weight: 500;
+            color: #ff69b4;
+        }
+        
+        .contact-info {
+            color: #e9ecef;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="nav">
+        <a href="../index.html">← Back to Main Index</a>
+    </div>
+
+    <div class="header">
+        <h1>👥 Friends & Family Support Coordination</h1>
+    </div>
+
+    <div class="content">
+        <p>Use this page to coordinate support from friends and family during your surgery and recovery. Fill in who can help with each task and any special notes or timing.</p>
+        
+        <div class="action-buttons">
+            <button class="action-btn" onclick="clearAll()">Clear All</button>
+            <button class="action-btn" onclick="printPage()">Print/Save PDF</button>
+            <button class="action-btn" onclick="exportData()">Export Data</button>
+            <a href="../surgery-support-schedule.html" class="action-btn">View Full Schedule</a>
+        </div>
+
+        <div class="support-grid">
+            <!-- Transportation & Medical -->
+            <div class="support-category">
+                <div class="category-header">
+                    🚗 Transportation & Medical
+                </div>
+                
+                <div class="support-item urgent">
+                    <div class="need-text">Ride to hospital (Surgery Day - 7:30am check-in)</div>
+                    <div class="helper-section">
+                        <input type="text" class="helper-input" placeholder="Who can help?" onchange="markAssigned(this)">
+                        <textarea class="notes-input" placeholder="Contact info, backup plans, special instructions..."></textarea>
+                    </div>
+                </div>
+                
+                <div class="support-item urgent">
+                    <div class="need-text">Ride home from hospital</div>
+                    <div class="helper-section">
+                        <input type="text" class="helper-input" placeholder="Who can help?" onchange="markAssigned(this)">
+                        <textarea class="notes-input" placeholder="May need help getting in/out of car..."></textarea>
+                    </div>
+                </div>
+                
+                <div class="support-item">
+                    <div class="need-text">Rides to follow-up appointments</div>
+                    <div class="helper-section">
+                        <input type="text" class="helper-input" placeholder="Who can help?" onchange="markAssigned(this)">
+                        <textarea class="notes-input" placeholder="First appointment: Oct 7, 2025 at 10:00am..."></textarea>
+                    </div>
+                </div>
+                
+                <div class="support-item">
+                    <div class="need-text">Help with wound care (changing dressings)</div>
+                    <div class="helper-section">
+                        <input type="text" class="helper-input" placeholder="Who can help?" onchange="markAssigned(this)">
+                        <textarea class="notes-input" placeholder="May need assistance first few days..."></textarea>
+                    </div>
+                </div>
+                
+                <div class="support-item">
+                    <div class="need-text">Help arranging/communicating with home health/outpatient PT</div>
+                    <div class="helper-section">
+                        <input type="text" class="helper-input" placeholder="Who can help?" onchange="markAssigned(this)">
+                        <textarea class="notes-input" placeholder="Luna PT: (619) 966-3822..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Daily Care & Personal -->
+            <div class="support-category">
+                <div class="category-header">
+                    🏠 Daily Care & Personal
+                </div>
+                
+                <div class="support-item">
+                    <div class="need-text">Help with bathing/showering</div>
+                    <div class="helper-section">
+                        <input type="text" class="helper-input" placeholder="Who can help?" onchange="markAssigned(this)">
+                        <textarea class="notes-input" placeholder="First week - assistance getting in/out safely..."></textarea>
+                    </div>
+                </div>
+                
+                <div class="support-item">
+                    <div class="need-text">Meal prep or delivery (first week)</div>
+                    <div class="helper-section">
+                        <input type="text" class="helper-input" placeholder="Who can help?" onchange="markAssigned(this)">
+                        <textarea class="notes-input" placeholder="Focus on anti-inflammatory foods, easy to prepare..."></textarea>
+                    </div>
+                </div>
+                
+                <div class="support-item">
+                    <div class="need-text">Help with laundry</div>
+                    <div class="helper-section">
+                        <input type="text" class="helper-input" placeholder="Who can help?" onchange="markAssigned(this)">
+                        <textarea class="notes-input" placeholder="Weekly or as needed..."></textarea>
+                    </div>
+                </div>
+                
+                <div class="support-item">
+                    <div class="need-text">Help with cleaning</div>
+                    <div class="helper-section">
+                        <input type="text" class="helper-input" placeholder="Who can help?" onchange="markAssigned(this)">
+                        <textarea class="notes-input" placeholder="Light housekeeping, reduce physical strain..."></textarea>
+                    </div>
+                </div>
+                
+                <div class="support-item">
+                    <div class="need-text">Companionship/check-ins</div>
+                    <div class="helper-section">
+                        <input type="text" class="helper-input" placeholder="Who can help?" onchange="markAssigned(this)">
+                        <textarea class="notes-input" placeholder="Daily or regular visits/calls..."></textarea>
+                    </div>
+                </div>
+                
+                <div class="support-item">
+                    <div class="need-text">Reminders for medication schedule</div>
+                    <div class="helper-section">
+                        <input type="text" class="helper-input" placeholder="Who can help?" onchange="markAssigned(this)">
+                        <textarea class="notes-input" placeholder="Especially important first few weeks..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Errands & Shopping -->
+            <div class="support-category">
+                <div class="category-header">
+                    🛒 Errands & Shopping
+                </div>
+                
+                <div class="support-item">
+                    <div class="need-text">Grocery shopping</div>
+                    <div class="helper-section">
+                        <input type="text" class="helper-input" placeholder="Who can help?" onchange="markAssigned(this)">
+                        <textarea class="notes-input" placeholder="Weekly shopping, specific dietary needs..."></textarea>
+                    </div>
+                </div>
+                
+                <div class="support-item">
+                    <div class="need-text">Picking up prescriptions</div>
+                    <div class="helper-section">
+                        <input type="text" class="helper-input" placeholder="Who can help?" onchange="markAssigned(this)">
+                        <textarea class="notes-input" placeholder="Initial pickup and refills..."></textarea>
+                    </div>
+                </div>
+                
+                <div class="support-item">
+                    <div class="need-text">Help with errands (bank, post office, etc.)</div>
+                    <div class="helper-section">
+                        <input type="text" class="helper-input" placeholder="Who can help?" onchange="markAssigned(this)">
+                        <textarea class="notes-input" placeholder="As needed during recovery..."></textarea>
+                    </div>
+                </div>
+                
+                <div class="support-item">
+                    <div class="need-text">Help with mail/packages</div>
+                    <div class="helper-section">
+                        <input type="text" class="helper-input" placeholder="Who can help?" onchange="markAssigned(this)">
+                        <textarea class="notes-input" placeholder="Daily mail pickup, package receiving..."></textarea>
+                    </div>
+                </div>
+                
+                <div class="support-item">
+                    <div class="need-text">Trash/recycling out</div>
+                    <div class="helper-section">
+                        <input type="text" class="helper-input" placeholder="Who can help?" onchange="markAssigned(this)">
+                        <textarea class="notes-input" placeholder="Weekly trash day..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Equipment & Recovery -->
+            <div class="support-category">
+                <div class="category-header">
+                    🛠️ Equipment & Recovery
+                </div>
+                
+                <div class="support-item">
+                    <div class="need-text">Setting up/adjusting medical equipment (walker, cane, shower chair)</div>
+                    <div class="helper-section">
+                        <input type="text" class="helper-input" placeholder="Who can help?" onchange="markAssigned(this)">
+                        <textarea class="notes-input" placeholder="Initial setup and ongoing adjustments..."></textarea>
+                    </div>
+                </div>
+                
+                <div class="support-item">
+                    <div class="need-text">Help with setting up Game Ready/cold therapy devices</div>
+                    <div class="helper-section">
+                        <input type="text" class="helper-input" placeholder="Who can help?" onchange="markAssigned(this)">
+                        <textarea class="notes-input" placeholder="Amy Weiner training: (619) 823-2691..."></textarea>
+                    </div>
+                </div>
+                
+                <div class="support-item">
+                    <div class="need-text">Help with physical therapy exercises at home</div>
+                    <div class="helper-section">
+                        <input type="text" class="helper-input" placeholder="Who can help?" onchange="markAssigned(this)">
+                        <textarea class="notes-input" placeholder="Encouragement and assistance with PT..."></textarea>
+                    </div>
+                </div>
+                
+                <div class="support-item">
+                    <div class="need-text">Help with meal planning for special dietary needs</div>
+                    <div class="helper-section">
+                        <input type="text" class="helper-input" placeholder="Who can help?" onchange="markAssigned(this)">
+                        <textarea class="notes-input" placeholder="Anti-inflammatory diet, nutrition during recovery..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pet & Child Care -->
+            <div class="support-category">
+                <div class="category-header">
+                    🐕 Pet & Family Care
+                </div>
+                
+                <div class="support-item">
+                    <div class="need-text">Pet care (feeding/walking)</div>
+                    <div class="helper-section">
+                        <input type="text" class="helper-input" placeholder="Who can help?" onchange="markAssigned(this)">
+                        <textarea class="notes-input" placeholder="Daily care needs, schedule..."></textarea>
+                    </div>
+                </div>
+                
+                <div class="support-item">
+                    <div class="need-text">Child care</div>
+                    <div class="helper-section">
+                        <input type="text" class="helper-input" placeholder="Who can help?" onchange="markAssigned(this)">
+                        <textarea class="notes-input" placeholder="If applicable, scheduling needs..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Additional Support -->
+            <div class="support-category">
+                <div class="category-header">
+                    ➕ Additional Support
+                </div>
+                
+                <div class="support-item">
+                    <div class="need-text">Other specific needs</div>
+                    <div class="helper-section">
+                        <input type="text" class="helper-input" placeholder="Who can help?" onchange="markAssigned(this)">
+                        <textarea class="notes-input" placeholder="Any additional support needs not listed above..."></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="contact-section">
+            <h3 style="color: #ff69b4; margin-bottom: 1rem;">📞 Key Contacts</h3>
+            <div class="contact-item">
+                <div class="contact-name">Dr. Jeffrey Wilde</div>
+                <div class="contact-info">(858) 554-7993</div>
+            </div>
+            <div class="contact-item">
+                <div class="contact-name">Game Ready (Amy Weiner)</div>
+                <div class="contact-info">(619) 823-2691</div>
+            </div>
+            <div class="contact-item">
+                <div class="contact-name">Luna PT</div>
+                <div class="contact-info">(619) 966-3822</div>
+            </div>
+            <div class="contact-item">
+                <div class="contact-name">Surgery Date</div>
+                <div class="contact-info">September 12, 2025 - 7:30am check-in</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function markAssigned(input) {
+            const supportItem = input.closest('.support-item');
+            if (input.value.trim()) {
+                supportItem.classList.add('assigned');
+            } else {
+                supportItem.classList.remove('assigned');
+            }
+        }
+        
+        function clearAll() {
+            if (confirm('Are you sure you want to clear all entries?')) {
+                document.querySelectorAll('.helper-input').forEach(input => {
+                    input.value = '';
+                    markAssigned(input);
+                });
+                document.querySelectorAll('.notes-input').forEach(textarea => {
+                    textarea.value = '';
+                });
+            }
+        }
+        
+        function printPage() {
+            window.print();
+        }
+        
+        function exportData() {
+            const data = [];
+            document.querySelectorAll('.support-item').forEach(item => {
+                const need = item.querySelector('.need-text').textContent;
+                const helper = item.querySelector('.helper-input').value;
+                const notes = item.querySelector('.notes-input').value;
+                data.push({need, helper, notes});
+            });
+            
+            const csvContent = "data:text/csv;charset=utf-8," 
+                + "Need,Who Can Help,Notes\n"
+                + data.map(row => `"${row.need}","${row.helper}","${row.notes}"`).join('\n');
+            
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "surgery_support_assignments.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+        
+        // Auto-save to localStorage
+        function saveData() {
+            const data = {};
+            document.querySelectorAll('.support-item').forEach((item, index) => {
+                data[index] = {
+                    helper: item.querySelector('.helper-input').value,
+                    notes: item.querySelector('.notes-input').value
+                };
+            });
+            localStorage.setItem('surgerySupport', JSON.stringify(data));
+        }
+        
+        function loadData() {
+            const savedData = localStorage.getItem('surgerySupport');
+            if (savedData) {
+                const data = JSON.parse(savedData);
+                document.querySelectorAll('.support-item').forEach((item, index) => {
+                    if (data[index]) {
+                        const helperInput = item.querySelector('.helper-input');
+                        const notesInput = item.querySelector('.notes-input');
+                        helperInput.value = data[index].helper || '';
+                        notesInput.value = data[index].notes || '';
+                        markAssigned(helperInput);
+                    }
+                });
+            }
+        }
+        
+        // Auto-save on input changes
+        document.addEventListener('input', function(e) {
+            if (e.target.matches('.helper-input') || e.target.matches('.notes-input')) {
+                saveData();
+                if (e.target.matches('.helper-input')) {
+                    markAssigned(e.target);
+                }
+            }
+        });
+        
+        // Load saved data on page load
+        loadData();
+    </script>
+</body>
+</html>

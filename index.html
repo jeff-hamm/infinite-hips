@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jump Hip - Surgery Documentation</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #e9ecef;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #0d1117;
+            background-image: 
+                radial-gradient(circle at 25% 25%, #ff007a20 0%, transparent 50%),
+                radial-gradient(circle at 75% 75%, #ff1a8c20 0%, transparent 50%);
+        }
+        .header {
+            background: linear-gradient(145deg, #4a4a4a 0%, #6c6c6c 100%);
+            color: #ff69b4;
+            padding: 2rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+            border: 1px solid #666666;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 2.5em;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        .header p {
+            margin: 0.5rem 0 0 0;
+            opacity: 0.95;
+            font-size: 1.1em;
+        }
+        .section {
+            background: linear-gradient(145deg, #161b22 0%, #1c2128 100%);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+            border: 1px solid #30363d;
+        }
+        .section h2 {
+            color: #ff69b4;
+            border-bottom: 2px solid #ff69b4;
+            padding-bottom: 0.5rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+        .doc-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+        }
+        .doc-card {
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 1rem;
+            background: linear-gradient(145deg, #0d1117 0%, #161b22 100%);
+            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+        }
+        .doc-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px rgba(255, 105, 180, 0.2);
+            border-color: #ff69b4;
+        }
+        .doc-card h3 {
+            margin: 0 0 0.5rem 0;
+            color: #f0f6fc;
+            font-weight: 600;
+        }
+        .doc-card p {
+            margin: 0 0 1rem 0;
+            color: #8b949e;
+            font-size: 0.9em;
+        }
+        .doc-links {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        .doc-links a {
+            padding: 0.4rem 0.8rem;
+            background: linear-gradient(135deg, #ff69b4 0%, #ff1a8c 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 0.8em;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            border: 1px solid rgba(255, 105, 180, 0.3);
+        }
+        .doc-links a:hover {
+            background: linear-gradient(135deg, #ff1a8c 0%, #ffb3da 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(255, 105, 180, 0.4);
+        }
+        .doc-links a.image {
+            background: linear-gradient(135deg, #ffb3da 0%, #ff69b4 100%);
+            border: 1px solid rgba(255, 179, 218, 0.3);
+        }
+        .doc-links a.image:hover {
+            background: linear-gradient(135deg, #ff69b4 0%, #ffb3da 100%);
+            box-shadow: 0 4px 12px rgba(255, 179, 218, 0.4);
+        }
+        .quick-links {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+        }
+        .quick-links a {
+            padding: 0.75rem 1.5rem;
+            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            border: 1px solid rgba(108, 117, 125, 0.3);
+        }
+        .quick-links a:hover {
+            background: linear-gradient(135deg, #495057 0%, #343a40 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(108, 117, 125, 0.3);
+        }
+        .timeline-note {
+            background: linear-gradient(145deg, #2d1b69 0%, #3d2b7a 100%);
+            border: 1px solid #6f42c1;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+            color: #e9ecef;
+        }
+        .timeline-note strong {
+            color: #ff69b4;
+        }
+        footer {
+            text-align: center; 
+            margin-top: 2rem; 
+            padding: 1rem; 
+            color: #8b949e; 
+            font-size: 0.9em;
+            border-top: 1px solid #30363d;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🦘 Jump Hip Surgery Documentation</h1>
+        <p>Hip Replacement Surgery with Dr. Jeffrey Wilde | Scripps Clinic | September 12, 2025</p>
+    </div>
+
+    <div class="section">
+        <h2>📋 Quick Access</h2>
+        <div class="quick-links">
+            <a href="docs/surgery-support-schedule.html">📅 Surgery Support Schedule</a>
+            <a href="docs/pre-surgery-checklist.html">✅ Pre-Surgery Checklist</a>
+            <a href="docs/friends-support-list.html">👥 Friends & Family Support</a>
+        </div>
+        <div class="timeline-note">
+            <strong>Surgery Date:</strong> September 12, 2025 at 7:30am | <strong>Location:</strong> Scripps Mission Valley, 7425 Mission Valley Rd, Suite 202, San Diego, CA 92108
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>📑 Pre-Operative Instructions</h2>
+        <div class="doc-grid">
+            <div class="doc-card">
+                <h3>🧼 Preoperative Skin Wash Protocol</h3>
+                <p>5-day antibacterial wash routine with Hibiclens before surgery</p>
+                <div class="doc-links">
+                    <a href="docs/preop-skin-wash.html">📄 Read Instructions</a>
+                    <a href="images/scan1_page1.jpg" class="image" target="_blank">🖼️ Source Image</a>
+                </div>
+            </div>
+            
+            <div class="doc-card">
+                <h3>🦠 MRSA/MSSA Screening Information</h3>
+                <p>Pre-surgical screening process and Mupirocin ointment instructions</p>
+                <div class="doc-links">
+                    <a href="docs/mrsa-screening.html">📄 Read Instructions</a>
+                    <a href="images/scan2_page1_20250822.jpg" class="image" target="_blank">🖼️ Source Image</a>
+                </div>
+            </div>
+            
+            <div class="doc-card">
+                <h3>📅 Surgery Schedule & Appointments</h3>
+                <p>Complete timeline of pre-op appointments and surgery details</p>
+                <div class="doc-links">
+                    <a href="docs/surgery-schedule.html">📄 View Schedule</a>
+                    <a href="images/scan3_page1_20250822.jpg" class="image" target="_blank">🖼️ Source Image</a>
+                </div>
+            </div>
+            
+            <div class="doc-card">
+                <h3>📋 Pre-Op Instructions & Timeline</h3>
+                <p>Detailed pre-operative preparation instructions and medication guidelines</p>
+                <div class="doc-links">
+                    <a href="docs/preop-instructions.html">📄 Read Instructions</a>
+                    <a href="images/scan2_page1.jpg" class="image" target="_blank">🖼️ Source Image</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>🏥 Post-Operative Care</h2>
+        <div class="doc-grid">
+            <div class="doc-card">
+                <h3>💊 Post-Surgery Medications</h3>
+                <p>Medication schedule including Oxycodone, Celebrex, and Dexamethasone</p>
+                <div class="doc-links">
+                    <a href="docs/postop-medications.html">📄 View Medications</a>
+                    <a href="images/scan5_page1_20250822.jpg" class="image" target="_blank">🖼️ Source Image</a>
+                </div>
+            </div>
+            
+            <div class="doc-card">
+                <h3>🚿 Incision Care & Activity Guidelines</h3>
+                <p>Wound care, bathing, icing, and activity progression instructions</p>
+                <div class="doc-links">
+                    <a href="docs/postop-care.html">📄 Read Guidelines</a>
+                    <a href="images/scan6_page1_20250822.jpg" class="image" target="_blank">🖼️ Source Image</a>
+                </div>
+            </div>
+            
+            <div class="doc-card">
+                <h3>🏃‍♂️ Physical Therapy & Recovery</h3>
+                <p>PT expectations, home health arrangements, and recovery milestones</p>
+                <div class="doc-links">
+                    <a href="docs/physical-therapy.html">📄 Read Guidelines</a>
+                    <a href="images/scan5_page1.jpg" class="image" target="_blank">🖼️ Source Image</a>
+                </div>
+            </div>
+            
+            <div class="doc-card">
+                <h3>💩 Constipation Management</h3>
+                <p>Diet recommendations and medication regimen for post-operative constipation</p>
+                <div class="doc-links">
+                    <a href="docs/constipation-care.html">📄 Read Guidelines</a>
+                    <a href="images/scan6_page1.jpg" class="image" target="_blank">🖼️ Source Image</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>⚕️ Medical Information</h2>
+        <div class="doc-grid">
+            <div class="doc-card">
+                <h3>💊 Opioid Education</h3>
+                <p>Important safety information about opioid use and addiction risks</p>
+                <div class="doc-links">
+                    <a href="docs/opioid-education.html">📄 Read Information</a>
+                    <a href="images/scan4_page1_20250822.jpg" class="image" target="_blank">🖼️ Source Image</a>
+                </div>
+            </div>
+            
+            <div class="doc-card">
+                <h3>🧊 Game Ready Cold Therapy</h3>
+                <p>Information about optional cold therapy equipment rental</p>
+                <div class="doc-links">
+                    <a href="docs/game-ready.html">📄 Read Information</a>
+                    <a href="images/scan4_page1.jpg" class="image" target="_blank">🖼️ Source Image</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>👨‍⚕️ Contact Information</h2>
+        <p><strong>Dr. Jeffrey Wilde, MD</strong><br>
+        Clinical Assistant Professor of Orthopedic Surgery<br>
+        Division Head, Section of Lower Extremity Reconstruction<br>
+        Scripps Clinic/Scripps Clinic Medical Group</p>
+        
+        <p><strong>Office:</strong> 10666 North Torrey Pines Rd, La Jolla, CA 92037<br>
+        <strong>Phone:</strong> (858) 554-7993<br>
+        <strong>Fax:</strong> (858) 554-6321</p>
+        
+        <p><strong>Game Ready Contact:</strong><br>
+        Amy Weiner: (619) 823-2691 | amy@therapedix.com</p>
+    </div>
+
+    <footer style="text-align: center; margin-top: 2rem; padding: 1rem; color: #8b949e; font-size: 0.9em; border-top: 1px solid #30363d;">
+        <p>Generated from surgery documentation scans | Last updated: August 22, 2025</p>
+    </footer>
+</body>
+</html>

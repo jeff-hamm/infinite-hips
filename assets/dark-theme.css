@@ -1,0 +1,250 @@
+/* Jump Hip - Dark Theme CSS */
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    line-height: 1.6;
+    color: #e9ecef;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #0d1117;
+    background-image: 
+        radial-gradient(circle at 25% 25%, #ff007a15 0%, transparent 50%),
+        radial-gradient(circle at 75% 75%, #ff1a8c15 0%, transparent 50%);
+}
+
+.header {
+    background: linear-gradient(145deg, #4a4a4a 0%, #6c6c6c 100%);
+    color: #ff69b4;
+    padding: 1.5rem;
+    border-radius: 12px;
+    margin-bottom: 2rem;
+    box-shadow: 0 6px 24px rgba(0,0,0,0.4);
+    border: 1px solid #666666;
+}
+
+.header h1 {
+    margin: 0;
+    font-size: 1.8em;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    font-weight: 600;
+}
+
+.nav {
+    margin-bottom: 1rem;
+}
+
+.nav a {
+    color: #ff69b4;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s ease;
+}
+
+.nav a:hover {
+    color: #ffb3da;
+    text-decoration: underline;
+}
+
+.content {
+    background: linear-gradient(145deg, #161b22 0%, #1c2128 100%);
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+    border: 1px solid #30363d;
+}
+
+.source-link {
+    background: linear-gradient(145deg, #0d1117 0%, #161b22 100%);
+    border: 1px solid #ff69b4;
+    border-radius: 8px;
+    padding: 1rem;
+    margin: 1rem 0;
+    text-align: center;
+}
+
+.source-link a {
+    color: #ff69b4;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s ease;
+}
+
+.source-link a:hover {
+    color: #ffb3da;
+    text-decoration: underline;
+}
+
+.highlight {
+    background: linear-gradient(145deg, #2d1b69 0%, #3d2b7a 100%);
+    border-left: 4px solid #ff69b4;
+    padding: 1rem;
+    margin: 1rem 0;
+    border-radius: 0 8px 8px 0;
+    color: #e9ecef;
+}
+
+.warning {
+    background: linear-gradient(145deg, #5a1a1a 0%, #6b2121 100%);
+    border: 1px solid #dc3545;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin: 1rem 0;
+    color: #ffc1cc;
+}
+
+.warning h3 {
+    margin-top: 0;
+    color: #ff6b7a;
+}
+
+.danger {
+    background: linear-gradient(145deg, #7a1a1a 0%, #8b2121 100%);
+    border: 2px solid #dc3545;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin: 1rem 0;
+    color: #ffc1cc;
+}
+
+.danger h3 {
+    margin-top: 0;
+    color: #ff6b7a;
+}
+
+.instructions, .info-box, .recommendation, .contact-box, .benefits, .location-info {
+    background: linear-gradient(145deg, #1a2332 0%, #213243 100%);
+    border: 1px solid #ffb3da;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin: 1rem 0;
+    color: #e9ecef;
+}
+
+.instructions h3, .info-box h3, .recommendation h3, .contact-box h3, .benefits h3, .location-info h3 {
+    margin-top: 0;
+    color: #ffb3da;
+}
+
+.medication {
+    background: linear-gradient(145deg, #161b22 0%, #1c2128 100%);
+    border: 1px solid #30363d;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin: 1rem 0;
+    transition: border-color 0.2s ease;
+}
+
+.medication:hover {
+    border-color: #ff69b4;
+}
+
+.medication h3 {
+    margin-top: 0;
+    color: #f0f6fc;
+    border-bottom: 2px solid #30363d;
+    padding-bottom: 0.5rem;
+}
+
+.dosage {
+    background: linear-gradient(145deg, #0d1117 0%, #161b22 100%);
+    border-left: 4px solid #ff69b4;
+    padding: 1rem;
+    margin: 0.5rem 0;
+    border-radius: 0 6px 6px 0;
+    color: #e9ecef;
+}
+
+.pricing-box {
+    background: linear-gradient(145deg, #2d1b69 0%, #3d2b7a 100%);
+    border: 1px solid #6f42c1;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin: 1rem 0;
+    text-align: center;
+    color: #e9ecef;
+}
+
+.pricing-box h3 {
+    margin-top: 0;
+    color: #ff69b4;
+}
+
+.appointment-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+    background: #161b22;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.appointment-table th,
+.appointment-table td {
+    border: 1px solid #30363d;
+    padding: 0.75rem;
+    text-align: left;
+    color: #e9ecef;
+}
+
+.appointment-table th {
+    background: linear-gradient(145deg, #4a4a4a 0%, #6c6c6c 100%);
+    font-weight: 600;
+    color: #ff69b4;
+}
+
+.appointment-table tr:nth-child(even) {
+    background: #0d1117;
+}
+
+.surgery-highlight {
+    background: linear-gradient(145deg, #2d1b69 0%, #3d2b7a 100%) !important;
+    border: 1px solid #ff69b4 !important;
+}
+
+.note {
+    background: linear-gradient(145deg, #1a2332 0%, #213243 100%);
+    border: 1px solid #ffb3da;
+    border-radius: 8px;
+    padding: 1rem;
+    margin: 1rem 0;
+    color: #e9ecef;
+}
+
+ol, ul {
+    padding-left: 1.5rem;
+}
+
+li {
+    margin-bottom: 0.5rem;
+    color: #e9ecef;
+}
+
+h2 {
+    color: #ff69b4;
+    border-bottom: 2px solid #ff69b4;
+    padding-bottom: 0.5rem;
+    margin-bottom: 1rem;
+    font-weight: 600;
+}
+
+h3 {
+    color: #f0f6fc;
+}
+
+p {
+    color: #e9ecef;
+}
+
+a {
+    color: #ff69b4;
+    transition: color 0.2s ease;
+}
+
+a:hover {
+    color: #ffb3da;
+}
+
+strong {
+    color: #f0f6fc;
+}

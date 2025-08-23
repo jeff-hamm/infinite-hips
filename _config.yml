@@ -1,0 +1,32 @@
+title: Jump Hip - Surgery Documentation
+description: Hip Replacement Surgery Documentation and Support Schedule
+theme: minima
+plugins:
+  - jekyll-feed
+  - jekyll-sitemap
+
+# GitHub Pages configuration
+url: "https://jeff-hamm.github.io"
+baseurl: "/jumphip"
+
+# Navigation
+header_pages:
+  - index.html
+
+# Collections
+collections:
+  docs:
+    output: true
+    permalink: /:collection/:name/
+
+# Markdown processing
+markdown: kramdown
+highlighter: rouge
+
+# Social links
+github_username: jeff-hamm
+
+# Build settings
+exclude:
+  - "*.jpg"
+  - "*.csv"
