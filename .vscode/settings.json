@@ -1,6 +1,8 @@
 {
-  "files.exclude": {
-  "**/.*": true,
-  "!**/.vscode": true,
+  "files.include": {
+    "**/.vscode": true,
   },
+  "files.exclude": {
+    "**/._*": true
+  }
 }

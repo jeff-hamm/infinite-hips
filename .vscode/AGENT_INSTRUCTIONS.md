@@ -35,17 +35,47 @@ This is a **hip replacement surgery documentation website** called "Infinite Hip
 - `docs/pre-surgery-checklist.html` - Day-by-day prep with countdown timer
 - `docs/friends-support-list.html` - Support coordination with auto-save
 
-#### Medical Documentation
+#### Medical Documentation (Updated August 23, 2025)
 
-- `docs/*.html` - All medical documents converted from scanned PDFs
-- `images/*.jpg` - Original scanned medical documents
-- `*.md` - OCR results from original scans
+- `docs/*.html` - All medical documents converted from markdown with consistent styling
+- `docs/*.md` - Clean, structured markdown files with YAML frontmatter
+- `scans_md/*.jpg` - Renamed medical document images with descriptive names
+- `scans_md/*-ocr.jpg.md` - OCR results from original scans with descriptive names
+- `old/*.md.old` - Archived original OCR files with generic scan names
 
 #### Legacy Data Files
 
 - `*.csv` - Original data files, now converted to interactive HTML
 
-### Development Guidelines
+### Development Guidelines (Updated August 23, 2025)
+
+#### File Organization Patterns
+
+**Naming Conventions:**
+- Images: `<descriptive-name>.jpg` (e.g., `preop-skin-wash.jpg`)
+- OCR files: `<descriptive-name>-ocr.jpg.md` (e.g., `preop-skin-wash-ocr.jpg.md`)
+- Clean markdown: `<descriptive-name>.md` in `/docs` directory
+- HTML pages: `<descriptive-name>.html` in `/docs` directory
+
+**Directory Structure:**
+```
+/scans_md/          # Images and OCR files with descriptive names
+/docs/              # Clean markdown and generated HTML
+/old/               # Archived original files
+```
+
+**Content Mapping:**
+Each medical document exists in 4 formats:
+1. Original scan → `scans_md/<name>.jpg`
+2. OCR extraction → `scans_md/<name>-ocr.jpg.md`
+3. Structured markdown → `docs/<name>.md` (with YAML frontmatter)
+4. Published HTML → `docs/<name>.html` (with navigation and styling)
+
+#### Terminal Command Preferences
+
+- **Batch operations preferred** - Use `&&` to chain related commands to reduce confirmations
+- **Working directory awareness** - Always use absolute paths for file operations
+- **Cleanup after operations** - Remove macOS `._*` metadata files automatically
 
 #### When Making Changes
 

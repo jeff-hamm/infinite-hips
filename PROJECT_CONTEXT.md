@@ -12,6 +12,22 @@ This workspace contains "Infinite Hips" - a comprehensive hip replacement surger
 - **Surgery Details**: September 12, 2025, Dr. Jeffrey Wilde at Scripps Mission Valley
 - **Source Material**: 7 scanned medical documents (JPG format) with corresponding markdown files
 
+### Recent Updates (August 23, 2025 Session)
+
+#### File Organization & Cleanup
+- **Phase 7**: Comprehensive file reorganization with descriptive naming
+- **Directory Structure**: Reorganized into `/docs` (clean files), `/scans_md` (source materials), `/old` (archives)
+- **File Naming**: Transitioned from generic `scan1_page1.jpg` to descriptive `preop-skin-wash.jpg`
+- **Content Mapping**: Established 4-format system for each medical document
+- **Archive Preservation**: Original OCR files maintained in `/old` directory for reference
+- **Cleanup Operations**: Removed duplicate files, metadata files, and temporary artifacts
+
+#### Technical Improvements
+- **Batch Commands**: Implemented preference for batched terminal operations to reduce confirmations
+- **HTML Synchronization**: Updated all HTML files to match markdown content changes
+- **Source Link Updates**: Corrected image references to use new descriptive file names
+- **Quality Assurance**: Comprehensive verification of content mappings and file relationships
+
 ### Evolution of Requirements
 
 1. **Phase 1**: CSV spreadsheet creation → Surgery support schedule with 79+ tasks
@@ -30,19 +46,25 @@ This workspace contains "Infinite Hips" - a comprehensive hip replacement surger
 - **Layout**: Mobile-responsive grid system
 - **Inspiration**: User's existing site https://jumpcloud.infinitebutts.com/
 
-#### File Structure Rationale
+#### File Structure Rationale (Updated August 23, 2025)
 
 ```
 /
 ├── index.html              # Main landing page with navigation
 ├── assets/
 │   └── dark-theme.css      # Shared stylesheet for consistency
-├── docs/                   # All HTML documentation pages
+├── docs/                   # All HTML documentation pages and clean markdown
+│   ├── *.md               # Structured markdown with YAML frontmatter
 │   ├── *.html             # Individual medical document pages
 │   ├── surgery-support-schedule.html    # Interactive task management
 │   ├── pre-surgery-checklist.html       # Countdown & progress tracking
 │   └── friends-support-list.html        # Support coordination form
-├── images/                 # Original scanned medical documents
+├── scans_md/              # Original scans and OCR data with descriptive names
+│   ├── *.jpg              # Renamed medical document images
+│   └── *-ocr.jpg.md       # OCR files with descriptive names
+├── old/                   # Archive of original scan files
+│   └── scan*_page*.md.old # Original OCR files with generic names
+├── images/                # Legacy image directory (may contain old files)
 └── *.csv                  # Original data files (legacy)
 ```
 
@@ -124,11 +146,14 @@ This workspace contains "Infinite Hips" - a comprehensive hip replacement surger
 3. **Refinement**: "get rid of the green, make it a lighter pink. Also, the header should be pink letters on a gray background"
 4. **Final**: #ff69b4 lighter pink, gray gradient headers with pink text
 
-#### File Naming Conventions
+#### File Naming Conventions (Updated August 23, 2025)
 
 - **HTML Pages**: kebab-case (surgery-support-schedule.html)
 - **Assets**: Descriptive names (dark-theme.css)
-- **Images**: Original scan naming preserved for traceability
+- **Images**: Descriptive content-based names (preop-skin-wash.jpg, mrsa-screening.jpg)
+- **OCR Files**: Descriptive names with suffix (preop-skin-wash-ocr.jpg.md)
+- **Clean Markdown**: Descriptive names in /docs directory (preop-skin-wash.md)
+- **Archive Files**: Original generic names preserved in /old directory
 
 ### User Feedback Integration
 
@@ -144,13 +169,16 @@ This workspace contains "Infinite Hips" - a comprehensive hip replacement surger
 - **Maintainability**: Clean code structure and documentation
 - **Future-proofing**: Standard web technologies for longevity
 
-## Current State
+## Current State (Updated August 23, 2025)
 
 - **Status**: Fully functional website ready for deployment
 - **Content**: Complete with all medical documentation and interactive tools
 - **Design**: Polished dark theme with pink accents
 - **Functionality**: Interactive features with local storage persistence
 - **Deployment**: Configured for GitHub Pages with custom domain
+- **File Organization**: Comprehensive reorganization completed with descriptive naming
+- **Content Mapping**: All documents exist in 4 formats (scan, OCR, markdown, HTML)
+- **Archive**: Original files preserved in /old directory for reference
 
 ## Next Steps for Future Development
 

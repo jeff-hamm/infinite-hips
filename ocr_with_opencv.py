@@ -1,25 +1,28 @@
-
 import cv2
 import pytesseract
 from pathlib import Path
 
-scans_dir = Path('scans_md')
-image_files = [f for f in scans_dir.iterdir() if f.suffix.lower() == '.jpg' and not f.name.startswith('.')]
+# Path to the image
+img_path = Path('scans_md/scan1_page1.jpg')
 
-for img_path in image_files:
-    try:
-        img = cv2.imread(str(img_path))
-        if img is None:
-            print(f'Skipping {img_path.name}: not a valid image')
-            continue
-        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        # Lighter preprocessing: just grayscale
-        custom_config = r'--oem 3 --psm 4'
-        text = pytesseract.image_to_string(gray, config=custom_config)
-        md_file = img_path.parent / (img_path.stem + '_mac.md')
-        with open(md_file, 'w', encoding='utf-8') as f:
-            f.write(f'# OCR of {img_path.name}\n\n')
-            f.write(text)
-        print(f'OCR complete for {img_path.name}. Markdown file created: {md_file.name}')
-    except Exception as e:
-        print(f'Skipping {img_path.name}: {e}')
+# Read image
+img = cv2.imread(str(img_path))
+
+# Preprocessing: convert to grayscale, increase contrast, denoise
+gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+# Apply adaptive thresholding
+thresh = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
+                               cv2.THRESH_BINARY, 31, 2)
+# Optionally, denoise
+denoised = cv2.fastNlMeansDenoising(thresh, None, 30, 7, 21)
+
+# OCR with Tesseract
+custom_config = r'--oem 3 --psm 6'
+text = pytesseract.image_to_string(denoised, config=custom_config)
+
+# Save OCR result
+output_path = img_path.with_suffix('.ocr.txt')
+with open(output_path, 'w') as f:
+    f.write(text)
+
+print(f'OCR complete. Output saved to {output_path}')
