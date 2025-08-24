@@ -1,0 +1,65 @@
+{
+  "name": "Infinite Hips - Surgery Documentation Website",
+  "description": "Hip replacement surgery documentation and support coordination site",
+  "folders": [
+    {
+      "name": "Infinite Hips",
+      "path": "."
+    }
+  ],
+  "settings": {
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "html.format.indentInnerHtml": true,
+    "css.validate": true,
+    "files.associations": {
+      "*.html": "html",
+      "*.css": "css",
+      "*.md": "markdown"
+    },
+    "emmet.includeLanguages": {
+      "html": "html"
+    }
+  },
+  "extensions": {
+    "recommendations": [
+      "esbenp.prettier-vscode",
+      "ms-vscode.live-server",
+      "bradlc.vscode-tailwindcss",
+      "ritwickdey.liveserver"
+    ]
+  },
+  "tasks": {
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "Deploy to GitHub Pages",
+        "type": "shell",
+        "command": "pwsh",
+        "args": ["-File", "./deploy.ps1"],
+        "group": "build",
+        "presentation": {
+          "echo": true,
+          "reveal": "always",
+          "focus": false,
+          "panel": "shared"
+        },
+        "problemMatcher": []
+      },
+      {
+        "label": "Start Local Server",
+        "type": "shell",
+        "command": "python",
+        "args": ["-m", "http.server", "8000"],
+        "group": "build",
+        "presentation": {
+          "echo": true,
+          "reveal": "always",
+          "focus": false,
+          "panel": "shared"
+        },
+        "problemMatcher": []
+      }
+    ]
+  }
+}

@@ -1,0 +1,200 @@
+# OCR of scan5_page1.jpg
+
+) are
+; i
+Naw See Savini ae
+‘
+;
+aa
+:
+
+Expectallons: °
+
+Therapy Recommendations | ge eh ns
+
+{4
+
+Ont ay sugary, alivel sel thera : (2) : SCC : ) is) SLY! GOT
+ie day O : i 1, cal } will work wilh you, you are & | ued to ca \ph @ Your surge ry Bi
+
+3PM. The physic
+
+a | theraplst's ariel Doctor
+may limit the amount of out of bed aclivill
+poiform bed oxerbises, move frofy lying
+physteal therapist will ass
+
+s expectalion |s lo ass
+you may be, able tof
+ey Hitting at thorside. oF
+
+se your Ability to’ saloly walle,
+
+st you In gelling oul of béd. There are factors thal
+licipato in, however Il Is-expocted thal you
+
+sido, oF ht tl and allompl standing: Wilh the walker, The
+Occupill oral therapy will poss
+. ’ 4 £ 1 ser ea}
+
+bly she you during your
+
+ay ; ae Re. ee : als Lagat agro
+General y for 3 ie qd isoliangje hore; you mist bo able to perfor nthe’ iorlowinty without feinds'on asgistanice:
+C}  Getin and ouit of boet with le bod flat and no grab bars eae ee a
+
+() Stand tip homthebed . ° >
+Walk at Jeast 100 ft with a walker
+
+‘T].. Compile. slair training for home, ff necessary
+
+Depending on yaur individual-situa
+tho Caso anagenent Todm. *™
+
+Tho avarac
+day of surgery il cleared
+
+Ls expected that you-will have paln alt
+
+e hospital slay alloraylotal hip.ar total knee, tep
+yeleal iherapist.
+
+py the Doslor andiph
+
+Recommendations yrlok to surgery.
+
+pe cgvered(.by ISH
+roachors/grabbers ane
+Alera anh ah oboe
+
+‘
+
+Upon Dischar t
+
+Case Managet nant will mer
+‘Typlcally, a‘Home Health P
+
+caregiving Serv)
+progress OXEFEIECS and
+
+how, 2 limes a weaelefor about 2-4 weels
+iherapisls aval able, therafo
+with you When to transilion away from a wall
+
+i)
+
+Recommendatio
+
+Walle 3-8 limes, 8 day for 5-10 mipieal
+Sitin a chair with dhnreetd,"3-5 times
+Complete hed-and soaled Exerc
+
+joo and clavate the loglieds as much
+minutes oF olf ime" belw at :
+as I k
+
+Cl} IFyau alroadly have a walker, pracll
+[]  Praetize golng up ‘and caw (stair
+
+Adaplive Equipment thal mia it bo. 1
+j | toilet seat, grab, bar
+
+Qa rals@a. |
+ith Consider the he
+
+jor stioe |
+
+; Loe) fees Ss ea ‘
+
+Hs recommended iat yOu"
+
+or the fi'st2-5 days ‘and nights.
+‘ De len be
+
+Ge
+
+;
+
+commen
+
+1 26
+
+with you whilo a
+
+EUEGOLY®
+
+te
+
+4
+
+tion,4f-you.clo not meet |
+
+ter, surety. this wil
+
+at home wilh or
+
+ical Therapist wil
+ce, They wi agsess home salely, improve your \
+range of motion of the, joint. On avorage, lhe ih
+s depending ori‘progress. Certaln rornote
+
+2g given to you In, the ho
+
+using the walkerinjyour, home. Se ee eae
+
+ded by your herap
+g, GOMMOACE sho
+ight of your
+
+nave a pliysically capable family m
+
+\
+
+tthe hospital to cts
+come to your hame 94-48 hours aller disc
+
+‘9 Oulpatient Physical Therapy, will
+
+er loa cane.
+
+0-600 foct)al a time
+
+a day, for 30 to 60 minules, Slowly. Increase tie Amaunto
+
+3 possible throughout the d
+
+he above. criteria, olher-aplions, may-bo discus
+
+agement is-1 nigh
+
+ssecl with
+Some people will bo discharged the
+
+a Diners ace
+
+be acd dressod/managed by nursing,
+
+ist far your coriveniance and safely, bul may not
+patr/ub-bench, aock ald, leg lifler,
+
+nie nood far éloal.
+
+nha
+
+amber, friend, and/or hired careglyer presant 2AlT
+
+idcuss' physical Iherapy options prior jo discharge.
+harge. This igiNOT a
+walking pattern, provide stalr training if needed,
+yeraplst will came to your home for about 1
+ateas will not have home health
+ieod to be sel up. The therapist will cornmuntcato
+
+' ’ : '
+
+3 tolerated,’ ee
+
+f {imo as Lolorated.
+
+ay for 4 5-20.rninutes Interval 5. Atleast 20
+

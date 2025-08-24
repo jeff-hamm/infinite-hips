@@ -1,0 +1,9 @@
+{
+  "files.exclude": {
+    "**/.*": falsefor img in scan*_page*.jpg; do base=$(basename "$img" .jpg); md="$base.md"; if [ -f "$md" ]; then cp "$img" scans_md/; cp "$md" scans_md/; fi; done
+
+  },
+  "files.include": {
+    ".vscode/**/*": true
+  }
+}

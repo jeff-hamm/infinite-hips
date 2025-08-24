@@ -1,0 +1,23 @@
+# OCR of scan7_page1.jpg
+
+" “egaaPe ae op eel 4
+
+WEP eating 9
+
+i
+
+Ae
+
+seine scrape
+tod
+
+naphea > gant ciated
+
+{
+
+|
+
+eltiss de Seencectab 16
+
+———
+

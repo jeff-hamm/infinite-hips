@@ -1,0 +1,51 @@
+# OCR of scan2_page1_20250822.jpg
+
+Cy Scripps
+
+Scripps Clinic
+Department of Orthopedics
+
+Pre-Surgical MRSA/MSSA Screening
+
+What is MRSA?
+
+MRSA stands for Methicillin Resistant Staph Aureus. MRSA is a variety of the staphylococcus
+bacterium that has developed a resistance to Methicillin, a synthetic form of penicillin, and to
+other commonly used antibiotics. MSSA is another variety of staphylococcus that has not yet
+
+developed this resistance.
+
+Why do we screen for MRSA and MSSA?
+
+Both MRSA and MSSA bacteria are commonly found on our skin, in our nostrils and
+throughout the environment, along with many other germ varieties. Even though these germs
+are in contact with us, they do not often cause an actual infection. But if you have a hospital
+stay and have a surgical incision, the risk of any germ causing an infection increases. To
+reduce this risk as much as possible, we ask all scheduled surgical patients to bathe with an
+antibacterial soap prior to their hospital admission. Using this antibacterial soap will help
+eliminate staph germs from your skin. As an extra precaution, we also screen pre-surgical
+patients by performing a simple nasal swab/Q-tip. In those patients who screen positive for
+MRSA or MSSA in the nostrils, we prescribe an ointment to help eliminate these germs. You
+will be informed 2 to 3 days after a swab is taken if you need to use the ointment. If you are
+not contacted, you can assume your swab did not show MRSA or MSSA.
+
+For more information regarding community acquired MRSA, please visit
+https:/Awww.cdc.gov/mrsa/
+
+if your nasal swab shows positive for MRSA or MSSA:
+
+Your surgeon’s nurse will call ina prescription for Mupirocin 2% ointment. For 5 days prior to
+your surgery, apply a small quantity to a cotton swab/Q-tip and apply inside your nostril as far
+back as you can tolerate. Repeat in the other nostril. Do this twice daily, morning and evening,
+and the morning of your surgery before leaving home. Even if you do not start this procedure a
+full 5 days before your surgery, using it just a few days will be beneficial.
+
+If your nasal swab reveals MRSA, after surgery you will be assigned a private room with
+“contact precautions”. This means that anyone having direct contact with you, including
+visitors, will need to wear disposable gloves and gown which are found in every room. Hand
+washing is also required upon leaving your room. Visitors may sit in your room without gloves
+and gown if they do not have contact with you. Visiting children should be monitored closely
+and not allowed contact with the patient.
+
+V1 06,2022
+

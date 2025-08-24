@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pre-Surgery Checklist - Infinite Hips</title>
+    <link rel="stylesheet" href="../assets/dark-theme.css">
+    <style>
+        .checklist-container {
+            display: grid;
+            gap: 1.5rem;
+            margin: 1rem 0;
+        }
+        
+        .day-section {
+            background: #161b22;
+            border-radius: 8px;
+            border: 1px solid #30363d;
+            padding: 1.5rem;
+            border-left: 4px solid #ff69b4;
+        }
+        
+        .day-header {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #ff69b4;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .task-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .task-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+            background: #0d1117;
+            border-radius: 6px;
+            border: 1px solid #30363d;
+            transition: all 0.2s ease;
+        }
+        
+        .task-item:hover {
+            border-color: #ff69b4;
+            background: #161b22;
+        }
+        
+        .checkbox {
+            width: 24px;
+            height: 24px;
+            background: #30363d;
+            border: 2px solid #ff69b4;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+        
+        .checkbox.checked {
+            background: #ff69b4;
+        }
+        
+        .checkbox.checked::after {
+            content: '✓';
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        
+        .task-text {
+            flex: 1;
+            color: #e9ecef;
+            line-height: 1.5;
+        }
+        
+        .countdown {
+            background: linear-gradient(145deg, #2d1b69 0%, #3d2b7a 100%);
+            border: 1px solid #ff69b4;
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+            margin: 1rem 0;
+        }
+        
+        .countdown h3 {
+            color: #ff69b4;
+            margin: 0 0 0.5rem 0;
+        }
+        
+        .countdown-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #ffb3da;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #30363d;
+            border-radius: 4px;
+            margin: 1rem 0;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff69b4 0%, #ffb3da 100%);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        
+        .surgery-day {
+            border-left-color: #ff1a8c !important;
+            background: linear-gradient(145deg, #2d1b69 0%, #3d2b7a 100%) !important;
+        }
+        
+        .surgery-day .day-header {
+            color: #ffb3da;
+            font-size: 1.4em;
+        }
+    </style>
+</head>
+<body>
+    <div class="nav">
+        <a href="../index.html">← Back to Main Index</a>
+    </div>
+
+    <div class="header">
+        <h1>✅ Pre-Surgery Checklist</h1>
+    </div>
+
+    <div class="content">
+        <p>This checklist will help you prepare systematically for your hip replacement surgery. Complete each task and check it off as you go.</p>
+        
+        <div class="countdown" id="countdownBox">
+            <h3>Days Until Surgery</h3>
+            <div class="countdown-number" id="countdownNumber">--</div>
+            <div>September 12, 2025</div>
+        </div>
+        
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div id="progressText" style="text-align: center; color: #ff69b4; margin-top: 0.5rem;">0% Complete</div>
+        </div>
+
+        <div class="checklist-container">
+            <div class="day-section">
+                <div class="day-header">
+                    🗓️ 7 Days Before Surgery
+                </div>
+                <ul class="task-list">
+                    <li class="task-item">
+                        <div class="checkbox" onclick="toggleCheck(this)"></div>
+                        <div class="task-text">Stop restricted medications/supplements as instructed</div>
+                    </li>
+                    <li class="task-item">
+                        <div class="checkbox" onclick="toggleCheck(this)"></div>
+                        <div class="task-text">Prepare home for recovery (remove hazards, set up recovery area)</div>
+                    </li>
+                    <li class="task-item">
+                        <div class="checkbox" onclick="toggleCheck(this)"></div>
+                        <div class="task-text">Arrange for help and medical equipment (walker, cane, etc.)</div>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="day-section">
+                <div class="day-header">
+                    🗓️ 6 Days Before Surgery
+                </div>
+                <ul class="task-list">
+                    <li class="task-item">
+                        <div class="checkbox" onclick="toggleCheck(this)"></div>
+                        <div class="task-text">Continue healthy meals and hydration</div>
+                    </li>
+                    <li class="task-item">
+                        <div class="checkbox" onclick="toggleCheck(this)"></div>
+                        <div class="task-text">Confirm surgery time/location with doctor</div>
+                    </li>
+                    <li class="task-item">
+                        <div class="checkbox" onclick="toggleCheck(this)"></div>
+                        <div class="task-text">Arrange transportation to/from hospital</div>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="day-section">
+                <div class="day-header">
+                    🗓️ 5 Days Before Surgery
+                </div>
+                <ul class="task-list">
+                    <li class="task-item">
+                        <div class="checkbox" onclick="toggleCheck(this)"></div>
+                        <div class="task-text">Review medication list with care team</div>
+                    </li>
+                    <li class="task-item">
+                        <div class="checkbox" onclick="toggleCheck(this)"></div>
+                        <div class="task-text">Complete pre-op lab work/clearances if needed</div>
+                    </li>
+                    <li class="task-item">
+                        <div class="checkbox" onclick="toggleCheck(this)"></div>
+                        <div class="task-text">Begin pre-surgical skin cleansing if instructed</div>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="day-section">
+                <div class="day-header">
+                    🗓️ 4 Days Before Surgery
+                </div>
+                <ul class="task-list">
+                    <li class="task-item">
+                        <div class="checkbox" onclick="toggleCheck(this)"></div>
+                        <div class="task-text">Continue to avoid restricted medications/supplements</div>
+                    </li>
+                    <li class="task-item">
+                        <div class="checkbox" onclick="toggleCheck(this)"></div>
+                        <div class="task-text">Prepare comfortable clothes and meals for recovery</div>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="day-section">
+                <div class="day-header">
+                    🗓️ 3 Days Before Surgery
+                </div>
+                <ul class="task-list">
+                    <li class="task-item">
+                        <div class="checkbox" onclick="toggleCheck(this)"></div>
+                        <div class="task-text">Check supply of wound care items (bandages, gauze, etc.)</div>
+                    </li>
+                    <li class="task-item">
+                        <div class="checkbox" onclick="toggleCheck(this)"></div>
+                        <div class="task-text">Continue pre-surgical skin cleansing if instructed</div>
+                    </li>
+                    <li class="task-item">
+                        <div class="checkbox" onclick="toggleCheck(this)"></div>
+                        <div class="task-text">Prepare insurance info and ID</div>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="day-section">
+                <div class="day-header">
+                    🗓️ 2 Days Before Surgery
+                </div>
+                <ul class="task-list">
+                    <li class="task-item">
+                        <div class="checkbox" onclick="toggleCheck(this)"></div>
+                        <div class="task-text">Pack hospital bag (ID, insurance, meds, toiletries, personal items)</div>
+                    </li>
+                    <li class="task-item">
+                        <div class="checkbox" onclick="toggleCheck(this)"></div>
+                        <div class="task-text">Confirm support person/ride for surgery day</div>
+                    </li>
+                    <li class="task-item">
+                        <div class="checkbox" onclick="toggleCheck(this)"></div>
+                        <div class="task-text">Continue dietary/medication restrictions</div>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="day-section">
+                <div class="day-header">
+                    🗓️ 1 Day Before Surgery
+                </div>
+                <ul class="task-list">
+                    <li class="task-item">
+                        <div class="checkbox" onclick="toggleCheck(this)"></div>
+                        <div class="task-text">Follow fasting instructions (nothing to eat/drink after midnight)</div>
+                    </li>
+                    <li class="task-item">
+                        <div class="checkbox" onclick="toggleCheck(this)"></div>
+                        <div class="task-text">Take shower with special soap if instructed</div>
+                    </li>
+                    <li class="task-item">
+                        <div class="checkbox" onclick="toggleCheck(this)"></div>
+                        <div class="task-text">Get a good night's sleep</div>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="day-section surgery-day">
+                <div class="day-header">
+                    🏥 Surgery Day
+                </div>
+                <ul class="task-list">
+                    <li class="task-item">
+                        <div class="checkbox" onclick="toggleCheck(this)"></div>
+                        <div class="task-text">Do not eat/drink unless instructed</div>
+                    </li>
+                    <li class="task-item">
+                        <div class="checkbox" onclick="toggleCheck(this)"></div>
+                        <div class="task-text">Take only approved medications with small sip of water</div>
+                    </li>
+                    <li class="task-item">
+                        <div class="checkbox" onclick="toggleCheck(this)"></div>
+                        <div class="task-text">Arrive at hospital at instructed time (7:30am check-in)</div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="contact-box">
+            <h3>📞 Important Reminders</h3>
+            <ul>
+                <li><strong>Surgery Date:</strong> September 12, 2025</li>
+                <li><strong>Check-in Time:</strong> 7:30am</li>
+                <li><strong>Location:</strong> Scripps Mission Valley</li>
+                <li><strong>Dr. Jeffrey Wilde:</strong> (858) 554-7993</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        function toggleCheck(element) {
+            element.classList.toggle('checked');
+            updateProgress();
+        }
+        
+        function updateProgress() {
+            const checkboxes = document.querySelectorAll('.checkbox');
+            const checkedBoxes = document.querySelectorAll('.checkbox.checked');
+            const percentage = Math.round((checkedBoxes.length / checkboxes.length) * 100);
+            
+            document.getElementById('progressFill').style.width = percentage + '%';
+            document.getElementById('progressText').textContent = percentage + '% Complete';
+        }
+        
+        function updateCountdown() {
+            const surgeryDate = new Date('2025-09-12T07:30:00');
+            const now = new Date();
+            const timeDiff = surgeryDate - now;
+            const daysDiff = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+            
+            const countdownElement = document.getElementById('countdownNumber');
+            if (daysDiff > 0) {
+                countdownElement.textContent = daysDiff;
+            } else if (daysDiff === 0) {
+                countdownElement.textContent = 'TODAY!';
+                countdownElement.style.color = '#ff1a8c';
+            } else {
+                countdownElement.textContent = 'Past';
+                countdownElement.style.color = '#28a745';
+            }
+        }
+        
+        // Initialize countdown
+        updateCountdown();
+        // Update countdown every hour
+        setInterval(updateCountdown, 3600000);
+    </script>
+</body>
+</html>
