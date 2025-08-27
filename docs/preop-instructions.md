@@ -1,14 +1,14 @@
 ---
 title: "Pre-Op Instructions & Timeline"
 emoji: "📋"
-source_image: "../scans_md/surgery-schedule.jpg"
+source_image: "../scans_md/preop-instructions.jpg"
 category: "preoperative"
 order: 10
 ---
 
 # 📋 Pre-Operative Instructions & Timeline
 
-**Source:** [📸 View Original Document Image](../scans_md/surgery-schedule.jpg)
+**Source:** [📸 View Original Document Image](../scans_md/preop-instructions.jpg)
 
 ## Dr. Jeffrey Wilde, MD
 Department of Orthopedic Surgery  

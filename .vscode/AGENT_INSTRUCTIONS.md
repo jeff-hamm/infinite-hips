@@ -35,8 +35,35 @@ This is a **hip replacement surgery documentation website** called "Infinite Hip
 - `docs/pre-surgery-checklist.html` - Day-by-day prep with countdown timer
 - `docs/friends-support-list.html` - Support coordination with auto-save
 
-#### Medical Documentation (Updated August 23, 2025)
+#### Medical Documentation (Updated August 27, 2025)
 
+**Complete Document Set** - 12 total medical documents:
+
+**Pre-Operative (4 documents):**
+- `docs/preop-skin-wash.html` - Hibiclens washing protocol
+- `docs/mrsa-screening.html` - MRSA/MSSA testing and Mupirocin ointment
+- `docs/surgery-schedule.html` - Timeline and appointment details
+- `docs/preop-instructions.html` - General pre-operative preparation
+
+**Post-Operative (6 documents):**
+- `docs/postop-medications.html` - Complete medication schedule and instructions
+- `docs/postop-antibiotics.html` - **NEW** - 2-year dental procedure antibiotic protocol
+- `docs/postop-problems-and-precautions.html` - **NEW** - Warning signs, travel restrictions
+- `docs/postop-care.html` - Wound care and activity guidelines
+- `docs/physical-therapy.html` - PT expectations and recovery milestones
+- `docs/constipation-care.html` - Post-surgical constipation prevention
+
+**Educational (1 document):**
+- `docs/opioid-education.html` - Pain medication safety information
+
+**Administrative (2 documents):**
+- `docs/instructions-state-disability.html` - **NEW** - California SDI filing instructions
+- `docs/dmv-handicap-placard.html` - **NEW** - Handicapped parking forms organization
+
+**Equipment/Optional:**
+- `docs/game-ready.html` - Cold therapy device information
+
+**File Organization:**
 - `docs/*.html` - All medical documents converted from markdown with consistent styling
 - `docs/*.md` - Clean, structured markdown files with YAML frontmatter
 - `scans_md/*.jpg` - Renamed medical document images with descriptive names
@@ -47,7 +74,22 @@ This is a **hip replacement surgery documentation website** called "Infinite Hip
 
 - `*.csv` - Original data files, now converted to interactive HTML
 
-### Development Guidelines (Updated August 23, 2025)
+### Development Guidelines (Updated August 27, 2025)
+
+#### Recent Document Additions
+
+**Critical New Information Added:**
+- **Antibiotic Prophylaxis**: 2-year dental procedure requirements, 3-month restriction after surgery
+- **Travel Restrictions**: No domestic flights 6 weeks, no international flights 3 months
+- **Work Return Timeline**: 1-3 months depending on job type and recovery
+- **Administrative Deadlines**: SDI filing must be done day after surgery (Sept 13, 2025)
+- **DMV Forms**: Handicapped placard application for recovery period parking
+
+**Website Integration:**
+- New "Administrative Tasks" section on main index
+- Enhanced surgery support schedule with direct links to forms
+- Day 1 Post-Op task added for SDI filing requirement
+- Cross-navigation between all related documents
 
 #### File Organization Patterns
 
@@ -83,6 +125,9 @@ Each medical document exists in 4 formats:
 2. **Test mobile responsiveness** - user will access during recovery on phone
 3. **Preserve data integrity** - medical information must remain accurate
 4. **Check cross-references** - many pages link to each other and source images
+5. **Update surgery support schedule** - when adding new documents, integrate relevant tasks
+6. **Maintain content mapping** - ensure 4-format system (scan, OCR, markdown, HTML) for medical docs
+7. **Consider administrative deadlines** - new documents may have time-sensitive requirements
 
 #### Code Patterns Used
 
@@ -142,9 +187,19 @@ Each medical document exists in 4 formats:
 These are referenced throughout the medical documentation:
 
 - **Dr. Jeffrey Wilde**: (858) 554-7993
-- **Game Ready (Amy Weiner)**: (619) 823-2691
+- **Game Ready (Amy Weiner)**: (619) 823-2691, amy@therapedix.com
 - **Luna PT**: (619) 966-3822
 - **Surgery Date**: September 12, 2025, 7:30am check-in
+- **Scripps Mission Valley**: 7425 Mission Valley Rd, Suite 202, San Diego, CA 92108
+- **After Hours**: Scripps operator (858) 554-9100, request on-call Orthopedist
+
+### Critical Dates & Deadlines
+
+- **September 5, 2025**: Start pre-op medications and skin washing (7 days before)
+- **September 12, 2025**: Surgery day, 7:30am check-in
+- **September 13, 2025**: File California State Disability claim (earliest date)
+- **October 24, 2025**: Domestic flight restrictions end (6 weeks post-op)
+- **December 12, 2025**: Hip movement restrictions end, dental visits can resume, international flights allowed (3 months post-op)
 
 ### User Experience Priorities
 
@@ -180,4 +235,6 @@ Always use the replace_string_in_file tool with sufficient context (3-5 lines be
 
 ## Final Notes
 
-This project evolved from a simple CSV request into a comprehensive digital health companion. The user values functionality, visual appeal, and medical accuracy equally. Always test changes thoroughly and maintain the established design patterns.
+This project evolved from a simple CSV request into a comprehensive digital health companion with 12 medical documents, interactive tools, and administrative support. The most recent additions (August 27, 2025) include critical post-operative guidelines for dental care, travel restrictions, and essential administrative processes for disability benefits and parking accommodations.
+
+The user values functionality, visual appeal, and medical accuracy equally. Always test changes thoroughly and maintain the established design patterns. Pay special attention to time-sensitive administrative tasks and medical restrictions that have specific deadlines tied to the surgery date.
