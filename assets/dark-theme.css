@@ -383,3 +383,96 @@ a:hover {
 strong {
     color: #f0f6fc;
 }
+
+.schedule-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+    background: #161b22;
+    border-radius: 8px;
+    overflow: hidden;
+}
+.schedule-table th,
+.schedule-table td {
+    border: 1px solid #30363d;
+    padding: 0.75rem;
+    text-align: left;
+    color: #e9ecef;
+    font-size: 0.9em;
+}
+.schedule-table th {
+    background: linear-gradient(145deg, #4a4a4a 0%, #6c6c6c 100%);
+    font-weight: 600;
+    color: #ff69b4;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+.schedule-table tr:nth-child(even) {
+    background: #0d1117;
+}
+.timeline-group {
+    background: var(--background-note) !important;
+    border: 1px solid #ff69b4 !important;
+    font-weight: bold;
+}
+.category-medical { border-left: 4px solid #ff69b4; }
+.category-home { border-left: 4px solid #ffb3da; }
+.category-equipment { border-left: 4px solid #ff1a8c; }
+.category-administrative { border-left: 4px solid #ff8eb3; }
+.category-transportation { border-left: 4px solid #ff4da6; }
+.category-shopping { border-left: 4px solid #ffcce5; }
+.category-technology { border-left: 4px solid #e60073; }
+.category-supplies { border-left: 4px solid #cc0066; }
+.category-personal { border-left: 4px solid #ff0080; }
+.category-recovery { border-left: 4px solid #ff3399; }
+.category-daily { border-left: 4px solid #ff66b3; }
+.category-projects { border-left: 4px solid #ff99cc; }
+.category-emergency { border-left: 4px solid #ff0000; }
+.category-activity { border-left: 4px solid #ff6600; }
+
+.checkbox {
+    width: 20px;
+    height: 20px;
+    background: #30363d;
+    border: 2px solid #ff69b4;
+    border-radius: 4px;
+    display: inline-block;
+    position: relative;
+    cursor: pointer;
+}
+
+.checkbox.checked {
+    background: #ff69b4;
+}
+
+.checkbox.checked::after {
+    content: '✓';
+    color: white;
+    position: absolute;
+    top: -2px;
+    left: 3px;
+    font-weight: bold;
+}
+
+.filter-buttons {
+    margin: 1rem 0;
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.filter-btn {
+    padding: 0.5rem 1rem;
+    background: #30363d;
+    color: #e9ecef;
+    border: 1px solid #ff69b4;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.filter-btn:hover, .filter-btn.active {
+    background: #ff69b4;
+    color: white;
+}
