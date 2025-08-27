@@ -1,5 +1,17 @@
 # Copilot Instructions for Infinite Hips Project
 
+## 🚨 CRITICAL REMINDER: Be Incredibly Careful When Editing This File
+
+**This file contains essential project context that keeps the Infinite Hips project working correctly.**
+
+- Only make changes when the user explicitly asks
+- Never remove information unless specifically instructed
+- Always preserve existing content unless user wants it changed
+- When unsure about editing this file, ask the user first
+- Remember: Small changes here can break the entire project understanding
+
+---
+
 ## Project Summary
 
 **Infinite Hips** is a comprehensive hip replacement surgery documentation website for patient Jeff Hamm. The project evolved from simple document organization into a full digital health companion with interactive tools for surgery preparation and recovery coordination.
@@ -42,6 +54,10 @@ Each medical document exists in 4 formats:
 - **Headers**: Gray gradient background with pink text
 - **NO GREEN COLORS** - User specifically requested removal
 
+### Design Reference
+- **User's Other Site**: https://jumpcloud.infinitebutts.com/ (design inspiration)
+- Dark theme with colorful accents is their preferred aesthetic
+
 ### CSS Patterns
 - Single stylesheet: `assets/dark-theme.css`
 - Mobile-first responsive design
@@ -67,20 +83,41 @@ Each medical document exists in 4 formats:
 1. **Surgery Support Schedule** - 79+ tasks with filtering, checkboxes, progress tracking
 2. **Pre-Surgery Checklist** - Day-by-day countdown with progress bar
 3. **Friends Support Coordination** - Auto-save forms for task assignment
-4. **Medical Documentation** - All 9 documents with consistent navigation
+4. **Medical Documentation** - All 12 documents with consistent navigation
 
 ## Content Guidelines
 
-### Medical Documents (9 total)
+### Medical Documents (12 total as of August 27, 2025)
+
+**Pre-Operative (4 documents):**
 - `preop-skin-wash` - Hibiclens washing protocol
 - `mrsa-screening` - MRSA/MSSA testing information
 - `surgery-schedule` - Timeline and logistics
-- `game-ready` - Cold therapy device instructions
-- `physical-therapy` - Post-op PT guidelines
+- `preop-instructions` - General pre-operative preparation
+
+**Post-Operative (6 documents):**
+- `postop-medications` - Complete medication schedule and instructions
+- `postop-antibiotics` - **NEW** - 2-year dental procedure antibiotic protocol
+- `postop-problems-and-precautions` - **NEW** - Warning signs, travel restrictions
 - `postop-care` - General recovery instructions
-- `postop-medications` - Medication schedules
-- `opioid-education` - Pain management education
+- `physical-therapy` - Post-op PT guidelines
 - `constipation-care` - Post-surgical constipation prevention
+
+**Educational (1 document):**
+- `opioid-education` - Pain management education
+
+**Administrative (1 document):**
+- `instructions-state-disability` - **NEW** - California SDI filing instructions
+
+**Equipment/Optional:**
+- `game-ready` - Cold therapy device instructions
+
+### Recent Critical Information Added
+- **Antibiotic Prophylaxis**: 2-year dental procedure requirements, 3-month restriction after surgery
+- **Travel Restrictions**: No domestic flights 6 weeks, no international flights 3 months
+- **Work Return Timeline**: 1-3 months depending on job type and recovery
+- **Administrative Deadlines**: SDI filing must be done day after surgery (Sept 13, 2025)
+- **DMV Forms**: Handicapped placard application for recovery period parking
 
 ### Personal Notes & Documentation
 - `/notes/` directory contains personal project management files:
@@ -109,6 +146,8 @@ order: 1
 3. Create clean markdown in `docs/descriptive-name.md`
 4. Generate HTML in `docs/descriptive-name.html`
 5. Update navigation if needed
+6. Keep `PROJECT_CONTEXT.md` up to date.
+7. Keep `.vscode/copilot-instructions.md` up to date.
 
 ### When Working with Personal Notes
 1. Personal files in `/notes/` provide additional context
@@ -130,7 +169,8 @@ order: 1
 3. Preserve patient personalization (Jeff, specific dates)
 4. Maintain medical accuracy
 5. Test mobile responsiveness
-
+6. Keep `PROJECT_CONTEXT.md` up to date.
+7. Keep `.vscode/copilot-instructions.md` up to date.
 ## Quality Standards
 
 - **Medical Accuracy**: All medical information must remain precise
@@ -142,9 +182,18 @@ order: 1
 
 ## Emergency Information in Content
 - **Dr. Jeffrey Wilde**: (858) 554-7993
-- **Game Ready (Amy Weiner)**: (619) 823-2691
+- **Game Ready (Amy Weiner)**: (619) 823-2691, amy@therapedix.com
 - **Luna PT**: (619) 966-3822
 - **Surgery**: September 12, 2025, 7:30am check-in
+- **Scripps Mission Valley**: 7425 Mission Valley Rd, Suite 202, San Diego, CA 92108
+- **After Hours**: Scripps operator (858) 554-9100, request on-call Orthopedist
+
+## Critical Dates & Deadlines
+- **September 5, 2025**: Start pre-op medications and skin washing (7 days before)
+- **September 12, 2025**: Surgery day, 7:30am check-in
+- **September 13, 2025**: File California State Disability claim (earliest date)
+- **October 24, 2025**: Domestic flight restrictions end (6 weeks post-op)
+- **December 12, 2025**: Hip movement restrictions end, dental visits can resume, international flights allowed (3 months post-op)
 
 ## Deployment
 - **Repository**: GitHub (jeff-hamm organization)
@@ -163,6 +212,89 @@ order: 1
 - Local storage only (no cloud sync)
 - Static site limitations
 - No framework dependencies (vanilla web technologies)
+
+## OCR Processing Guidelines
+
+### Always Use OpenCV-Enhanced OCR
+- **Script**: `batch_ocr_opencv.py` for medical document processing
+- **Method**: OpenCV preprocessing (grayscale, Gaussian blur, OTSU thresholding) + pytesseract
+- **Installation**: `pip install opencv-python` if needed
+- **Workflow**: Place images in `scans_md/`, run script, creates `<name>-ocr.jpg.md` files
+
+### Common User Requests & Solutions
+
+#### "The pink is too bright"
+- Use #ff69b4 (lighter pink) instead of #ff007a or #ff1a8c
+- Secondary pink: #ffb3da for subtle accents
+
+#### "Headers should be gray with pink text"
+- Use `background: linear-gradient(145deg, #4a4a4a 0%, #6c6c6c 100%)`
+- Text color: #ff69b4
+
+#### "Remove the green"
+- Replace any #28a745, #20c997, or green variants with pink equivalents
+- Success states should use pink, not green
+
+## Testing Checklist
+- [ ] All pages load correctly
+- [ ] Color scheme consistent (lighter pink, gray headers)
+- [ ] Mobile responsive design works
+- [ ] Interactive features save/load properly
+- [ ] Cross-references between pages work
+- [ ] Print layouts are clean
+
+## Quick Reference Commands
+
+### Git Operations (Be Very Helpful - User is Not Git Expert)
+
+#### Basic Workflow
+```bash
+git add . && git commit -m "Description" && git push origin main
+```
+
+#### Common Git Tasks for Non-Git Users
+```bash
+# Check what files have changed
+git status
+
+# See what changes you made
+git diff
+
+# Save your work with a message
+git add .
+git commit -m "Brief description of what you changed"
+
+# Upload your changes to GitHub
+git push origin main
+
+# Get the latest changes from GitHub
+git pull origin main
+
+# If you made a mistake, see recent commits
+git log --oneline -10
+
+# If you need to undo the last commit (but keep your changes)
+git reset --soft HEAD~1
+```
+
+#### When Things Go Wrong
+```bash
+# If git push fails, try this first
+git pull origin main
+
+# If you have conflicts, you'll need to resolve them manually
+# Look for files with <<<<<<< markers and edit them
+
+# After fixing conflicts
+git add .
+git commit -m "Fixed merge conflicts"
+git push origin main
+```
+
+### Local Development
+```bash
+python -m http.server 8000  # Then open http://localhost:8000
+```
 
 ## Red Flags to Avoid
 - ❌ Using green colors anywhere
