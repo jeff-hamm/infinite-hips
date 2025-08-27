@@ -91,7 +91,19 @@ This is a **hip replacement surgery documentation website** called "Infinite Hip
 - Day 1 Post-Op task added for SDI filing requirement
 - Cross-navigation between all related documents
 
-#### File Organization Patterns
+#### OCR Processing Guidelines
+
+**Always use OpenCV-enhanced OCR** for medical document processing:
+- **Script to use:** `batch_ocr_opencv.py` for multiple files
+- **Method:** OpenCV preprocessing (grayscale, adaptive thresholding, denoising) + pytesseract
+- **Advantages:** Better accuracy than basic pytesseract due to image preprocessing
+- **Output format:** Markdown files with descriptive names (`<name>-ocr.jpg.md`)
+
+**OCR Workflow:**
+1. Ensure OpenCV is installed: `pip install opencv-python`
+2. Use `batch_ocr_opencv.py` for processing multiple images
+3. Review OCR output for accuracy and update associated HTML/markdown if needed
+4. Maintain the 4-format content mapping system
 
 **Naming Conventions:**
 - Images: `<descriptive-name>.jpg` (e.g., `preop-skin-wash.jpg`)
@@ -118,6 +130,7 @@ Each medical document exists in 4 formats:
 - **Batch operations preferred** - Use `&&` to chain related commands to reduce confirmations
 - **Working directory awareness** - Always use absolute paths for file operations
 - **Cleanup after operations** - Remove macOS `._*` metadata files automatically
+- **OCR Processing** - Always use `batch_ocr_opencv.py` with OpenCV preprocessing for medical documents
 
 #### When Making Changes
 
@@ -129,12 +142,39 @@ Each medical document exists in 4 formats:
 6. **Maintain content mapping** - ensure 4-format system (scan, OCR, markdown, HTML) for medical docs
 7. **Consider administrative deadlines** - new documents may have time-sensitive requirements
 
+#### 🚨 CRITICAL: Agent Instructions Editing Policy
+
+**NEVER modify .vscode/AGENT_INSTRUCTIONS.md without explicit user request**
+- This file contains critical project context and development guidelines
+- Random changes can break future agent understanding of the project
+- Only add content when specifically asked by the user
+- Only remove content if explicitly instructed to do so
+- Always preserve existing content unless user specifically wants it changed
+- When in doubt about agent instructions changes, ask the user first
+
 #### Code Patterns Used
 
 - **Vanilla HTML/CSS/JS** - no frameworks for simplicity
 - **Progressive enhancement** - works without JS, better with JS
 - **Local storage** - for saving user progress and assignments
 - **CSS Grid/Flexbox** - for responsive layouts
+- **OpenCV OCR Processing** - `batch_ocr_opencv.py` for medical document text extraction
+
+#### OCR Processing Guidelines
+
+**Always use OpenCV-enhanced OCR for medical documents:**
+- Use `batch_ocr_opencv.py` for processing medical document images
+- Script includes optimized preprocessing: grayscale conversion, Gaussian blur, OTSU thresholding, morphological cleaning
+- Configured for medical documents with PSM 4 (single column text)
+- Outputs properly formatted markdown files with `# OCR of filename.jpg` header
+
+**OCR Workflow:**
+1. Place images in `scans_md/` directory with descriptive names
+2. Run `python batch_ocr_opencv.py` (modify script to include target images)
+3. Creates `<filename>-ocr.jpg.md` files with clean text extraction
+4. Use OCR content to create clean markdown and HTML documentation
+
+**Never use basic pytesseract without preprocessing** - medical documents require image enhancement for accurate text extraction.
 
 ### Common User Requests & Solutions
 
@@ -170,7 +210,7 @@ Each medical document exists in 4 formats:
 
 1. `git add .`
 2. `git commit -m "Description"`
-3. `git push origin master`
+3. `git push origin main`
 4. GitHub Pages auto-deploys to infinitehips.infinitebutts.com
 
 ### Testing Checklist
@@ -226,7 +266,7 @@ python -m http.server 8000
 # Standard workflow
 git add .
 git commit -m "Description of changes"
-git push origin master
+git push origin main
 ```
 
 ### Find and Replace Operations
