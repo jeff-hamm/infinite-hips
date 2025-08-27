@@ -10,9 +10,8 @@
     --color-pink: #ff69b4;
     --color-pink-dark: #ff1a8c;
     --color-pink-light: #ffb3da;
-    --color-purple1: #2d1b69;
-    --color-purple2: #3d2b7a;
-    --color-purple-border: #6f42c1;
+    --color-note1: rgba(255, 105, 180, 0.2);
+    --color-note2: rgba(255, 179, 218, 0.3);
     --color-gray1: #6c757d;
     --color-gray2: #495057;
     --color-gray3: #343a40;
@@ -31,6 +30,7 @@
     --color-border-pink: rgba(255, 105, 180, 0.3);
     --color-border-pink-light: rgba(255, 179, 218, 0.3);
     --color-border-gray: rgba(108, 117, 125, 0.3);
+    --background-note: linear-gradient(145deg, var(--color-note1) 0%, var(--color-note2) 100%);
 }
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
@@ -147,7 +147,7 @@ body {
         box-shadow: 0 6px 16px var(--color-border-gray);
     }
     .timeline-note {
-        background: linear-gradient(145deg, rgba(255, 105, 180, 0.2) 0%, rgba(255, 179, 218, 0.3) 100%) !important;
+        background: var(--background-note) !important;
         border: 1px solid var(--color-border-pink);
         border-radius: 8px;
         padding: 1rem;
@@ -157,10 +157,6 @@ body {
     .timeline-note strong {
         color: var(--color-pink);
     }
-    /* ...existing code... */
-    box-shadow: 0 6px 24px rgba(0,0,0,0.4);
-    border: 1px solid #666666;
-}
 
 .header h1 {
     margin: 0;
@@ -215,7 +211,7 @@ body {
 }
 
 .highlight {
-    background: linear-gradient(145deg, #2d1b69 0%, #3d2b7a 100%);
+    background: var(--background-note) !important;
     border-left: 4px solid #ff69b4;
     padding: 1rem;
     margin: 1rem 0;
@@ -295,7 +291,7 @@ body {
 }
 
 .pricing-box {
-    background: linear-gradient(145deg, #2d1b69 0%, #3d2b7a 100%);
+        background: var(--background-note) !important;
     border: 1px solid #6f42c1;
     border-radius: 8px;
     padding: 1.5rem;
@@ -337,12 +333,12 @@ body {
 }
 
 .surgery-highlight {
-    background: linear-gradient(145deg, #2d1b69 0%, #3d2b7a 100%) !important;
+        background: var(--background-note) !important;
     border: 1px solid #ff69b4 !important;
 }
 
 .note {
-    background: linear-gradient(145deg, #1a2332 0%, #213243 100%);
+        background: var(--background-note) !important;
     border: 1px solid #ffb3da;
     border-radius: 8px;
     padding: 1rem;
