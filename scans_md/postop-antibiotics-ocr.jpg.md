@@ -1,7 +1,7 @@
 # OCR of postop-antibiotics.jpg
 
-Jeffrey Wilde, MD tT .. .
-Clinical Assistant Professor of Orthopedic Surgery SC. Scripps
+Jeffrey Wilde, MD tf .. :
+Clinical Assistant Professor of Orthopedic Surgery C. Scripps
 Division Head, Section of Lower Extremity Reconstruction
 
 Department of Orthopedics

@@ -1,0 +1,9 @@
+Agency Name,Type,Address,City,State,Zip Code,Distance (miles),Phone Number,Network Status,Contacted,Contact Date,Appointment Scheduled,Appointment Date,Insurance Verified,Notes,Priority Level
+"Aveanna Healthcare","Home Health Agency","2020 Camino Del Rio N Ste 600","San Diego","CA","92108",1.8,"619-574-6744","In-network",,,,,,,"High/Medium/Low"
+"Centerwell Home Health","Home Health Agency","2525 Camino Del Rio S Ste 220","San Diego","CA","92108",1.9,"619-299-9900","In-network",,,,,,,"High/Medium/Low"
+"Danny's Home Health Care","Home Health Agency","2667 Camino Del Rio S Ste 308","San Diego","CA","92108",2.0,"619-908-1934","In-network",,,,,,,"High/Medium/Low"
+"Health Plus Home Health Care","Home Health Agency","3110 Camino Del Rio S Ste A215","San Diego","CA","92108",2.6,"619-223-2779","In-network",,,,,,,"High/Medium/Low"
+"Maxim Healthcare Services","Home Health Agency","3111 Camino Del Rio N Ste 1200","San Diego","CA","92108",2.6,"619-299-9350","In-network",,,,,,,"High/Medium/Low"
+"Seaport Scripps Home Health","Home Health Agency","3750 Convoy St Ste 220","San Diego","CA","92111",4.4,"619-452-7000","In-network",,,,,,,"High/Medium/Low"
+"Lorian Health","Home Health Agency","9655 Granite Ridge Dr Ste 500","San Diego","CA","92123",4.7,"877-567-4265","In-network",,,,,,,"High/Medium/Low"
+"Absolute Home Health","Home Health Agency","3656 Ruffin Rd Ste A","San Diego","CA","92123",4.9,"858-541-2000","Not specified",,,,,,,"High/Medium/Low"

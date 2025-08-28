@@ -8,7 +8,7 @@ All SDI claims must be filed online at www.edd.ca.gov to expedite claims and pay
 To Complete Claim Online:
 4. You will need to create an account and register online before you can submit your claim.
 « Go to www.edd.ca.gowdisability
-« Under file a claim, select "SDI Online”
+* Under file a claim, select "SDI Online”
 e Select “Register for SDI Online”
 e Select “Continue to Registration” and follow the prompts to create your account log in
 and password
@@ -27,7 +27,7 @@ e Once completed, SDI claim processing may take up to 7 business days.
 If you have questions about enrolling or filing your SDI claim contact the EDD by calling (800) 480-
 3287 and select option 6.
 
-"Any additional forms required by your employer for time off should be provided to our office for
+“Any additional forms required by your employer for time off should be provided to our office for
 completion. We do not provide any unemployment/disability forms. See reverse side regarding fees
 for non-EDD forms and letters for employers.
 
