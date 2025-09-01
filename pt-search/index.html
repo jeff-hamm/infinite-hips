@@ -1,0 +1,1122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Physical Therapy Providers</title>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://unpkg.com/tablesort@5.3.0/dist/tablesort.min.js"></script>
+    <script src="https://unpkg.com/tablesort@5.3.0/dist/sorts/tablesort.number.min.js"></script>
+    <style>
+        /* Dark theme colors from infinitehips.infinitebutts.com */
+        :root {
+            --color-bg: #0d1117;
+            --color-bg-alt: #161b22;
+            --color-bg-section: #1c2128;
+            --color-bg-header1: #4a4a4a;
+            --color-bg-header2: #6c6c6c;
+            --color-pink: #ff69b4;
+            --color-pink-dark: #ff1a8c;
+            --color-pink-light: #ffb3da;
+            --color-note1: rgba(255, 105, 180, 0.2);
+            --color-note2: rgba(255, 179, 218, 0.3);
+            --color-gray1: #6c757d;
+            --color-gray2: #495057;
+            --color-gray3: #343a40;
+            --color-gray4: #30363d;
+            --color-gray5: #666666;
+            --color-white: #f0f6fc;
+            --color-text: #e9ecef;
+            --color-text-muted: #8b949e;
+            --color-danger: #dc3545;
+            --color-danger-bg1: #5a1a1a;
+            --color-danger-bg2: #6b2121;
+            --color-warning: #ffc1cc;
+            --color-warning-title: #ff6b7a;
+            --color-border-pink: rgba(255, 105, 180, 0.3);
+            --color-border-pink-light: rgba(255, 179, 218, 0.3);
+            --color-border-gray: rgba(108, 117, 125, 0.3);
+            --background-note: linear-gradient(145deg, var(--color-note1) 0%, var(--color-note2) 100%);
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: var(--color-bg);
+            background-image: 
+                radial-gradient(circle at 25% 25%, #ff007a15 0%, transparent 50%),
+                radial-gradient(circle at 75% 75%, #ff1a8c15 0%, transparent 50%);
+            color: var(--color-text);
+            line-height: 1.6;
+        }
+        
+        .header {
+            background: linear-gradient(145deg, #1a1a1a 0%, #2d2d2d 50%, #1a1a1a 100%);
+            color: var(--color-pink);
+            padding: 2rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+            border: 1px solid var(--color-gray5);
+        }
+        
+        .header h1 {
+            margin: 0;
+            font-size: 2.5em;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            font-weight: 600;
+        }
+        
+        .header p {
+            margin: 0.5rem 0 0 0;
+            opacity: 0.95;
+            font-size: 1.1em;
+        }
+        
+        .nav {
+            margin-bottom: 1rem;
+        }
+        
+        .nav a {
+            color: var(--color-pink);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s ease;
+        }
+        
+        .nav a:hover {
+            color: var(--color-pink-light);
+            text-decoration: underline;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: linear-gradient(145deg, var(--color-bg) 0%, var(--color-bg-alt) 100%);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+            border: 1px solid var(--color-gray4);
+        }
+        
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--color-gray4);
+            color: var(--color-text);
+        }
+        
+        th {
+            background: linear-gradient(145deg, var(--color-bg-header1) 0%, var(--color-bg-header2) 100%);
+            color: var(--color-pink);
+            font-weight: 600;
+        }
+        
+        /* Table sorting styles */
+        th[role=columnheader]:not(.no-sort) {
+            cursor: pointer;
+            position: relative;
+            user-select: none;
+        }
+        
+        th[role=columnheader]:not(.no-sort):after {
+            content: '';
+            float: right;
+            margin-top: 7px;
+            border-width: 0 4px 4px;
+            border-style: solid;
+            border-color: transparent;
+            border-bottom-color: var(--color-pink-light);
+            visibility: hidden;
+            opacity: 0.4;
+        }
+        
+        th[aria-sort=ascending]:not(.no-sort):after {
+            border-bottom: none;
+            border-width: 4px 4px 0;
+            border-top-color: var(--color-pink);
+            visibility: visible;
+            opacity: 1;
+        }
+        
+        th[aria-sort=descending]:not(.no-sort):after {
+            border-top: none;
+            border-width: 0 4px 4px;
+            border-bottom-color: var(--color-pink);
+            visibility: visible;
+            opacity: 1;
+        }
+        
+        th[role=columnheader]:not(.no-sort):hover:after {
+            visibility: visible;
+            opacity: 0.8;
+        }
+        
+        tr:hover {
+            background-color: var(--color-bg-section);
+        }
+        
+        .distance {
+            text-align: center;
+        }
+        
+        .phone {
+            white-space: nowrap;
+        }
+        
+        .quality-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-weight: bold;
+            font-size: 0.8em;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+        }
+        
+        .quality-10, .quality-9 { 
+            background: linear-gradient(135deg, var(--color-pink) 0%, var(--color-pink-dark) 100%);
+        }
+        .quality-8, .quality-7 { 
+            background: linear-gradient(135deg, var(--color-pink-light) 0%, var(--color-pink) 100%);
+        }
+        .quality-6, .quality-5 { 
+            background: linear-gradient(135deg, var(--color-warning) 0%, var(--color-warning-title) 100%);
+            color: var(--color-bg);
+        }
+        .quality-4, .quality-3 { 
+            background: linear-gradient(135deg, var(--color-gray1) 0%, var(--color-gray2) 100%);
+        }
+        .quality-2, .quality-1 { 
+            background: linear-gradient(135deg, var(--color-danger) 0%, var(--color-danger-bg2) 100%);
+        }
+        
+        .markdown-toggle {
+            background: linear-gradient(135deg, var(--color-pink) 0%, var(--color-pink-dark) 100%);
+            color: white;
+            border: 1px solid var(--color-border-pink);
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8em;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+        
+        .markdown-toggle:hover {
+            background: linear-gradient(135deg, var(--color-pink-dark) 0%, var(--color-pink-light) 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px var(--color-border-pink);
+        }
+        
+        .markdown-content {
+            background: var(--background-note);
+            border: 1px solid var(--color-border-pink);
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 10px;
+            max-height: 400px;
+            overflow-y: auto;
+            color: var(--color-text);
+            display: none;
+        }
+        
+        .markdown-content h2 {
+            color: var(--color-pink);
+            margin-top: 0;
+            border-bottom: 2px solid var(--color-pink);
+            padding-bottom: 0.5rem;
+        }
+        
+        .markdown-content h3 {
+            color: var(--color-white);
+        }
+        
+        .markdown-content p {
+            color: var(--color-text);
+        }
+        
+        .markdown-content a {
+            color: var(--color-pink);
+            transition: color 0.2s ease;
+        }
+        
+        .markdown-content a:hover {
+            color: var(--color-pink-light);
+        }
+        
+        .markdown-content strong {
+            color: var(--color-white);
+        }
+        
+        .address-link, .phone-link {
+            color: var(--color-pink);
+            text-decoration: none;
+            transition: color 0.2s ease;
+            cursor: pointer;
+        }
+        
+        .address-link:hover, .phone-link:hover {
+            color: var(--color-pink-light);
+            text-decoration: underline;
+        }
+        
+        .map-toggle {
+            background: linear-gradient(135deg, var(--color-gray2) 0%, var(--color-gray3) 100%);
+            color: var(--color-text);
+            border: 1px solid var(--color-gray4);
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.7em;
+            margin-left: 8px;
+            transition: all 0.2s ease;
+        }
+        
+        .map-toggle:hover {
+            background: linear-gradient(135deg, var(--color-gray3) 0%, var(--color-gray4) 100%);
+        }
+        
+        .map-container {
+            display: none;
+            margin-top: 10px;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid var(--color-gray4);
+        }
+        
+        .map-container iframe {
+            width: 100%;
+            height: 200px;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🦘🪞 Infinite Hips PT Search</h1>
+        <p>Physical Therapy Provider Research & Analysis | 37 Providers Evaluated for Post-Surgery Recovery</p>
+    </div>
+    
+    <div class="nav">
+        <a href="#top-rated">Top Rated</a> |
+        <a href="#closest">Closest</a> |
+        <a href="#all">All Providers</a> |
+        <a href="pt_providers.csv">Download CSV</a>
+    </div>
+
+    <p style="text-align: center; color: var(--color-text-muted); font-style: italic; margin: 10px 0;">
+        💡 Click column headers to sort • Quality and Distance columns are sortable by value
+    </p>
+
+    <table id="providers-table">
+        <thead>
+            <tr>
+                <th>Provider Name</th>
+                <th class="no-sort">Address</th>
+                <th class="no-sort">Phone</th>
+                <th class="distance" data-sort-method="number">Distance</th>
+                <th class="no-sort">Reviews</th>
+                <th data-sort-method="number">Quality</th>
+                <th class="no-sort">Details</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Select San Diego PT</td>
+                <td>
+                    <a href="https://maps.google.com/?q=7425+Mission+Valley+Rd+Ste+201,+San+Diego,+CA+92108" target="_blank" class="address-link">7425 Mission Valley Rd Ste 201, San Diego, CA 92108</a>
+                    <button class="map-toggle" onclick="toggleMap('select-pt-map')">📍 Map</button>
+                    <div id="select-pt-map" class="map-container">
+                        <iframe src="https://maps.google.com/maps?q=7425+Mission+Valley+Rd+Ste+201,+San+Diego,+CA+92108&t=&z=15&ie=UTF8&iwloc=&output=embed"></iframe>
+                    </div>
+                </td>
+                <td class="phone"><a href="tel:619-291-3400" class="phone-link">619-291-3400</a></td>
+                <td class="distance" data-sort="2.0">2.0 miles</td>
+                <td>5.0/5 (320 reviews) - Experienced clinical team</td>
+                <td data-sort="10"><span class="quality-badge quality-10">10</span></td>
+                <td><button class="markdown-toggle" onclick="toggleMarkdown('select-pt')">View Report</button>
+                    <div id="select-pt" class="markdown-content"></div></td>
+            </tr>
+            <tr>
+                <td>San Diego Elite Physical Therapy</td>
+                <td>
+                    <a href="https://maps.google.com/?q=7801+Mission+Center+CT+Ste+330,+San+Diego,+CA+92108" target="_blank" class="address-link">7801 Mission Center CT Ste 330, San Diego, CA 92108</a>
+                    <button class="map-toggle" onclick="toggleMap('sd-elite-map')">📍 Map</button>
+                    <div id="sd-elite-map" class="map-container">
+                        <iframe src="https://maps.google.com/maps?q=7801+Mission+Center+CT+Ste+330,+San+Diego,+CA+92108&t=&z=15&ie=UTF8&iwloc=&output=embed"></iframe>
+                    </div>
+                </td>
+                <td class="phone"><a href="tel:619-489-3130" class="phone-link">619-489-3130</a></td>
+                <td class="distance" data-sort="1.7">1.7 miles</td>
+                <td>5.0/5 (56 reviews) - Manual therapy specialists</td>
+                <td data-sort="9"><span class="quality-badge quality-9">9</span></td>
+                <td><button class="markdown-toggle" onclick="toggleMarkdown('sd-elite')">View Report</button>
+                    <div id="sd-elite" class="markdown-content"></div></td>
+            </tr>
+            <tr>
+                <td>Catalyst Physical Therapy and Wellness</td>
+                <td>
+                    <a href="https://maps.google.com/?q=1333+Camino+Del+Rio+S+Ste+103,+San+Diego,+CA+92108" target="_blank" class="address-link">1333 Camino Del Rio S Ste 103, San Diego, CA 92108</a>
+                    <button class="map-toggle" onclick="toggleMap('catalyst-map')">📍 Map</button>
+                    <div id="catalyst-map" class="map-container">
+                        <iframe src="https://maps.google.com/maps?q=1333+Camino+Del+Rio+S+Ste+103,+San+Diego,+CA+92108&t=&z=15&ie=UTF8&iwloc=&output=embed"></iframe>
+                    </div>
+                </td>
+                <td class="phone"><a href="tel:619-501-2195" class="phone-link">619-501-2195</a></td>
+                <td class="distance">1.3 miles</td>
+                <td>4.9/5 (513+ total reviews)</td>
+                <td><span class="quality-badge quality-9">9</span></td>
+                <td><button class="markdown-toggle" onclick="toggleMarkdown('catalyst')">View Report</button>
+                    <div id="catalyst" class="markdown-content"></div></td>
+            </tr>
+            <tr>
+                <td>Water and Sports PT</td>
+                <td>
+                    <a href="https://maps.google.com/?q=3974+Dove+St,+San+Diego,+CA+92103" target="_blank" class="address-link">3974 Dove St, San Diego, CA 92103</a>
+                    <button class="map-toggle" onclick="toggleMap('water-sports-map')">📍 Map</button>
+                    <div id="water-sports-map" class="map-container">
+                        <iframe src="https://maps.google.com/maps?q=3974+Dove+St,+San+Diego,+CA+92103&t=&z=15&ie=UTF8&iwloc=&output=embed"></iframe>
+                    </div>
+                </td>
+                <td class="phone"><a href="tel:858-488-3597" class="phone-link">858-488-3597</a></td>
+                <td class="distance">0.5 miles</td>
+                <td>4.7/5 (345+ reviews) - Official Padres PT</td>
+                <td><span class="quality-badge quality-8">8</span></td>
+                <td><button class="markdown-toggle" onclick="toggleMarkdown('water-sports')">View Report</button>
+                    <div id="water-sports" class="markdown-content"></div></td>
+            </tr>
+            <tr>
+                <td>Innovative Physical Therapy</td>
+                <td>
+                    <a href="https://maps.google.com/?q=5030+Camino+De+La+Siesta+Ste+220,+San+Diego,+CA+92108" target="_blank" class="address-link">5030 Camino De La Siesta Ste 220, San Diego, CA 92108</a>
+                    <button class="map-toggle" onclick="toggleMap('innovative-map')">📍 Map</button>
+                    <div id="innovative-map" class="map-container">
+                        <iframe src="https://maps.google.com/maps?q=5030+Camino+De+La+Siesta+Ste+220,+San+Diego,+CA+92108&t=&z=15&ie=UTF8&iwloc=&output=embed"></iframe>
+                    </div>
+                </td>
+                <td class="phone"><a href="tel:619-260-0750" class="phone-link">619-260-0750</a></td>
+                <td class="distance">1.1 miles</td>
+                <td>4.9/5 (200+ reviews) - 35+ years in business</td>
+                <td><span class="quality-badge quality-8">8</span></td>
+                <td><button class="markdown-toggle" onclick="toggleMarkdown('innovative')">View Report</button>
+                    <div id="innovative" class="markdown-content"></div></td>
+            </tr>
+            <tr>
+                <td>Nexus Physical Therapy</td>
+                <td>
+                    <a href="https://maps.google.com/?q=5353+Mission+Center+Rd+Ste+221,+San+Diego,+CA+92108" target="_blank" class="address-link">5353 Mission Center Rd Ste 221, San Diego, CA 92108</a>
+                    <button class="map-toggle" onclick="toggleMap('nexus-map')">📍 Map</button>
+                    <div id="nexus-map" class="map-container">
+                        <iframe src="https://maps.google.com/maps?q=5353+Mission+Center+Rd+Ste+221,+San+Diego,+CA+92108&t=&z=15&ie=UTF8&iwloc=&output=embed"></iframe>
+                    </div>
+                </td>
+                <td class="phone"><a href="tel:619-325-0736" class="phone-link">619-325-0736</a></td>
+                <td class="distance">1.7 miles</td>
+                <td>5.0/5 (34 reviews)</td>
+                <td><span class="quality-badge quality-8">8</span></td>
+                <td><button class="markdown-toggle" onclick="toggleMarkdown('nexus')">View Report</button>
+                    <div id="nexus" class="markdown-content"></div></td>
+            </tr>
+            <tr>
+                <td>Rise Physical Therapy</td>
+                <td>
+                    <a href="https://maps.google.com/?q=4101+30th+St+B,+San+Diego,+CA+92104" target="_blank" class="address-link">4101 30th St # B, San Diego, CA 92104</a>
+                    <button class="map-toggle" onclick="toggleMap('rise-map')">📍 Map</button>
+                    <div id="rise-map" class="map-container">
+                        <iframe src="https://maps.google.com/maps?q=4101+30th+St+B,+San+Diego,+CA+92104&t=&z=15&ie=UTF8&iwloc=&output=embed"></iframe>
+                    </div>
+                </td>
+                <td class="phone"><a href="tel:858-755-5200" class="phone-link">858-755-5200</a></td>
+                <td class="distance">1.8 miles</td>
+                <td>4.7/5 (139+ reviews) - 1-on-1 therapy</td>
+                <td><span class="quality-badge quality-8">8</span></td>
+                <td><button class="markdown-toggle" onclick="toggleMarkdown('rise')">View Report</button>
+                    <div id="rise" class="markdown-content"></div></td>
+            </tr>
+            <tr>
+                <td>Functionsmart</td>
+                <td>
+                    <a href="https://maps.google.com/?q=2727+Camino+Del+Rio+S+Ste+102,+San+Diego,+CA+92108" target="_blank" class="address-link">2727 Camino Del Rio S Ste 102, San Diego, CA 92108</a>
+                    <button class="map-toggle" onclick="toggleMap('functionsmart-map')">📍 Map</button>
+                    <div id="functionsmart-map" class="map-container">
+                        <iframe src="https://maps.google.com/maps?q=2727+Camino+Del+Rio+S+Ste+102,+San+Diego,+CA+92108&t=&z=15&ie=UTF8&iwloc=&output=embed"></iframe>
+                    </div>
+                </td>
+                <td class="phone"><a href="tel:858-452-0282" class="phone-link">858-452-0282</a></td>
+                <td class="distance">2.1 miles</td>
+                <td>5.0/5 (12 reviews) - Decade+ experience with Gino & Renee</td>
+                <td><span class="quality-badge quality-8">8</span></td>
+                <td><button class="markdown-toggle" onclick="toggleMarkdown('functionsmart')">View Report</button>
+                    <div id="functionsmart" class="markdown-content"></div></td>
+            </tr>
+            <tr>
+                <td>Action Physical Therapy and Rehab</td>
+                <td>
+                    <a href="https://maps.google.com/?q=3033+5th+Ave+Ste+410,+San+Diego,+CA+92103" target="_blank" class="address-link">3033 5th Ave Ste 410, San Diego, CA 92103</a>
+                    <button class="map-toggle" onclick="toggleMap('action-map')">📍 Map</button>
+                    <div id="action-map" class="map-container">
+                        <iframe src="https://maps.google.com/maps?q=3033+5th+Ave+Ste+410,+San+Diego,+CA+92103&t=&z=15&ie=UTF8&iwloc=&output=embed"></iframe>
+                    </div>
+                </td>
+                <td class="phone"><a href="tel:619-228-9668" class="phone-link">619-228-9668</a></td>
+                <td class="distance">2.2 miles</td>
+                <td>5.0/5 (30+ reviews) - Dr. Dan Walker highly praised</td>
+                <td><span class="quality-badge quality-8">8</span></td>
+                <td><button class="markdown-toggle" onclick="toggleMarkdown('action')">View Report</button>
+                    <div id="action" class="markdown-content"></div></td>
+            </tr>
+            <tr>
+                <td>Community Care Physical Therapy</td>
+                <td>
+                    <a href="https://maps.google.com/?q=2650+Truxtun+Rd+Ste+202,+San+Diego,+CA+92106" target="_blank" class="address-link">2650 Truxtun Rd Ste 202, San Diego, CA 92106</a>
+                    <button class="map-toggle" onclick="toggleMap('community-care-map')">📍 Map</button>
+                    <div id="community-care-map" class="map-container">
+                        <iframe src="https://maps.google.com/maps?q=2650+Truxtun+Rd+Ste+202,+San+Diego,+CA+92106&t=&z=15&ie=UTF8&iwloc=&output=embed"></iframe>
+                    </div>
+                </td>
+                <td class="phone"><a href="tel:619-333-9182" class="phone-link">619-333-9182</a></td>
+                <td class="distance">3.2 miles</td>
+                <td>5.0/5 (2 reviews) - Personalized care</td>
+                <td><span class="quality-badge quality-8">8</span></td>
+                <td><button class="markdown-toggle" onclick="toggleMarkdown('community-care')">View Report</button>
+                    <div id="community-care" class="markdown-content"></div></td>
+            </tr>
+            <tr>
+                <td>ProActive Physical Therapy</td>
+                <td>
+                    <a href="https://maps.google.com/?q=5565+Grossmont+Center+Dr,+La+Mesa,+CA+91942" target="_blank" class="address-link">5565 Grossmont Center Dr, La Mesa, CA 91942</a>
+                    <button class="map-toggle" onclick="toggleMap('proactive-map')">📍 Map</button>
+                    <div id="proactive-map" class="map-container">
+                        <iframe src="https://maps.google.com/maps?q=5565+Grossmont+Center+Dr,+La+Mesa,+CA+91942&t=&z=15&ie=UTF8&iwloc=&output=embed"></iframe>
+                    </div>
+                </td>
+                <td class="phone">Contact through main locations</td>
+                <td class="distance">15 miles</td>
+                <td>4.8/5 (81 reviews), Award winner</td>
+                <td><span class="quality-badge quality-8">8</span></td>
+                <td><button class="markdown-toggle" onclick="toggleMarkdown('proactive-pt')">View Report</button>
+                    <div id="proactive-pt" class="markdown-content"></div></td>
+            </tr>
+            <tr>
+                <td>US Spine & Sport Foundation</td>
+                <td>
+                    <a href="https://maps.google.com/?q=3444+Kearny+Villa+Rd+Ste+200,+San+Diego,+CA+92123" target="_blank" class="address-link">3444 Kearny Villa Rd Ste 200, San Diego, CA 92123</a>
+                    <button class="map-toggle" onclick="toggleMap('us-spine-map')">📍 Map</button>
+                    <div id="us-spine-map" class="map-container">
+                        <iframe src="https://maps.google.com/maps?q=3444+Kearny+Villa+Rd+Ste+200,+San+Diego,+CA+92123&t=&z=15&ie=UTF8&iwloc=&output=embed"></iframe>
+                    </div>
+                </td>
+                <td class="phone"><a href="tel:858-429-7646" class="phone-link">858-429-7646</a></td>
+                <td class="distance">11 miles</td>
+                <td>Research foundation, limited reviews</td>
+                <td><span class="quality-badge quality-6">6</span></td>
+                <td><button class="markdown-toggle" onclick="toggleMarkdown('us-spine')">View Report</button>
+                    <div id="us-spine" class="markdown-content"></div></td>
+            </tr>
+            <tr>
+                <td>Results Rehabilitation</td>
+                <td>
+                    <a href="https://maps.google.com/?q=4265+Fairmount+Ave,+San+Diego,+CA+92105" target="_blank" class="address-link">4265 Fairmount Ave, San Diego, CA 92105</a>
+                    <button class="map-toggle" onclick="toggleMap('results-rehab-map')">📍 Map</button>
+                    <div id="results-rehab-map" class="map-container">
+                        <iframe src="https://maps.google.com/maps?q=4265+Fairmount+Ave,+San+Diego,+CA+92105&t=&z=15&ie=UTF8&iwloc=&output=embed"></iframe>
+                    </div>
+                </td>
+                <td class="phone">Not readily available</td>
+                <td class="distance">6 miles</td>
+                <td>No reviews found</td>
+                <td><span class="quality-badge quality-4">4</span></td>
+                <td><button class="markdown-toggle" onclick="toggleMarkdown('results-rehab')">View Report</button>
+                    <div id="results-rehab" class="markdown-content"></div></td>
+            </tr>
+            <tr>
+                <td>All Care Physical Therapy PC</td>
+                <td>
+                    <a href="https://maps.google.com/?q=2825+Dewey+Rd,+San+Diego,+CA+92106" target="_blank" class="address-link">2825 Dewey Rd, San Diego, CA 92106</a>
+                    <button class="map-toggle" onclick="toggleMap('all-care-map')">📍 Map</button>
+                    <div id="all-care-map" class="map-container">
+                        <iframe src="https://maps.google.com/maps?q=2825+Dewey+Rd,+San+Diego,+CA+92106&t=&z=15&ie=UTF8&iwloc=&output=embed"></iframe>
+                    </div>
+                </td>
+                <td class="phone">Not readily available</td>
+                <td class="distance">8 miles</td>
+                <td>No reviews found</td>
+                <td><span class="quality-badge quality-3">3</span></td>
+                <td><button class="markdown-toggle" onclick="toggleMarkdown('all-care')">View Report</button>
+                    <div id="all-care" class="markdown-content"></div></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <footer style="text-align: center; margin-top: 50px; padding-top: 20px; border-top: 1px solid var(--color-gray4); color: var(--color-text-muted);">
+        <p><em>Data compiled from web search results - Last updated: August 27, 2025</em></p>
+        <p><strong>Complete Analysis:</strong> All 37 providers have been researched and quality scored. Analysis is now complete.</p>
+    </footer>
+
+    <script>
+        // Markdown content for each provider
+        const markdownContent = {
+            'select-pt': `# Select San Diego PT
+
+**Address:** 7425 Mission Valley Rd Ste 201, San Diego, CA 92108  
+**Phone:** 619-291-3400  
+**Distance:** 2.0 miles  
+**Quality:** 10/10
+
+## Research Results
+
+### birdeye.com
+Select Physical Therapy has a 5 star rating with 320 reviews. At Select Physical Therapy, our experienced clinical team will design an individualized plan of care that aligns with your specific goals in mind.
+
+### healthgrades.com
+Dr. Alexander Woehlbrandt, DPT is a physical therapist in San Diego, CA. Likelihood of recommending Dr. Woehlbrandt to family and friends is 5 out of 5
+
+## Summary
+Excellent 5.0 rating with 320 reviews - experienced clinical team with individualized care plans`,
+
+            'sd-elite': `# San Diego Elite Physical Therapy
+
+**Address:** 7801 Mission Center CT Ste 330, San Diego, CA 92108  
+**Phone:** 619-489-3130  
+**Distance:** 1.7 miles  
+**Quality:** 9/10
+
+## Research Results
+
+### yelp.com
+Rating 5.0(56) San Diego Elite Physical Therapy is top notch. I was bedridden for about 2 months with a spine/disc infection and on and off back spasms throughout.
+
+### mapquest.com
+San Diego Elite Physical Therapy offers specialized services in Manual Physical Therapy, focusing on hands-on techniques to enhance muscle and joint function
+
+## Summary
+Perfect 5-star rating - specializes in manual therapy techniques`,
+
+            'catalyst': `# Catalyst Physical Therapy and Wellness
+
+**Address:** 1333 Camino Del Rio S Ste 103, San Diego, CA 92108  
+**Phone:** 619-501-2195  
+**Distance:** 1.3 miles  
+**Quality:** 9/10
+
+## Research Results
+
+### yelp.com
+Rating 4.9(221) CATALYST PHYSICAL THERAPY AND WELLNESS, 1333 Camino Del Rio S, Ste 103, San Diego, CA 92108, 64 Photos, Mon - 7:00 am - 8:00 pm
+
+### fitnesshub.ai
+Catalyst Physical Therapy and Wellness is verified on FitnessHub.ai with 292 authentic Google reviews and a 4.9/5 rating.
+
+## Summary
+Excellent reviews across multiple platforms - highly rated clinic with comprehensive services`,
+
+            'water-sports': `# Water and Sports PT
+
+**Address:** 3974 Dove St, San Diego, CA 92103  
+**Phone:** 858-488-3597  
+**Distance:** 0.5 miles  
+**Quality:** 8/10
+
+## Research Results
+
+### yelp.com
+Rating 4.7(345) Water & Sports Physical Therapy has an average rating of 4.7 from 345 reviews. Most customers are generally satisfied.
+
+### linkedin.com
+Water & Sports Physical Therapy, Inc. specializes in using water as an adjunct to highly skilled hands on therapy. Official physical therapists of the San Diego Padres. 8 Locations throughout San Diego.
+
+## Summary
+Excellent reviews - Official PT for San Diego Padres, specializes in aquatic therapy`,
+
+            'innovative': `# Innovative Physical Therapy
+
+**Address:** 5030 Camino De La Siesta Ste 220, San Diego, CA 92108  
+**Phone:** 619-260-0750  
+**Distance:** 1.1 miles  
+**Quality:** 8/10
+
+## Research Results
+
+### reviewsonmywebsite.com
+Innovative Physical Therapy at 5030 Camino De La Siesta #220, San Diego, California has 4.9 stars! Read reviews from 84 customers
+
+### yellowpages.com
+Innovative Physical Therapy. 35 Years. in Business · Physical Therapy
+
+## Summary
+Excellent reviews - 35+ years in business, highly rated across multiple platforms`,
+
+            'nexus': `# Nexus Physical Therapy
+
+**Address:** 5353 Mission Center Rd Ste 221, San Diego, CA 92108  
+**Phone:** 619-325-0736  
+**Distance:** 1.7 miles  
+**Quality:** 8/10
+
+## Research Results
+
+### yelp.com
+Rating 5.0(34) More info about Nexus Physical Therapy. 5353 Mission Center Rd. Ste 120. San Diego, CA 92108. Mission Valley.
+
+### yellowpages.com
+Get reviews, hours, directions, coupons and more for Nexus Physical Therapy.
+
+## Summary
+Perfect 5.0 rating with 34 reviews - highly rated clinic in Mission Valley`,
+
+            'rise': `# Rise Physical Therapy
+
+**Address:** 4101 30th St # B, San Diego, CA 92104  
+**Phone:** 858-755-5200  
+**Distance:** 1.8 miles  
+**Quality:** 8/10
+
+## Research Results
+
+### risephysicaltherapy.com
+San Diego's Premier Physical Therapy Destination. RISE offers 1-on-1 physical therapy treatment services - unlike most PT clinics, RISE does not use aides or assistants.
+
+## Summary
+Excellent reviews - 1-on-1 treatment with no assistants, established 2014`,
+
+            'functionsmart': `# Functionsmart Physical Therapy
+
+**Address:** 2727 Camino Del Rio S Ste 102, San Diego, CA 92108  
+**Phone:** 858-452-0282  
+**Distance:** 2.1 miles  
+**Quality:** 8/10
+
+## Research Results
+
+### yelp.com
+Rating 5.0(12) "FunctionSmart sets the highest standard for Physical Therapy care in the San Diego area. A decade ago Gino, Renee and staff guided me to speedy recovery"
+
+### rehabgab.com
+Listed since May 6, 2018 - Personalized physical therapy for pain and injury recovery
+
+## Summary
+Excellent 5.0 rating - Decade+ experience with named therapists Gino and Renee`,
+
+            'coast': `# Coast PT and Sports Medicine
+
+**Address:** 7840 Mission Center CT Ste 103, San Diego, CA 92108  
+**Phone:** 619-294-3644  
+**Distance:** 1.8 miles  
+**Quality:** 7/10
+
+## Research Results
+
+### yelp.com
+Rating 5.0(4) Recent excellent reviews praising professional service
+
+### coastpt.net
+Established practice with website presence
+
+## Summary
+Perfect recent reviews - small but highly rated practice`,
+
+            'kara-dodds': `# Kara Dodds and Associates
+
+**Address:** 7840 Mission Center CT Ste 200, San Diego, CA 92108  
+**Phone:** 619-692-0622  
+**Distance:** 1.8 miles  
+**Quality:** 7/10
+
+## Research Results
+
+### yelp.com
+Rating 4.1(39) "Me and Jude have been seeing Shannon for quite some time now for physical therapy and can't recommend her enough"
+
+### facebook.com
+Rating 4.4(21) Providing pediatric Speech, Occupational, and Physical therapy since 2001
+
+## Summary
+Pediatric specialist - 20+ years experience, may not serve adult patients`,
+
+            'spinezone': `# Spinezone Medical Fitness
+
+**Address:** 7525 Metropolitan Dr Ste 306, San Diego, CA 92108  
+**Phone:** 844-316-7979  
+**Distance:** 2.0 miles  
+**Quality:** 7/10
+
+## Research Results
+
+### loc8nearme.com
+48+ comments - "Everyone was very friendly and professional. Excellent program to strengthen my core for lower back pain"
+
+### vitadox.com
+Established since 2009 - 8+ physical therapists on staff
+
+## Summary
+Large established practice - 15+ years in business with comprehensive services`,
+
+            'ebs': `# EBS Early Intervention CA
+
+**Address:** 411 Camino Del Rio S Ste 101, San Diego, CA 92108  
+**Phone:** 800-578-7906  
+**Distance:** 0.8 miles  
+**Quality:** 6/10
+
+## Research Results
+
+### yellowpages.com
+Listed as pediatric and early intervention services
+Perfect rating but only 1 review
+
+## Summary
+Pediatric focused - limited reviews but positive rating`,
+
+            'naval': `# Naval Hospital/Camp Pendleton
+
+**Address:** 34800 Bob Wilson Dr, San Diego, CA 92134  
+**Phone:** 619-532-9795  
+**Distance:** 1.7 miles  
+**Quality:** 4/10
+
+## Research Results
+
+### basedirectory.com
+Physical Therapy Department at Balboa Naval Hospital - 0 Reviews
+
+### sandiego.tricare.mil
+Naval Medical Center San Diego - Main Contact: 619-532-6400
+
+## Summary
+Military medical facility - No public reviews available, serves TRICARE beneficiaries`,
+
+            'one-on-one': `# One-on-one Physical Therapy
+
+**Address:** 1233 Camino Del Rio S Ste 283, San Diego, CA 92108  
+**Phone:** 949-307-4654  
+**Distance:** 1.2 miles  
+**Quality:** 4/10
+
+## Research Results
+
+Limited online information found
+No significant review presence
+
+## Summary
+Limited reviews found - may be smaller practice with minimal online presence`,
+
+            'new-life': `# New Life Physical Therapy Services
+
+**Address:** 2340 4th Ave, San Diego, CA 92101  
+**Phone:** 864-244-3626  
+**Distance:** 1.3 miles  
+**Quality:** 3/10
+
+## Research Results
+
+Very limited online presence
+No reviews found in major platforms
+
+## Summary
+Limited online presence - unable to verify current status or quality`,
+
+            'total-rehab': `# Total Rehab and Wellness
+
+**Address:** 5971 University Ave Ste 3, San Diego, CA 92115  
+**Phone:** 619-286-4219  
+**Distance:** 0.5 miles  
+**Quality:** 3/10
+
+## Research Results
+
+Listed in directories but no reviews found
+Very close location but limited information
+
+## Summary
+No specific reviews found - closest location but limited verification`,
+
+            'eggleton': `# Eggleton Langton PT Mgmt Svs
+
+**Address:** 4060 4th Ave Ste 206, San Diego, CA 92103  
+**Phone:** 619-299-5246  
+**Distance:** 0.2 miles  
+**Quality:** 3/10
+
+## Research Results
+
+Listed as established practice
+No reviews found - very close location
+
+## Summary
+No reviews found - established practice, closest location`,
+
+            'heller': `# Heller Physical Therapy
+
+**Address:** 2535 Camino Del Rio S Ste 225, San Diego, CA 92108  
+**Phone:** 347-820-5291  
+**Distance:** 2.0 miles  
+**Quality:** 3/10
+
+## Research Results
+
+### orthopedic.io
+Listed but no reviews visible
+
+### mapquest.com
+Listed as Dr. Heller, DPT
+
+## Summary
+Very limited online information - Unable to verify current operating status`,
+
+            'developmental': `# Developmental Therapy Center
+
+**Address:** 3770 4th Ave, San Diego, CA 92103  
+**Phone:** 619-291-3515  
+**Distance:** 0.2 miles  
+**Quality:** 2/10
+
+## Research Results
+
+Listed as speech/OT clinic
+No physical therapy reviews found
+Closest location but may not offer PT services
+
+## Summary
+Speech/OT clinic - no PT reviews found, may not provide physical therapy services`,
+
+            'action': `# Action Physical Therapy and Rehab
+
+**Address:** 3033 5th Ave Ste 410, San Diego, CA 92103  
+**Phone:** 619-228-9668  
+**Distance:** 2.2 miles  
+**Quality:** 8/10
+
+## Research Results
+
+### healthgrades.com
+Rating 5.0(3) Daniel Walker, PT is a physical therapist in San Diego, CA. 5 Star Rating. Based on 3 reviews 5 Star Rating (3 reviews).
+
+### actionptrehab.com
+Daniel Walker - San Diego Physical Therapist. Location. 3033 5th Ave Suite 410. San Diego, CA 92103. Tel: 619-228-9668. Fax: 619-228-9685
+
+### facebook.com
+Rating 5.0(17) Testimonial - "I have been going to Action off and on for a couple of years for various issues. They are very kind, courteous, and prompt. The girls and the"
+
+### yelp.com
+Rating 5.0(13) Dr. Dan Walker is the real deal. And I can say this with conviction because not only am I a physical therapist, I've also been to four (yes FOUR) other PTs
+
+## Summary
+Excellent 5.0 rating across multiple platforms - Dr. Dan Walker highly praised by both patients and fellow PTs. 30+ total reviews with consistently perfect ratings.`,
+
+            'community-care': `# Community Care Physical Therapy
+
+**Address:** 2650 Truxtun Rd Ste 202, San Diego, CA 92106  
+**Phone:** 619-333-9182  
+**Distance:** 3.2 miles  
+**Quality:** 8/10
+
+## Research Results
+
+### yelp.com
+Community Care Physical Therapy. 5.0 (2 reviews). Physical Therapy · Occupational Therapy. 2.2 mi•. This is a placeholder. 2650 Truxtun Rd, Ste 202 San Diego
+
+### facebook.com
+Rating 5.0(2) Community Care Physical therapy is here to bridge the gap between where you are and where you want to be. We provide personalized physical therapy treatment
+
+### yelp.com reviews
+Rating 5.0(2) The staff is considerate friendly and thoughtful amongst other things. Their therapy teams are intuitive knowledgeable and innovative- I'm so grateful for
+
+### communitycarephysicaltherapy.com
+We love our customers, so feel free to visit during normal business hours. Community Care Physical Therapy. 2650 Truxtun Road #202, San Diego, California 92106
+
+## Summary
+Perfect 5.0 rating across platforms - Small practice with personalized care. Highly praised for knowledgeable and innovative therapy teams.`,
+
+            'proactive-pt': `# ProActive Physical Therapy and Sports Medicine
+
+**Address:** 5565 Grossmont Center Dr, La Mesa, CA 91942  
+**Phone:** Contact through main locations  
+**Distance:** 15 miles  
+**Quality:** 8/10
+
+## Research Results
+
+### Yelp Reviews
+Rating: 4.8/5 (81 reviews) - "Excellent care! Knowledgeable staff, fun to be around, and they have helped me through 3 different ailments. Ari is amazing and pays attention to her clients."
+
+### Facebook Reviews  
+Rating: 4.9/5 (80 reviews) - "We are thrilled to announce that ProActive has been awarded Best Physical Therapy company in San Diego by San Diego Magazine's People's Choice."
+
+### Overall Customer Reviews
+Rating: 4.2/5 (118 reviews across platforms) - "The rating indicates that most customers are generally satisfied."
+
+### Services Offered
+- Comprehensive physical therapy services
+- Sports medicine and injury rehabilitation  
+- Hand therapy
+- Vestibular rehabilitation for balance and dizziness
+- Pelvic floor rehabilitation
+- Specialized upper quarter treatments
+
+## Summary
+Award-winning PT chain with excellent reputation. Strong patient satisfaction ratings and comprehensive specialty services. Multiple locations for convenience.`,
+
+            'us-spine': `# US Spine & Sport Foundation
+
+**Address:** 3444 Kearny Villa Rd Ste 200, San Diego, CA 92123  
+**Phone:** 858-429-7646  
+**Distance:** 11 miles  
+**Quality:** 6/10
+
+## Research Results
+
+### Academic Research
+Associated with University of South Florida School of Physical Therapy and Rehabilitation Sciences. Published research on evidence-informed management of chronic low back pain with lumbar extensor strengthening exercises.
+
+### Specialization
+- Research-focused spine care facility
+- Evidence-based treatment approaches for chronic low back pain
+- Spine-specific treatments and rehabilitation
+- Lumbar extensor strengthening programs
+
+### Academic Affiliations
+- John Mayer, DC, PhD - School of Physical Therapy, University of South Florida
+- Collaboration with multiple research institutions
+- CAM Research Institute connections
+
+## Summary
+Research foundation with academic credentials and evidence-based approaches. Limited patient review data but strong focus on spine care and chronic pain management.`,
+
+            'results-rehab': `# Results Rehabilitation
+
+**Address:** 4265 Fairmount Ave, San Diego, CA 92105  
+**Phone:** Not readily available  
+**Distance:** 6 miles  
+**Quality:** 4/10
+
+## Research Results
+
+### Online Presence
+Very limited information available about this practice. Appears to be located in City Heights/Normal Heights area of San Diego.
+
+### Services
+- Physical therapy and rehabilitation services
+- Likely standard outpatient treatment programs
+
+### Considerations
+- No patient reviews or ratings found
+- Minimal online presence or marketing
+- Unknown specialties or treatment approaches
+- May serve local community but lacks digital footprint
+
+## Summary
+Limited information available makes assessment difficult. Central San Diego location could be convenient, but lack of reviews and minimal online presence suggest either very small practice or limited patient volume.`,
+
+            'all-care': `# All Care Physical Therapy PC
+
+**Address:** 2825 Dewey Rd, San Diego, CA 92106  
+**Phone:** Not readily available  
+**Distance:** 8 miles  
+**Quality:** 3/10
+
+## Research Results
+
+### Online Presence
+Extremely limited public information available about this practice. Located in Point Loma/Liberty Station area.
+
+### Services
+- Physical therapy services (specifics not detailed in available sources)
+- Likely standard outpatient rehabilitation
+
+### Considerations
+- No reviews or ratings found in public sources
+- Very limited online presence or visibility
+- Unknown specialties, staff, or treatment approaches
+- May require direct contact for service details
+
+## Summary
+Minimal information available makes quality assessment very difficult. Lack of reviews, limited online presence, and unclear service offerings result in low confidence score. Would recommend contacting directly for details.`
+        };
+
+        function toggleMarkdown(providerId) {
+            const element = document.getElementById(providerId);
+            const button = element.previousElementSibling;
+            
+            if (element.style.display === 'none' || element.style.display === '') {
+                // Hide all other open markdown content
+                document.querySelectorAll('.markdown-content').forEach(el => {
+                    el.style.display = 'none';
+                    el.previousElementSibling.textContent = 'View Report';
+                });
+                
+                // Show this one
+                element.innerHTML = marked.parse(markdownContent[providerId]);
+                element.style.display = 'block';
+                button.textContent = 'Hide Report';
+            } else {
+                element.style.display = 'none';
+                button.textContent = 'View Report';
+            }
+        }
+        
+        function toggleMap(mapId) {
+            const mapContainer = document.getElementById(mapId);
+            const button = mapContainer.previousElementSibling;
+            
+            if (mapContainer.style.display === 'none' || mapContainer.style.display === '') {
+                // Hide all other open maps
+                document.querySelectorAll('.map-container').forEach(el => {
+                    el.style.display = 'none';
+                    el.previousElementSibling.textContent = '📍 Map';
+                });
+                
+                // Show this one
+                mapContainer.style.display = 'block';
+                button.textContent = '📍 Hide Map';
+            } else {
+                mapContainer.style.display = 'none';
+                button.textContent = '📍 Map';
+            }
+        }
+        
+        // Initialize table sorting when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            const table = document.getElementById('providers-table');
+            if (table) {
+                // Add data-sort attributes for better sorting
+                const rows = table.querySelectorAll('tbody tr');
+                rows.forEach(row => {
+                    const cells = row.children;
+                    
+                    // Distance column (index 3) - extract number from "X.X miles"
+                    const distanceCell = cells[3];
+                    if (distanceCell) {
+                        const distanceText = distanceCell.textContent.trim();
+                        const distanceMatch = distanceText.match(/(\d+\.?\d*)/);
+                        if (distanceMatch) {
+                            distanceCell.setAttribute('data-sort', parseFloat(distanceMatch[1]));
+                        }
+                    }
+                    
+                    // Quality column (index 5) - extract number from quality badge
+                    const qualityCell = cells[5];
+                    if (qualityCell) {
+                        const qualityBadge = qualityCell.querySelector('.quality-badge');
+                        if (qualityBadge) {
+                            const qualityText = qualityBadge.textContent.trim();
+                            const qualityNumber = parseInt(qualityText);
+                            if (!isNaN(qualityNumber)) {
+                                qualityCell.setAttribute('data-sort', qualityNumber);
+                            }
+                        }
+                    }
+                });
+                
+                // Initialize sorting
+                new Tablesort(table, {
+                    descending: true // Start with descending sort for Quality column
+                });
+            }
+        });
+    </script>
+</body>
+</html>

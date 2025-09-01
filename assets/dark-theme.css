@@ -125,11 +125,25 @@ body {
         box-shadow: 0 4px 12px var(--color-border-pink-light);
     }
     .quick-links {
-        display: flex;
-        justify-content: center;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
         gap: 1rem;
-        flex-wrap: wrap;
         margin-top: 1rem;
+        max-width: 100%;
+    }
+    
+    /* Force 2x2 layout on smaller screens */
+    @media (max-width: 768px) {
+        .quick-links {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+    
+    /* Force single row on very wide screens */
+    @media (min-width: 1000px) {
+        .quick-links {
+            grid-template-columns: repeat(4, 1fr);
+        }
     }
     .quick-links a {
         padding: 0.75rem 1.5rem;

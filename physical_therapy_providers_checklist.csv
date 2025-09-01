@@ -1,0 +1,9 @@
+Provider Name,Address,Phone Number,Languages,Provider ID,Accepting New Patients,Distance from Home,Specialties,Contacted,Contact Date,Appointment Scheduled,Appointment Date,Insurance Verified,Notes,Priority Level
+"Langton PT Mgmt","2000 Ave St #208, San Diego CA","(___) ___-____","Spanish/English",001996205,Yes,,"General PT",,,,,,,"High/Medium/Low"
+"Physical Therapy (University Ave)","University Ave Ste 3, San Diego CA","(___) ___-____","",002370885,Yes,,"General PT",,,,,,,"High/Medium/Low"
+"Water and Sports PT","Sore Ave, San Diego CA","(959) 488-3597","Spanish/English",002720914,Yes,,"Sports/Aquatic PT",,,,,,,"High/Medium/Low"
+"PT Provider (Camino De La Siesta)","5030 Camino De La Siesta Ste 22, San Diego CA","(___) ___-____","Spanish/English",0014s064,Yes,,"General PT",,,,,,,"High/Medium/Low"
+"Luna PT (Home Health)","Mobile Service","(619) 966-3822","English",Luna,Yes,"0 miles","Home Health PT",,,,,,,"High"
+"Additional Provider 1","","","","",,,"",,,,,,,"High/Medium/Low"
+"Additional Provider 2","","","","",,,"",,,,,,,"High/Medium/Low"
+"Additional Provider 3","","","","",,,"",,,,,,,"High/Medium/Low"
