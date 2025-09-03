@@ -162,7 +162,7 @@
         class GoogleSheetsChecklist {
             constructor() {
                 // Extract sheet ID from the published URL
-                this.sheetId = '1qQINNTcfVJKEPdJyP-9Qh_DfJKwJcN4j9OuQHMBdBP4'; // From the published URL
+                this.sheetId = '1ziPiBhIYXTgVvs2HVokZQrFPjYdF9w-wcO9ivPwpgag'; // From the published URL
                 this.gid = '1860137714'; // The specific sheet tab
                 this.tasks = [];
                 this.lastSync = null;
@@ -204,8 +204,8 @@
                     this.hideOfflineNotice();
 
                     // Use Google Sheets CSV export URL for public access
-                    const csvUrl = `https://docs.google.com/spreadsheets/d/${this.sheetId}/export?format=csv&gid=0`;
-                    
+//                    const csvUrl = `https://docs.google.com/spreadsheets/d/${this.sheetId}/export?format=csv&gid=0`;
+                    const csvUrl = `https://docs.google.com/spreadsheets/d/${this.sheetId}/gviz/tq?tqx=out:csv&sheet=Sheet1`;
                     const response = await fetch(csvUrl, {
                         mode: 'cors',
                         cache: 'no-cache'
