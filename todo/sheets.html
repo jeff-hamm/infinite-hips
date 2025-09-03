@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Surgery Checklist - Infinite Hips</title>
+    <link rel="stylesheet" href="../assets/dark-theme.css">
+    <style>
+        .todo-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .todo-item {
+            background: #21262d;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 16px;
+            margin: 12px 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.3s ease;
+        }
+        .todo-item:hover {
+            border-color: #ff69b4;
+        }
+        .todo-checkbox {
+            width: 20px;
+            height: 20px;
+            accent-color: #ff69b4;
+        }
+        .todo-text {
+            flex: 1;
+            color: #f0f6fc;
+            line-height: 1.4;
+        }
+        .todo-completed {
+            text-decoration: line-through;
+            opacity: 0.6;
+        }
+        .refresh-btn {
+            padding: 12px 24px;
+            background: #ff69b4;
+            color: #0d1117;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .refresh-btn:hover {
+            background: #ffb3da;
+        }
+        .loading {
+            text-align: center;
+            color: #ff69b4;
+            padding: 40px;
+        }
+        .error {
+            background: #ff4444;
+            color: white;
+            padding: 12px;
+            border-radius: 6px;
+            margin: 12px 0;
+        }
+        .shared-info {
+            background: #21262d;
+            border: 1px solid #ff69b4;
+            border-radius: 8px;
+            padding: 16px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        .shared-info h3 {
+            color: #ff69b4;
+            margin: 0 0 8px 0;
+        }
+        .sync-status {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #21262d;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            padding: 8px 12px;
+            font-size: 12px;
+            color: #ff69b4;
+        }
+        .sheet-link {
+            color: #ff69b4;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .sheet-link:hover {
+            color: #ffb3da;
+        }
+        .controls {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            margin: 20px 0;
+        }
+        .offline-notice {
+            background: #ffcc00;
+            color: #000;
+            padding: 12px;
+            border-radius: 6px;
+            margin: 12px 0;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="todo-container">
+        <h1>📋 Jeff's Surgery Checklist</h1>
+        
+        <div class="shared-info">
+            <h3>📊 Google Sheets Powered</h3>
+            <p>This checklist syncs with our shared Google Sheet. Check off items below or edit directly in the sheet.</p>
+            <div id="progress-bar" style="background: #30363d; border-radius: 10px; height: 8px; margin: 12px 0;">
+                <div id="progress-fill" style="background: #ff69b4; height: 100%; border-radius: 10px; width: 0%; transition: width 0.3s ease;"></div>
+            </div>
+            <div id="progress-text" style="font-size: 14px; color: #7d8590;">Loading tasks...</div>
+            <p style="margin-top: 12px;">
+                
+                <a href="https://docs.google.com/spreadsheets/d/1ziPiBhIYXTgVvs2HVokZQrFPjYdF9w-wcO9ivPwpgag/edit?usp=sharing" 
+                   target="_blank" class="sheet-link">📝 Edit in Google Sheets</a>
+            </p>
+        </div>
+
+        <div class="controls">
+            <button id="refresh-btn" class="refresh-btn">🔄 Refresh from Sheet</button>
+            <div id="last-sync" style="color: #7d8590; font-size: 12px;">Never synced</div>
+        </div>
+
+        <div id="loading" class="loading" style="display: none;">
+            Loading tasks from Google Sheets...
+        </div>
+
+        <div id="offline-notice" class="offline-notice" style="display: none;">
+            ⚠️ Can't connect to Google Sheets. Showing cached data.
+        </div>
+
+        <div id="sample-notice" class="offline-notice" style="display: none; background: #ff69b4; color: #0d1117;">
+            📋 Showing sample data. <a href="https://docs.google.com/spreadsheets/d/1ziPiBhIYXTgVvs2HVokZQrFPjYdF9w-wcO9ivPwpgag/edit?usp=sharing" target="_blank" style="color: #0d1117; font-weight: bold;">Make your Google Sheet public</a> to see real data.
+        </div>
+
+        <div id="error-message" class="error" style="display: none;"></div>
+
+        <div id="todo-list">
+            <!-- Tasks will be dynamically loaded here -->
+        </div>
+    </div>
+
+    <div id="sync-status" class="sync-status">
+        📊 Google Sheets
+    </div>
+
+    <script>
+        class GoogleSheetsChecklist {
+            constructor() {
+                // Extract sheet ID from the published URL
+                this.sheetId = '1qQINNTcfVJKEPdJyP-9Qh_DfJKwJcN4j9OuQHMBdBP4'; // From the published URL
+                this.gid = '1860137714'; // The specific sheet tab
+                this.tasks = [];
+                this.lastSync = null;
+                this.isOnline = navigator.onLine;
+                this.init();
+            }
+
+            init() {
+                // Event listeners
+                document.getElementById('refresh-btn').addEventListener('click', () => this.loadFromSheet());
+
+                // Auto-refresh every 30 seconds
+                setInterval(() => this.loadFromSheet(), 30000);
+
+                // Network status monitoring
+                window.addEventListener('online', () => {
+                    this.isOnline = true;
+                    this.hideOfflineNotice();
+                    this.loadFromSheet();
+                });
+                
+                window.addEventListener('offline', () => {
+                    this.isOnline = false;
+                    this.showOfflineNotice();
+                });
+
+                // Initial load
+                this.loadFromSheet();
+            }
+
+            async loadFromSheet() {
+                if (!this.isOnline) {
+                    this.showOfflineNotice();
+                    return;
+                }
+
+                try {
+                    this.showLoading(true);
+                    this.hideOfflineNotice();
+
+                    // Use Google Sheets CSV export URL for public access
+                    const csvUrl = `https://docs.google.com/spreadsheets/d/${this.sheetId}/export?format=csv&gid=0`;
+                    
+                    const response = await fetch(csvUrl, {
+                        mode: 'cors',
+                        cache: 'no-cache'
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}: Sheet may not be public`);
+                    }
+
+                    const csvText = await response.text();
+                    
+                    // Check if we got an HTML error page instead of CSV
+                    if (csvText.includes('<HTML>') || csvText.includes('<!DOCTYPE')) {
+                        throw new Error('Sheet is not publicly accessible. Please make it viewable to anyone with the link.');
+                    }
+                    
+                    this.parseCsvData(csvText);
+                    this.lastSync = new Date();
+                    this.updateLastSyncDisplay();
+                    this.renderTasks();
+                    this.updateProgress();
+                    this.updateSyncStatus('✅ Synced');
+
+                } catch (error) {
+                    console.error('Error loading from Google Sheets:', error);
+                    this.showError(`Failed to sync with Google Sheets: ${error.message}`);
+                    this.showOfflineNotice();
+                    
+                    // Try to load cached data, or use sample data if no cache
+                    if (!this.loadCachedData()) {
+                        this.loadSampleData();
+                    }
+                } finally {
+                    this.showLoading(false);
+                }
+            }
+
+            parseCsvData(csvText) {
+                const lines = csvText.trim().split('\n');
+                const tasks = [];
+
+                // Skip header row and process data
+                for (let i = 1; i < lines.length; i++) {
+                    const line = lines[i].trim();
+                    if (!line) continue;
+
+                    // Parse CSV line (handling commas in quotes)
+                    const columns = this.parseCSVLine(line);
+                    
+                    if (columns.length >= 2) {
+                        const completed = columns[0].toLowerCase().trim();
+                        const taskText = columns[1].trim();
+                        
+                        if (taskText) {
+                            tasks.push({
+                                id: `sheet-${i}`,
+                                text: taskText,
+                                completed: completed === 'true' || completed === '✓' || completed === 'yes' || completed === '1',
+                                source: 'google-sheets',
+                                rowIndex: i + 1 // +1 for Excel row numbering
+                            });
+                        }
+                    }
+                }
+
+                this.tasks = tasks;
+                
+                // Cache the data
+                localStorage.setItem('sheets-checklist-cache', JSON.stringify({
+                    tasks: this.tasks,
+                    lastSync: this.lastSync,
+                    timestamp: Date.now()
+                }));
+            }
+
+            parseCSVLine(line) {
+                const result = [];
+                let current = '';
+                let inQuotes = false;
+
+                for (let i = 0; i < line.length; i++) {
+                    const char = line[i];
+                    
+                    if (char === '"') {
+                        inQuotes = !inQuotes;
+                    } else if (char === ',' && !inQuotes) {
+                        result.push(current.replace(/^"|"$/g, ''));
+                        current = '';
+                    } else {
+                        current += char;
+                    }
+                }
+                
+                result.push(current.replace(/^"|"$/g, ''));
+                return result;
+            }
+
+            loadCachedData() {
+                try {
+                    const cached = localStorage.getItem('sheets-checklist-cache');
+                    if (cached) {
+                        const data = JSON.parse(cached);
+                        this.tasks = data.tasks || [];
+                        this.lastSync = data.lastSync ? new Date(data.lastSync) : null;
+                        this.updateLastSyncDisplay();
+                        this.renderTasks();
+                        this.updateProgress();
+                        
+                        // Show age of cached data
+                        const age = Date.now() - (data.timestamp || 0);
+                        const ageMinutes = Math.floor(age / 60000);
+                        this.updateSyncStatus(`💾 Cached (${ageMinutes}m old)`);
+                        return true;
+                    }
+                    return false;
+                } catch (error) {
+                    console.error('Error loading cached data:', error);
+                    return false;
+                }
+            }
+
+            loadSampleData() {
+                // Sample data for demonstration while sheet access is being set up
+                this.tasks = [
+                    {
+                        id: 'sample-1',
+                        text: '🧴 Start Hibiclens skin washing daily (Sept 5)',
+                        completed: false,
+                        source: 'sample',
+                        rowIndex: 2
+                    },
+                    {
+                        id: 'sample-2',
+                        text: '🏥 Confirm surgery check-in time: 7:30am at Scripps Mission Valley',
+                        completed: true,
+                        source: 'sample',
+                        rowIndex: 3
+                    },
+                    {
+                        id: 'sample-3',
+                        text: '🚗 Arrange transportation for surgery day',
+                        completed: false,
+                        source: 'sample',
+                        rowIndex: 4
+                    },
+                    {
+                        id: 'sample-4',
+                        text: '🏠 Set up recovery area at home',
+                        completed: false,
+                        source: 'sample',
+                        rowIndex: 5
+                    },
+                    {
+                        id: 'sample-5',
+                        text: '💊 Pick up prescribed medications',
+                        completed: false,
+                        source: 'sample',
+                        rowIndex: 6
+                    }
+                ];
+                
+                this.renderTasks();
+                this.updateProgress();
+                this.updateSyncStatus('📋 Sample Data');
+                
+                // Show sample data notice
+                document.getElementById('sample-notice').style.display = 'block';
+            }
+
+            async updateTaskInSheet(taskId, completed) {
+                // For updating the sheet, we'd need Google Sheets API with authentication
+                // For now, show a message directing users to edit the sheet directly
+                const task = this.tasks.find(t => t.id === taskId);
+                if (task) {
+                    const sheetUrl = `https://docs.google.com/spreadsheets/d/${this.sheetId}/edit#gid=0&range=A${task.rowIndex}`;
+                    
+                    if (confirm(`This will open the Google Sheet to edit row ${task.rowIndex}. Continue?`)) {
+                        window.open(sheetUrl, '_blank');
+                    }
+                }
+            }
+
+            renderTasks() {
+                const todoList = document.getElementById('todo-list');
+                
+                if (this.tasks.length === 0) {
+                    todoList.innerHTML = '<p style="text-align: center; color: #ff69b4; padding: 40px;">No tasks found in the Google Sheet.<br><a href="https://docs.google.com/spreadsheets/d/1ziPiBhIYXTgVvs2HVokZQrFPjYdF9w-wcO9ivPwpgag/edit?usp=sharing" target="_blank" style="color: #ff69b4;">Add some tasks to the sheet</a></p>';
+                    return;
+                }
+
+                // Sort tasks: incomplete first, then completed
+                const sortedTasks = [...this.tasks].sort((a, b) => {
+                    if (a.completed !== b.completed) {
+                        return a.completed ? 1 : -1;
+                    }
+                    return 0;
+                });
+
+                todoList.innerHTML = sortedTasks.map(task => `
+                    <div class="todo-item">
+                        <input 
+                            type="checkbox" 
+                            class="todo-checkbox" 
+                            ${task.completed ? 'checked' : ''} 
+                            onchange="sheetsChecklist.updateTaskInSheet('${task.id}', this.checked)"
+                            title="Click to edit this task in Google Sheets"
+                        >
+                        <div style="flex: 1;">
+                            <div class="todo-text ${task.completed ? 'todo-completed' : ''}">${this.escapeHtml(task.text)}</div>
+                            <div style="font-size: 12px; color: #7d8590; margin-top: 4px;">
+                                From Google Sheets • Row ${task.rowIndex} • 
+                                <a href="https://docs.google.com/spreadsheets/d/${this.sheetId}/edit#gid=0&range=A${task.rowIndex}" 
+                                   target="_blank" style="color: #ff69b4; text-decoration: none;">Edit in sheet</a>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+
+            updateProgress() {
+                const totalTasks = this.tasks.length;
+                const completedTasks = this.tasks.filter(task => task.completed).length;
+                const percentage = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
+                
+                const progressFill = document.getElementById('progress-fill');
+                const progressText = document.getElementById('progress-text');
+                
+                if (progressFill) {
+                    progressFill.style.width = `${percentage}%`;
+                }
+                
+                if (progressText) {
+                    progressText.textContent = `${completedTasks} of ${totalTasks} tasks completed (${Math.round(percentage)}%)`;
+                }
+            }
+
+            updateLastSyncDisplay() {
+                const lastSyncEl = document.getElementById('last-sync');
+                if (lastSyncEl && this.lastSync) {
+                    const timeAgo = this.getTimeAgo(this.lastSync);
+                    lastSyncEl.textContent = `Last synced: ${timeAgo}`;
+                }
+            }
+
+            getTimeAgo(date) {
+                const now = new Date();
+                const diff = now - date;
+                const minutes = Math.floor(diff / 60000);
+                
+                if (minutes < 1) return 'just now';
+                if (minutes < 60) return `${minutes} minute${minutes === 1 ? '' : 's'} ago`;
+                
+                const hours = Math.floor(minutes / 60);
+                if (hours < 24) return `${hours} hour${hours === 1 ? '' : 's'} ago`;
+                
+                const days = Math.floor(hours / 24);
+                return `${days} day${days === 1 ? '' : 's'} ago`;
+            }
+
+            showLoading(show) {
+                document.getElementById('loading').style.display = show ? 'block' : 'none';
+            }
+
+            showError(message) {
+                const errorDiv = document.getElementById('error-message');
+                errorDiv.textContent = message;
+                errorDiv.style.display = 'block';
+                
+                setTimeout(() => {
+                    errorDiv.style.display = 'none';
+                }, 8000);
+            }
+
+            showOfflineNotice() {
+                document.getElementById('offline-notice').style.display = 'block';
+            }
+
+            hideOfflineNotice() {
+                document.getElementById('offline-notice').style.display = 'none';
+            }
+
+            updateSyncStatus(status) {
+                const syncStatus = document.getElementById('sync-status');
+                syncStatus.textContent = status;
+                
+                setTimeout(() => {
+                    syncStatus.textContent = '📊 Google Sheets';
+                }, 3000);
+            }
+        }
+
+        // Initialize the Google Sheets checklist
+        const sheetsChecklist = new GoogleSheetsChecklist();
+    </script>
+</body>
+</html>

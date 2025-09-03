@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Microsoft To Do Integration - Infinite Hips</title>
+    <link rel="stylesheet" href="../assets/dark-theme.css">
+    <style>
+        .todo-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .todo-item {
+            background: #21262d;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 16px;
+            margin: 12px 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .todo-checkbox {
+            width: 20px;
+            height: 20px;
+            accent-color: #ff69b4;
+        }
+        .todo-text {
+            flex: 1;
+            color: #f0f6fc;
+        }
+        .todo-completed {
+            text-decoration: line-through;
+            opacity: 0.6;
+        }
+        .add-task-container {
+            display: flex;
+            gap: 12px;
+            margin: 20px 0;
+        }
+        .task-input {
+            flex: 1;
+            padding: 12px;
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            color: #f0f6fc;
+            font-size: 16px;
+        }
+        .add-btn {
+            padding: 12px 24px;
+            background: #ff69b4;
+            color: #0d1117;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .add-btn:hover {
+            background: #ffb3da;
+        }
+        .loading {
+            text-align: center;
+            color: #ff69b4;
+            padding: 40px;
+        }
+        .error {
+            background: #ff4444;
+            color: white;
+            padding: 12px;
+            border-radius: 6px;
+            margin: 12px 0;
+        }
+        .auth-section {
+            text-align: center;
+            padding: 40px 20px;
+            background: #21262d;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .auth-btn {
+            padding: 12px 24px;
+            background: #ff69b4;
+            color: #0d1117;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="todo-container">
+        <h1>📋 Microsoft To Do - Surgery Tasks</h1>
+        
+        <div id="auth-section" class="auth-section">
+            <h2>Connect to Microsoft To Do</h2>
+            <p>Sign in to sync your tasks with Microsoft To Do</p>
+            <button id="auth-btn" class="auth-btn">Sign In with Microsoft</button>
+        </div>
+
+        <div id="todo-section" style="display: none;">
+            <div class="add-task-container">
+                <input type="text" id="new-task" class="task-input" placeholder="Add a surgery-related task...">
+                <button id="add-task" class="add-btn">Add Task</button>
+            </div>
+
+            <div id="loading" class="loading" style="display: none;">
+                Loading your tasks...
+            </div>
+
+            <div id="error-message" class="error" style="display: none;"></div>
+
+            <div id="todo-list">
+                <!-- Tasks will be dynamically loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Redirect to Google Sheets powered todo list -->
+    <script>
+        window.location.href = 'sheets.html';
+    </script>
+</body>
+</html>

@@ -1,0 +1,2 @@
+# Docker Compose removed - using client-side shared task list instead
+# No backend needed for the shared todo functionality
