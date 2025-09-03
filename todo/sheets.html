@@ -1,5 +1,14 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE htm        .todo-item {
+            background: #21262d;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            transition: all 0.2s ease;
+        }ng="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -22,8 +31,111 @@
             gap: 12px;
             transition: all 0.3s ease;
         }
-        .todo-item:hover {
-            border-color: #ff69b4;
+        .todo-item.priority-high {
+            border-left: 4px solid #ff69b4;
+            background: linear-gradient(145deg, #21262d 0%, #2a1a2a 100%);
+        }
+        .todo-item.priority-medium {
+            border-left: 4px solid #ffb3da;
+        }
+        .todo-item.priority-low {
+            border-left: 4px solid #7d8590;
+        }
+        .timeline-group {
+            margin-bottom: 1.5rem;
+        }
+        .timeline-title {
+            color: #ff69b4;
+            font-size: 1.2em;
+            font-weight: bold;
+            margin: 0;
+        }
+        .task-details {
+            font-size: 12px;
+            color: #7d8590;
+            margin-top: 8px;
+            line-height: 1.4;
+        }
+        .task-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 6px;
+        }
+        .priority-badge {
+            background: #30363d;
+            color: #f0f6fc;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        .priority-badge.high {
+            background: #ff69b4;
+            color: #0d1117;
+        }
+
+        /* Enhanced task details styles */
+        .detail-item {
+            margin: 4px 0;
+            display: flex;
+            align-items: flex-start;
+            gap: 6px;
+        }
+
+        .detail-icon {
+            font-size: 0.9em;
+            flex-shrink: 0;
+        }
+
+        .detail-label {
+            font-weight: 600;
+            color: #ff69b4;
+            min-width: 60px;
+            flex-shrink: 0;
+        }
+
+        .priority-indicator {
+            margin-left: 8px;
+            font-size: 0.9em;
+        }
+
+        /* Enhanced timeline group styling */
+        .timeline-group .todo-item {
+            border-radius: 0;
+            border-top: none;
+        }
+
+        .timeline-group .todo-item:last-child {
+            border-radius: 0 0 8px 8px;
+        }
+
+        .timeline-group .todo-item:first-child {
+            border-top: 1px solid #30363d;
+        }
+
+        .timeline-title {
+            background: linear-gradient(145deg, #4a4a4a 0%, #6c6c6c 100%);
+            color: #ff69b4;
+            padding: 12px 20px;
+            border-radius: 8px 8px 0 0;
+            font-weight: bold;
+            font-size: 1.1em;
+            border-left: 4px solid #ff69b4;
+            margin: 0;
+        }
+        .priority-badge.medium {
+            background: #ffb3da;
+            color: #0d1117;
+        }
+        .category-tag {
+            background: #21262d;
+            border: 1px solid #30363d;
+            color: #7d8590;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 10px;
         }
         .todo-checkbox {
             width: 20px;
@@ -203,9 +315,8 @@
                     this.showLoading(true);
                     this.hideOfflineNotice();
 
-                    // Use Google Sheets CSV export URL for public access
-//                    const csvUrl = `https://docs.google.com/spreadsheets/d/${this.sheetId}/export?format=csv&gid=0`;
-                    const csvUrl = `https://docs.google.com/spreadsheets/d/${this.sheetId}/gviz/tq?tqx=out:csv&sheet=Sheet1`;
+                    // Use Google Sheets CSV export URL for public access with headers
+                    const csvUrl = `https://docs.google.com/spreadsheets/d/${this.sheetId}/gviz/tq?tqx=out:csv&gid=${this.gid}&headers=1`;
                     const response = await fetch(csvUrl, {
                         mode: 'cors',
                         cache: 'no-cache'
@@ -247,25 +358,43 @@
                 const lines = csvText.trim().split('\n');
                 const tasks = [];
 
-                // Skip header row and process data
+                if (lines.length < 2) return; // Need at least header + 1 data row
+
+                // Parse header row to get column indices
+                const headers = this.parseCSVLine(lines[0]).map(h => h.toLowerCase().trim());
+                const columnMap = {
+                    done: headers.indexOf('done?') !== -1 ? headers.indexOf('done?') : 0,
+                    task: headers.indexOf('task') !== -1 ? headers.indexOf('task') : 1,
+                    timeline: headers.indexOf('timeline') !== -1 ? headers.indexOf('timeline') : -1,
+                    priority: headers.indexOf('priority') !== -1 ? headers.indexOf('priority') : -1,
+                    category: headers.indexOf('category') !== -1 ? headers.indexOf('category') : -1,
+                    how: headers.indexOf('how') !== -1 ? headers.indexOf('how') : -1,
+                    notes: headers.indexOf('notes') !== -1 ? headers.indexOf('notes') : -1
+                };
+
+                // Process data rows
                 for (let i = 1; i < lines.length; i++) {
                     const line = lines[i].trim();
                     if (!line) continue;
 
-                    // Parse CSV line (handling commas in quotes)
                     const columns = this.parseCSVLine(line);
                     
-                    if (columns.length >= 2) {
-                        const completed = columns[0].toLowerCase().trim();
-                        const taskText = columns[1].trim();
+                    if (columns.length > columnMap.task && columns[columnMap.task]?.trim()) {
+                        const completed = columns[columnMap.done]?.toLowerCase().trim();
+                        const taskText = columns[columnMap.task]?.trim();
                         
                         if (taskText) {
                             tasks.push({
                                 id: `sheet-${i}`,
                                 text: taskText,
                                 completed: completed === 'true' || completed === '✓' || completed === 'yes' || completed === '1',
+                                timeline: columnMap.timeline >= 0 ? columns[columnMap.timeline]?.trim() || 'General' : 'General',
+                                priority: columnMap.priority >= 0 ? columns[columnMap.priority]?.toLowerCase().trim() || 'medium' : 'medium',
+                                category: columnMap.category >= 0 ? columns[columnMap.category]?.trim() || '' : '',
+                                how: columnMap.how >= 0 ? columns[columnMap.how]?.trim() || '' : '',
+                                notes: columnMap.notes >= 0 ? columns[columnMap.notes]?.trim() || '' : '',
                                 source: 'google-sheets',
-                                rowIndex: i + 1 // +1 for Excel row numbering
+                                rowIndex: i + 1
                             });
                         }
                     }
@@ -332,29 +461,49 @@
                 this.tasks = [
                     {
                         id: 'sample-1',
-                        text: '🧴 Start Hibiclens skin washing daily (Sept 5)',
+                        text: '🧴 Start Hibiclens skin washing daily',
                         completed: false,
+                        timeline: 'Pre-Surgery (Sept 5-11)',
+                        priority: 'high',
+                        category: 'Medical Prep',
+                        how: 'Daily shower with Hibiclens soap',
+                        notes: 'Start 7 days before surgery',
                         source: 'sample',
                         rowIndex: 2
                     },
                     {
                         id: 'sample-2',
-                        text: '🏥 Confirm surgery check-in time: 7:30am at Scripps Mission Valley',
+                        text: '🏥 Confirm surgery check-in time',
                         completed: true,
+                        timeline: 'Pre-Surgery (Sept 5-11)',
+                        priority: 'high',
+                        category: 'Logistics',
+                        how: 'Call Scripps Mission Valley',
+                        notes: '7:30am check-in confirmed',
                         source: 'sample',
                         rowIndex: 3
                     },
                     {
                         id: 'sample-3',
-                        text: '🚗 Arrange transportation for surgery day',
+                        text: '🚗 Arrange transportation',
                         completed: false,
+                        timeline: 'Surgery Day (Sept 12)',
+                        priority: 'high',
+                        category: 'Logistics',
+                        how: 'Family member or rideshare',
+                        notes: 'Cannot drive home after surgery',
                         source: 'sample',
                         rowIndex: 4
                     },
                     {
                         id: 'sample-4',
-                        text: '🏠 Set up recovery area at home',
+                        text: '🏠 Set up recovery area',
                         completed: false,
+                        timeline: 'Pre-Surgery (Sept 5-11)',
+                        priority: 'medium',
+                        category: 'Home Prep',
+                        how: 'Install raised toilet seat, shower chair',
+                        notes: 'Make sure walker can fit through doorways',
                         source: 'sample',
                         rowIndex: 5
                     },
@@ -362,6 +511,11 @@
                         id: 'sample-5',
                         text: '💊 Pick up prescribed medications',
                         completed: false,
+                        timeline: 'Pre-Surgery (Sept 5-11)',
+                        priority: 'high',
+                        category: 'Medical Prep',
+                        how: 'Pharmacy pickup',
+                        notes: 'Pain management and antibiotics',
                         source: 'sample',
                         rowIndex: 6
                     }
@@ -396,33 +550,104 @@
                     return;
                 }
 
-                // Sort tasks: incomplete first, then completed
-                const sortedTasks = [...this.tasks].sort((a, b) => {
-                    if (a.completed !== b.completed) {
-                        return a.completed ? 1 : -1;
+                // Group tasks by timeline
+                const timelineGroups = {};
+                this.tasks.forEach(task => {
+                    const timeline = task.timeline || 'Other';
+                    if (!timelineGroups[timeline]) {
+                        timelineGroups[timeline] = [];
                     }
-                    return 0;
+                    timelineGroups[timeline].push(task);
                 });
 
-                todoList.innerHTML = sortedTasks.map(task => `
-                    <div class="todo-item">
-                        <input 
-                            type="checkbox" 
-                            class="todo-checkbox" 
-                            ${task.completed ? 'checked' : ''} 
-                            onchange="sheetsChecklist.updateTaskInSheet('${task.id}', this.checked)"
-                            title="Click to edit this task in Google Sheets"
-                        >
-                        <div style="flex: 1;">
-                            <div class="todo-text ${task.completed ? 'todo-completed' : ''}">${this.escapeHtml(task.text)}</div>
-                            <div style="font-size: 12px; color: #7d8590; margin-top: 4px;">
-                                From Google Sheets • Row ${task.rowIndex} • 
-                                <a href="https://docs.google.com/spreadsheets/d/${this.sheetId}/edit#gid=0&range=A${task.rowIndex}" 
-                                   target="_blank" style="color: #ff69b4; text-decoration: none;">Edit in sheet</a>
-                            </div>
-                        </div>
-                    </div>
-                `).join('');
+                // Sort groups by timeline order (surgery workflow)
+                const timelineOrder = [
+                    'Pre-Surgery (Sept 5-11)',
+                    'Surgery Day (Sept 12)', 
+                    'Recovery Week 1',
+                    'Recovery Week 2-6',
+                    'Recovery 3+ Months',
+                    'Other'
+                ];
+
+                const sortedTimelines = timelineOrder.filter(timeline => timelineGroups[timeline]);
+                // Add any timelines not in the predefined order
+                Object.keys(timelineGroups).forEach(timeline => {
+                    if (!timelineOrder.includes(timeline)) {
+                        sortedTimelines.push(timeline);
+                    }
+                });
+
+                let html = '';
+
+                sortedTimelines.forEach(timeline => {
+                    const tasks = timelineGroups[timeline];
+                    
+                    // Sort tasks within timeline by priority (high -> medium -> low), then by completion status
+                    const priorityOrder = { 'high': 0, 'medium': 1, 'low': 2, '': 3 };
+                    tasks.sort((a, b) => {
+                        // First sort by completion (incomplete first)
+                        if (a.completed !== b.completed) {
+                            return a.completed ? 1 : -1;
+                        }
+                        // Then by priority
+                        const aPriority = priorityOrder[a.priority?.toLowerCase()] ?? 3;
+                        const bPriority = priorityOrder[b.priority?.toLowerCase()] ?? 3;
+                        return aPriority - bPriority;
+                    });
+
+                    // Add timeline group header
+                    html += `<div class="timeline-group">`;
+                    html += `<div class="timeline-title">${timeline}</div>`;
+
+                    tasks.forEach(task => {
+                        const priorityClass = task.priority ? `priority-${task.priority.toLowerCase()}` : '';
+                        
+                        html += `<div class="todo-item ${priorityClass}">`;
+                        html += `<input type="checkbox" class="todo-checkbox" ${task.completed ? 'checked' : ''} 
+                                   onchange="sheetsChecklist.updateTaskInSheet('${task.id}', this.checked)"
+                                   title="Click to edit this task in Google Sheets">`;
+                        html += `<div style="flex: 1;">`;
+                        // Add priority icon to the task text
+                        let taskText = this.escapeHtml(task.text);
+                        if (task.priority) {
+                            const priorityIcon = {
+                                'high': '🔴',
+                                'medium': '🟡', 
+                                'low': '🟢'
+                            }[task.priority.toLowerCase()] || '';
+                            taskText = `${priorityIcon} ${taskText}`;
+                        }
+                        
+                        html += `<div class="todo-text ${task.completed ? 'todo-completed' : ''}">${taskText}</div>`;
+                        
+                        // Add details section for category, how, and notes
+                        if (task.category || task.how || task.notes) {
+                            html += `<div class="task-details">`;
+                            
+                            if (task.category) {
+                                html += `<div class="detail-item"><span class="detail-icon">📂</span><span class="detail-label">Category:</span> ${this.escapeHtml(task.category)}</div>`;
+                            }
+                            
+                            if (task.how) {
+                                html += `<div class="detail-item"><span class="detail-icon">🔧</span><span class="detail-label">How:</span> ${this.escapeHtml(task.how)}</div>`;
+                            }
+                            
+                            if (task.notes) {
+                                html += `<div class="detail-item"><span class="detail-icon">📝</span><span class="detail-label">Notes:</span> ${this.escapeHtml(task.notes)}</div>`;
+                            }
+                            
+                            html += `</div>`;
+                        }
+                        
+                        html += `</div>`;
+                        html += `</div>`;
+                    });
+
+                    html += `</div>`; // Close timeline-group
+                });
+
+                todoList.innerHTML = html;
             }
 
             escapeHtml(text) {
