@@ -36,7 +36,7 @@ class GoogleSheetsChecklist {
         this.useAppsScript = this.appsScriptUrl && this.appsScriptUrl !== 'YOUR_APPS_SCRIPT_WEB_APP_URL_HERE';
         this.retryCount = 0;
         this.isInitialLoad = true;
-        this.currentFilter = 'support-needed'; // Always default to 'support-needed' on page refresh
+        this.currentFilter = 'all'; // Always default to 'all' on page refresh
         this.init();
     }
 
@@ -91,6 +91,7 @@ class GoogleSheetsChecklist {
         document.getElementById('task-timeline').addEventListener('change', (e) => this.handleOtherOption(e, 'task-timeline-other'));
         document.getElementById('task-category').addEventListener('change', (e) => this.handleOtherOption(e, 'task-category-other'));
         document.getElementById('task-who-can-help').addEventListener('change', (e) => this.handleOtherOption(e, 'task-who-can-help-other'));
+        document.getElementById('task-how').addEventListener('change', (e) => this.handleOtherOption(e, 'task-how-other'));
 
         // Auto-refresh using configured interval
         setInterval(() => this.loadFromSheet(), this.refreshInterval);
@@ -653,7 +654,18 @@ class GoogleSheetsChecklist {
                     }
                     
                     if (task.how) {
-                        html += `<div class="detail-item"><span class="detail-icon">🔧</span><span class="detail-label">How:</span> <span class="detail-text-non-editable">${this.escapeHtml(task.how)}</span></div>`;
+                        html += `<div class="detail-item">
+                            <span class="detail-icon">🔧</span>
+                            <span class="detail-label">How:</span> 
+                            <span class="editable-text" data-task-id="${task.id}" data-field="how" onclick="sheetsChecklist.startEditingDropdown(this)">${this.escapeHtml(task.how)}<span class="edit-icon">✏️</span></span>
+                        </div>`;
+                    } else {
+                        // Show empty how field that can be clicked to add how
+                        html += `<div class="detail-item">
+                            <span class="detail-icon">🔧</span>
+                            <span class="detail-label">How:</span> 
+                            <span class="editable-text empty-field" data-task-id="${task.id}" data-field="how" onclick="sheetsChecklist.startEditingDropdown(this)">Click to set how...<span class="edit-icon">✏️</span></span>
+                        </div>`;
                     }
                     
                     if (task.notes) {
@@ -929,6 +941,8 @@ class GoogleSheetsChecklist {
             return task.priority || '';
         } else if (field === 'category') {
             return task.category || '';
+        } else if (field === 'how') {
+            return task.how || '';
         }
         return '';
     }
@@ -958,6 +972,14 @@ class GoogleSheetsChecklist {
             values = [...new Set(
                 this.tasks
                     .map(task => task.Category || task.category)
+                    .filter(value => value && value.trim() !== '')
+                    .map(value => value.trim())
+            )].sort(); // Alphabetical sorting
+        } else if (field === 'how') {
+            // Get unique how values from tasks (excluding empty values)
+            values = [...new Set(
+                this.tasks
+                    .map(task => task.How || task.how)
                     .filter(value => value && value.trim() !== '')
                     .map(value => value.trim())
             )].sort(); // Alphabetical sorting
@@ -1145,6 +1167,14 @@ class GoogleSheetsChecklist {
                 element.innerHTML = `Click to set category...<span class="edit-icon">✏️</span>`;
                 element.classList.add('empty-field');
             }
+        } else if (field === 'how') {
+            if (value && value.trim()) {
+                element.innerHTML = `${this.escapeHtml(value)}<span class="edit-icon">✏️</span>`;
+                element.classList.remove('empty-field');
+            } else {
+                element.innerHTML = `Click to set how...<span class="edit-icon">✏️</span>`;
+                element.classList.add('empty-field');
+            }
         }
     }
 
@@ -1304,6 +1334,9 @@ class GoogleSheetsChecklist {
         // Pre-populate timeline if a timeline filter is currently selected
         this.prePopulateTimelineFromFilter();
         
+        // Pre-populate How field if a specific filter is selected
+        this.prePopulateHowFromFilter();
+        
         document.getElementById('task-text').focus();
     }
 
@@ -1312,7 +1345,7 @@ class GoogleSheetsChecklist {
         if (!timelineSelect || !this.currentFilter) return;
         
         // Special filters shouldn't pre-populate the timeline
-        if (this.currentFilter === 'all' || this.currentFilter === 'support-needed' || this.currentFilter === 'completed') {
+        if (this.currentFilter === 'all' || this.currentFilter === 'support-needed' || this.currentFilter === 'dom-needed' || this.currentFilter === 'team-needed' || this.currentFilter === 'help-offered') {
             return;
         }
         
@@ -1333,6 +1366,20 @@ class GoogleSheetsChecklist {
             if (matchingOption) {
                 timelineSelect.value = matchingTask.timeline;
             }
+        }
+    }
+
+    prePopulateHowFromFilter() {
+        const howSelect = document.getElementById('task-how');
+        if (!howSelect || !this.currentFilter) return;
+        
+        // Pre-populate How field based on specific filters
+        if (this.currentFilter === 'support-needed') {
+            // Set How field to 'Help Needed'
+            howSelect.value = 'Help Needed';
+        } else if (this.currentFilter === 'team-needed') {
+            // Set How field to 'Team Needed'
+            howSelect.value = 'Team Needed';
         }
     }
 
@@ -1445,6 +1492,7 @@ class GoogleSheetsChecklist {
         const taskWhoCanHelp = document.getElementById('task-who-can-help');
         const taskWhoCanHelpOther = document.getElementById('task-who-can-help-other');
         const taskHow = document.getElementById('task-how');
+        const taskHowOther = document.getElementById('task-how-other');
         const taskNotes = document.getElementById('task-notes');
         
         if (taskText) formData.taskText = taskText.value;
@@ -1465,6 +1513,10 @@ class GoogleSheetsChecklist {
             formData.taskWhoCanHelpOtherVisible = taskWhoCanHelpOther.style.display !== 'none';
         }
         if (taskHow) formData.taskHow = taskHow.value;
+        if (taskHowOther) {
+            formData.taskHowOther = taskHowOther.value;
+            formData.taskHowOtherVisible = taskHowOther.style.display !== 'none';
+        }
         if (taskNotes) formData.taskNotes = taskNotes.value;
         
         return formData;
@@ -1483,6 +1535,7 @@ class GoogleSheetsChecklist {
         const taskWhoCanHelp = document.getElementById('task-who-can-help');
         const taskWhoCanHelpOther = document.getElementById('task-who-can-help-other');
         const taskHow = document.getElementById('task-how');
+        const taskHowOther = document.getElementById('task-how-other');
         const taskNotes = document.getElementById('task-notes');
         
         if (taskText && formData.taskText !== undefined) taskText.value = formData.taskText;
@@ -1509,6 +1562,12 @@ class GoogleSheetsChecklist {
             }
         }
         if (taskHow && formData.taskHow !== undefined) taskHow.value = formData.taskHow;
+        if (taskHowOther && formData.taskHowOther !== undefined) {
+            taskHowOther.value = formData.taskHowOther;
+            if (formData.taskHowOtherVisible !== undefined) {
+                taskHowOther.style.display = formData.taskHowOtherVisible ? 'block' : 'none';
+            }
+        }
         if (taskNotes && formData.taskNotes !== undefined) taskNotes.value = formData.taskNotes;
     }
 
@@ -1516,6 +1575,7 @@ class GoogleSheetsChecklist {
         this.populateTimelineDropdown();
         this.populateCategoryDropdown();
         this.populateWhoCanHelpDropdown();
+        this.populateHowDropdown();
     }
 
     populateTimelineDropdown() {
@@ -1589,7 +1649,7 @@ class GoogleSheetsChecklist {
         // Get unique who-can-help values from tasks
         const whoCanHelpValues = [...new Set(
             this.tasks
-                .map(task => task['Who Can Help'])
+                .map(task => task.whoCanHelp)
                 .filter(value => value && value.trim() !== '')
                 .map(value => value.trim())
         )].sort(); // Alphabetical sorting
@@ -1648,6 +1708,36 @@ class GoogleSheetsChecklist {
         }
     }
 
+    populateHowDropdown() {
+        const howSelect = document.getElementById('task-how');
+        if (!howSelect) return;
+
+        // Get unique how values from tasks
+        const howValues = [...new Set(
+            this.tasks
+                .map(task => task.how)
+                .filter(value => value && value.trim() !== '')
+                .map(value => value.trim())
+        )].sort(); // Alphabetical sorting
+
+        // Remove existing dynamic options (keep default and "Other")
+        const existingOptions = Array.from(howSelect.options);
+        existingOptions.forEach(option => {
+            if (option.value !== '' && option.value !== 'Other') {
+                option.remove();
+            }
+        });
+
+        // Add dynamic options before "Other"
+        const otherOption = howSelect.querySelector('option[value="Other"]');
+        howValues.forEach(value => {
+            const option = document.createElement('option');
+            option.value = value;
+            option.textContent = value;
+            howSelect.insertBefore(option, otherOption);
+        });
+    }
+
     hideAddTaskForm() {
         document.getElementById('add-task-form').style.display = 'none';
         document.getElementById('new-task-form').reset();
@@ -1663,11 +1753,21 @@ class GoogleSheetsChecklist {
 
     handleOtherOption(event, otherFieldId) {
         const otherField = document.getElementById(otherFieldId);
+        const otherContainer = document.getElementById(otherFieldId + '-container');
+        
         if (event.target.value === 'Other') {
-            otherField.style.display = 'block';
+            if (otherContainer) {
+                otherContainer.style.display = 'block';
+            } else {
+                otherField.style.display = 'block';
+            }
             otherField.focus();
         } else {
-            otherField.style.display = 'none';
+            if (otherContainer) {
+                otherContainer.style.display = 'none';
+            } else {
+                otherField.style.display = 'none';
+            }
             otherField.value = '';
         }
     }
@@ -1693,12 +1793,17 @@ class GoogleSheetsChecklist {
             whoCanHelp = formData.get('whoCanHelpOther')?.trim() || '';
         }
         
+        let how = formData.get('how') || '';
+        if (how === 'Other') {
+            how = formData.get('how-other')?.trim() || '';
+        }
+        
         const taskData = {
             text: formData.get('taskText').trim(),
             timeline: timeline,
             priority: formData.get('priority') || '3 - Medium', // Default to Medium if empty
             category: category,
-            how: formData.get('how') || '',
+            how: how,
             notes: formData.get('notes') || '',
             whoCanHelp: whoCanHelp,
             completed: false
@@ -2031,15 +2136,23 @@ class GoogleSheetsChecklist {
         // Generate filter buttons HTML
         let buttonsHtml = '<button class="filter-btn" data-filter="all">All Tasks</button>';
         
+        // Add category-based filters
+        buttonsHtml += '<button class="filter-btn" data-filter="support-needed">Help Needed</button>';
+        buttonsHtml += '<button class="filter-btn" data-filter="dom-needed">Dom Needed</button>';
+        buttonsHtml += '<button class="filter-btn" data-filter="team-needed">Team Needed</button>';
+        buttonsHtml += '<button class="filter-btn" data-filter="help-offered">Help Offered</button>';
+        
+        // Add line break before timeline buttons
+        buttonsHtml += '<div style="flex-basis: 100%; height: 0;"></div>';
+        
         sortedTimelines.forEach(timeline => {
             const safeTimeline = timeline.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase();
             buttonsHtml += `<button class="filter-btn" data-filter="${safeTimeline}">${timeline}</button>`;
         });
 
-        // Add category-based filters
-        buttonsHtml += '<button class="filter-btn" data-filter="support-needed">Support Needed</button>';
-        buttonsHtml += '<button class="filter-btn" data-filter="dom-needed">Dom Needed</button>';
-        buttonsHtml += '<button class="filter-btn" data-filter="completed">Completed</button>';
+        // Add completed items checkbox at the bottom
+        buttonsHtml += '<div style="flex-basis: 100%; height: 0;"></div>';
+        buttonsHtml += '<div style="margin-top: 10px;"><label style="color: var(--color-text); font-size: 14px; cursor: pointer;"><input type="checkbox" id="show-completed-checkbox" style="margin-right: 8px;"> Show Completed Items</label></div>';
 
         filterContainer.innerHTML = buttonsHtml;
         filterContainer.style.display = 'flex';
@@ -2074,6 +2187,19 @@ class GoogleSheetsChecklist {
                 this.handleFilterClick(e.target);
             }
         });
+
+        // Add event listener for the completed items checkbox
+        const showCompletedCheckbox = filterContainer.querySelector('#show-completed-checkbox');
+        if (showCompletedCheckbox) {
+            // Initialize the checkbox state (default unchecked)
+            this.showCompleted = this.showCompleted || false;
+            showCompletedCheckbox.checked = this.showCompleted;
+            
+            showCompletedCheckbox.addEventListener('change', (e) => {
+                this.showCompleted = e.target.checked;
+                this.applyFilter(this.currentFilter);
+            });
+        }
     }
 
     handleFilterClick(button) {
@@ -2114,37 +2240,42 @@ class GoogleSheetsChecklist {
             const how = item.dataset.how || '';
             const completed = item.dataset.completed === 'true';
 
-            // If 'completed' filter is selected, only show completed tasks
-            if (filterType === 'completed') {
-                show = completed;
-            } else if (filterType === 'all') {
-                // For 'All Tasks' filter, show all incomplete tasks
-                show = !completed;
+            // Apply the main filter logic
+            if (filterType === 'all') {
+                // For 'All Tasks' filter, show all tasks
+                show = true;
             } else {
-                // For all other filters, always exclude completed tasks
-                if (completed) {
-                    show = false;
-                } else {
-                    // Apply the specific filter logic for incomplete tasks
-                    switch (filterType) {
-                        case 'support-needed':
-                            // Filter for tasks where 'how' contains 'outsource' (with word boundaries) 
-                            // AND 'whocanhelp' is empty
-                            const outsourceRegex = /(^|\s)outsource(\s|$)/i;
-                            show = outsourceRegex.test(how) && whoCanHelp.length == 0;
-                            break;
-                        case 'dom-needed':
-                            // Filter for tasks where 'how' contains 'dom' or 'jumper' (with word boundaries) 
-                            // AND 'whocanhelp' is empty
-                            const domRegex = /(^|\s)(dom|jumper)(\s|$)/i;
-                            show = domRegex.test(how) && whoCanHelp.length == 0;
-                            break;
-                        default:
-                            // Timeline-based filter
-                            show = safeTimeline === filterType;
-                            break;
-                    }
+                // Apply the specific filter logic
+                switch (filterType) {
+                    case 'support-needed':
+                        // Filter for tasks where 'how' field equals 'Help Needed'
+                        show = how.trim().toLowerCase() === 'help needed';
+                        break;
+                    case 'dom-needed':
+                        // Filter for tasks where 'how' contains 'dom', 'to do', 'jumper' (with word boundaries) 
+                        // OR 'how' is empty, AND 'whocanhelp' is empty
+                        const domRegex = /(^|\s)(dom|jumper|to do)(\s|$)/i;
+                        show = (domRegex.test(how) || how.trim() === '') && whoCanHelp.length == 0;
+                        break;
+                    case 'team-needed':
+                        // Filter for tasks where 'how' field equals 'Team Needed'
+                        show = how.trim().toLowerCase() === 'team needed';
+                        break;
+                    case 'help-offered':
+                        // Filter for tasks where 'whoCanHelp' is not empty
+                        show = whoCanHelp && whoCanHelp.trim() !== '';
+                        break;
+                    default:
+                        // Timeline-based filter
+                        show = safeTimeline === filterType;
+                        break;
                 }
+            }
+
+            // Apply completed items visibility based on checkbox state
+            if (show && completed && !this.showCompleted) {
+                // Hide completed items if checkbox is unchecked
+                show = false;
             }
 
             if (!show) {

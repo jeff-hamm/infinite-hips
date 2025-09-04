@@ -127,7 +127,17 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label for="task-how">How (Instructions)</label>
-                        <textarea id="task-how" name="how" rows="2" placeholder="How to complete this task..."></textarea>
+                        <select id="task-how" name="how">
+                            <option value="">Select how to complete task...</option>
+                            <option value="Other">Other (specify below)</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-row" id="task-how-other-container" style="display: none;">
+                    <div class="form-group">
+                        <label for="task-how-other">Other How (Instructions)</label>
+                        <textarea id="task-how-other" name="how-other" rows="2" placeholder="How to complete this task..."></textarea>
                     </div>
                 </div>
                 
