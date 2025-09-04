@@ -508,14 +508,14 @@ class GoogleSheetsChecklist {
                     const bMatch = bTimeline.match(/^(\d+)\s+days?\s+before/i);
                     
                     if (aMatch && bMatch) {
-                        // Both are "X days before" - sort by number (ascending: 1 day, 7 days, 14 days)
-                        return parseInt(aMatch[1]) - parseInt(bMatch[1]);
+                        // Both are "X days before" - sort by number (descending: 14 days, 7 days, 1 day)
+                        return parseInt(bMatch[1]) - parseInt(aMatch[1]);
                     } else if (aMatch && !bMatch) {
-                        // A is "X days before", B is not - A comes first
-                        return -1;
-                    } else if (!aMatch && bMatch) {
-                        // B is "X days before", A is not - B comes first
+                        // A is "X days before", B is not - B (alpha) comes first
                         return 1;
+                    } else if (!aMatch && bMatch) {
+                        // B is "X days before", A is not - A (alpha) comes first
+                        return -1;
                     } else {
                         // Neither is "X days before" - sort alphabetically
                         return aTimeline.localeCompare(bTimeline);
