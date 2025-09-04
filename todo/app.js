@@ -703,8 +703,21 @@ class GoogleSheetsChecklist {
         // Apply the current filter to hide/show appropriate tasks
         this.applyFilter(this.currentFilter);
         
+        // Preserve form data if Add Task form is visible, update form dropdowns, then restore form data
+        const addTaskForm = document.getElementById('add-task-form');
+        const formIsVisible = addTaskForm && addTaskForm.style.display !== 'none';
+        let preservedFormData = null;
+        
+        if (formIsVisible) {
+            preservedFormData = this.preserveFormData();
+        }
+        
         // Update form dropdowns with current data
         this.populateFormDropdowns();
+        
+        if (formIsVisible && preservedFormData) {
+            this.restoreFormData(preservedFormData);
+        }
         
         // Populate detail view dropdowns
         this.populateDetailDropdowns();
@@ -1330,6 +1343,86 @@ class GoogleSheetsChecklist {
                 dropdown.appendChild(option);
             });
         });
+    }
+
+    preserveFormData() {
+        // Preserve current form values before repopulating dropdowns
+        const formData = {};
+        
+        const taskText = document.getElementById('task-text');
+        const taskTimeline = document.getElementById('task-timeline');
+        const taskTimelineOther = document.getElementById('task-timeline-other');
+        const taskPriority = document.getElementById('task-priority');
+        const taskCategory = document.getElementById('task-category');
+        const taskCategoryOther = document.getElementById('task-category-other');
+        const taskWhoCanHelp = document.getElementById('task-who-can-help');
+        const taskWhoCanHelpOther = document.getElementById('task-who-can-help-other');
+        const taskHow = document.getElementById('task-how');
+        const taskNotes = document.getElementById('task-notes');
+        
+        if (taskText) formData.taskText = taskText.value;
+        if (taskTimeline) formData.taskTimeline = taskTimeline.value;
+        if (taskTimelineOther) {
+            formData.taskTimelineOther = taskTimelineOther.value;
+            formData.taskTimelineOtherVisible = taskTimelineOther.style.display !== 'none';
+        }
+        if (taskPriority) formData.taskPriority = taskPriority.value;
+        if (taskCategory) formData.taskCategory = taskCategory.value;
+        if (taskCategoryOther) {
+            formData.taskCategoryOther = taskCategoryOther.value;
+            formData.taskCategoryOtherVisible = taskCategoryOther.style.display !== 'none';
+        }
+        if (taskWhoCanHelp) formData.taskWhoCanHelp = taskWhoCanHelp.value;
+        if (taskWhoCanHelpOther) {
+            formData.taskWhoCanHelpOther = taskWhoCanHelpOther.value;
+            formData.taskWhoCanHelpOtherVisible = taskWhoCanHelpOther.style.display !== 'none';
+        }
+        if (taskHow) formData.taskHow = taskHow.value;
+        if (taskNotes) formData.taskNotes = taskNotes.value;
+        
+        return formData;
+    }
+
+    restoreFormData(formData) {
+        // Restore preserved form values after repopulating dropdowns
+        if (!formData) return;
+        
+        const taskText = document.getElementById('task-text');
+        const taskTimeline = document.getElementById('task-timeline');
+        const taskTimelineOther = document.getElementById('task-timeline-other');
+        const taskPriority = document.getElementById('task-priority');
+        const taskCategory = document.getElementById('task-category');
+        const taskCategoryOther = document.getElementById('task-category-other');
+        const taskWhoCanHelp = document.getElementById('task-who-can-help');
+        const taskWhoCanHelpOther = document.getElementById('task-who-can-help-other');
+        const taskHow = document.getElementById('task-how');
+        const taskNotes = document.getElementById('task-notes');
+        
+        if (taskText && formData.taskText !== undefined) taskText.value = formData.taskText;
+        if (taskTimeline && formData.taskTimeline !== undefined) taskTimeline.value = formData.taskTimeline;
+        if (taskTimelineOther && formData.taskTimelineOther !== undefined) {
+            taskTimelineOther.value = formData.taskTimelineOther;
+            if (formData.taskTimelineOtherVisible !== undefined) {
+                taskTimelineOther.style.display = formData.taskTimelineOtherVisible ? 'block' : 'none';
+            }
+        }
+        if (taskPriority && formData.taskPriority !== undefined) taskPriority.value = formData.taskPriority;
+        if (taskCategory && formData.taskCategory !== undefined) taskCategory.value = formData.taskCategory;
+        if (taskCategoryOther && formData.taskCategoryOther !== undefined) {
+            taskCategoryOther.value = formData.taskCategoryOther;
+            if (formData.taskCategoryOtherVisible !== undefined) {
+                taskCategoryOther.style.display = formData.taskCategoryOtherVisible ? 'block' : 'none';
+            }
+        }
+        if (taskWhoCanHelp && formData.taskWhoCanHelp !== undefined) taskWhoCanHelp.value = formData.taskWhoCanHelp;
+        if (taskWhoCanHelpOther && formData.taskWhoCanHelpOther !== undefined) {
+            taskWhoCanHelpOther.value = formData.taskWhoCanHelpOther;
+            if (formData.taskWhoCanHelpOtherVisible !== undefined) {
+                taskWhoCanHelpOther.style.display = formData.taskWhoCanHelpOtherVisible ? 'block' : 'none';
+            }
+        }
+        if (taskHow && formData.taskHow !== undefined) taskHow.value = formData.taskHow;
+        if (taskNotes && formData.taskNotes !== undefined) taskNotes.value = formData.taskNotes;
     }
 
     populateFormDropdowns() {
