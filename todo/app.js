@@ -49,6 +49,18 @@ class GoogleSheetsChecklist {
         }
     }
 
+    // Helper functions for multi-value 'who can help' field
+    parseWhoCanHelp(whoCanHelpStr) {
+        if (!whoCanHelpStr || !whoCanHelpStr.trim()) return [];
+        // Split by comma or multiple whitespace, filter out empty strings, and trim each value
+        return whoCanHelpStr.split(/[,\s]+/).filter(value => value.trim() !== '').map(value => value.trim());
+    }
+
+    formatWhoCanHelp(valuesArray) {
+        if (!valuesArray || valuesArray.length === 0) return '';
+        return valuesArray.filter(value => value && value.trim() !== '').join(', ');
+    }
+
     saveCurrentFilter() {
         try {
             localStorage.setItem('checklist-current-filter', this.currentFilter);
@@ -684,19 +696,34 @@ class GoogleSheetsChecklist {
                         </div>`;
                     }
                     
-                                        // Always show Helper field last (editable)
+                                        // Always show Helper field last (editable with multiple values)
                     const whoCanHelpValue = task.whoCanHelp || '';
-                    const displayValue = whoCanHelpValue || '';
+                    const helpers = this.parseWhoCanHelp(whoCanHelpValue);
+                    
                     html += `<div class="detail-item">
                         <span class="detail-icon">🤝</span>
                         <span class="detail-label">Helper/Dom:</span> 
-                        <div class="editable-field-container">
-                            <select class="editable-dropdown" data-task-id="${task.id}" data-field="whoCanHelp" onchange="sheetsChecklist.handleWhoCanHelpChange(this)">
+                        <div class="helper-dropdowns-container" data-task-id="${task.id}">`;
+                    
+                    // Add dropdown for each existing helper
+                    helpers.forEach((helper, index) => {
+                        html += `
+                            <select class="editable-dropdown helper-dropdown" data-task-id="${task.id}" data-helper-index="${index}" onchange="sheetsChecklist.handleHelperDropdownChange(this)">
                                 <option value=""></option>
-                                ${whoCanHelpValue ? `<option value="${this.escapeHtml(whoCanHelpValue)}" selected>${this.escapeHtml(whoCanHelpValue)}</option>` : ''}
+                                <option value="${this.escapeHtml(helper)}" selected>${this.escapeHtml(helper)}</option>
                                 <option value="Other">Other</option>
-                            </select>
-                            <input type="text" class="editable-other-input" style="display: none; margin-top: 8px;" placeholder="Enter helper/dom name..." onblur="sheetsChecklist.updateWhoCanHelpField(this)" data-task-id="${task.id}">
+                            </select>`;
+                    });
+                    
+                    // Always add one blank dropdown for new entries
+                    html += `
+                        <select class="editable-dropdown helper-dropdown blank-helper-dropdown" data-task-id="${task.id}" data-helper-index="${helpers.length}" onchange="sheetsChecklist.handleHelperDropdownChange(this)">
+                            <option value="" selected></option>
+                            <option value="Other">Other</option>
+                        </select>`;
+                    
+                    html += `
+                            <input type="text" class="editable-other-input" style="display: none; margin-top: 8px;" placeholder="Enter helper/dom name..." onblur="sheetsChecklist.updateHelperField(this)" data-task-id="${task.id}">
                         </div>
                     </div>`;
                     
@@ -768,6 +795,63 @@ class GoogleSheetsChecklist {
         if (newValue) {
             await this.updateTaskDetails(taskId, { whoCanHelp: newValue });
         }
+    }
+
+    handleHelperDropdownChange(dropdown) {
+        const container = dropdown.closest('.helper-dropdowns-container');
+        const otherInput = container.querySelector('.editable-other-input');
+        const taskId = dropdown.dataset.taskId;
+        const helperIndex = parseInt(dropdown.dataset.helperIndex);
+        
+        if (dropdown.value === 'Other') {
+            // Show the "Other" input field
+            otherInput.style.display = 'block';
+            otherInput.dataset.helperIndex = helperIndex;
+            otherInput.focus();
+        } else {
+            // Hide the "Other" input field
+            otherInput.style.display = 'none';
+            otherInput.value = '';
+            
+            // Update the helpers array
+            this.updateHelpersArray(taskId, helperIndex, dropdown.value);
+        }
+    }
+
+    async updateHelperField(input) {
+        const taskId = input.dataset.taskId;
+        const helperIndex = parseInt(input.dataset.helperIndex);
+        const newValue = input.value.trim();
+        
+        if (newValue) {
+            await this.updateHelpersArray(taskId, helperIndex, newValue);
+        }
+        
+        // Hide the input field
+        input.style.display = 'none';
+        input.value = '';
+    }
+
+    async updateHelpersArray(taskId, helperIndex, newValue) {
+        const task = this.tasks.find(t => t.id === taskId);
+        if (!task) return;
+        
+        // Get current helpers array
+        const helpers = this.parseWhoCanHelp(task.whoCanHelp || '');
+        
+        if (newValue && newValue.trim() !== '') {
+            // Set the value at the specified index
+            helpers[helperIndex] = newValue.trim();
+        } else {
+            // Remove the helper at this index if value is empty
+            if (helperIndex < helpers.length) {
+                helpers.splice(helperIndex, 1);
+            }
+        }
+        
+        // Format back to string and update
+        const formattedValue = this.formatWhoCanHelp(helpers);
+        await this.updateTaskDetails(taskId, { whoCanHelp: formattedValue });
     }
 
     startEditingText(element) {
@@ -1394,16 +1478,16 @@ class GoogleSheetsChecklist {
 
     populateDetailDropdowns() {
         // Get all editable dropdowns in the detail view
-        const whoCanHelpDropdowns = document.querySelectorAll('.editable-dropdown[data-field="whoCanHelp"]');
+        const helperDropdowns = document.querySelectorAll('.helper-dropdown');
         const timelineDropdowns = document.querySelectorAll('.editable-dropdown[data-field="timeline"]');
         
-        // Get unique who-can-help values from tasks (excluding empty values)
-        const whoCanHelpValues = [...new Set(
-            this.tasks
-                .map(task => task['Who Can Help'] || task.whoCanHelp)
-                .filter(value => value && value.trim() !== '')
-                .map(value => value.trim())
-        )].sort(); // Alphabetical sorting
+        // Get unique who-can-help values from all tasks, split by comma/whitespace
+        const allHelperValues = [];
+        this.tasks.forEach(task => {
+            const helpers = this.parseWhoCanHelp(task.whoCanHelp || '');
+            allHelperValues.push(...helpers);
+        });
+        const whoCanHelpValues = [...new Set(allHelperValues)].sort(); // Alphabetical sorting
 
         // Get unique timeline values from tasks (excluding empty values)
         const timelineValues = [...new Set(
@@ -1413,17 +1497,23 @@ class GoogleSheetsChecklist {
                 .map(value => value.trim())
         )].sort(); // Alphabetical sorting
         
-        // Populate whoCanHelp dropdowns
-        whoCanHelpDropdowns.forEach(dropdown => {
+        // Populate helper dropdowns
+        helperDropdowns.forEach(dropdown => {
             const currentValue = dropdown.value;
+            const isBlankDropdown = dropdown.classList.contains('blank-helper-dropdown') || dropdown.querySelector('option[value=""]')?.hasAttribute('selected');
             
             // Clear all options and rebuild
             dropdown.innerHTML = '';
             
-            // Always add blank option first
+            // Add appropriate blank option
             const blankOption = document.createElement('option');
             blankOption.value = '';
-            blankOption.textContent = '';
+            if (isBlankDropdown) {
+                blankOption.textContent = '';
+                blankOption.selected = true;
+            } else {
+                blankOption.textContent = '';
+            }
             dropdown.appendChild(blankOption);
             
             // Add current value if it exists and isn't in the values list
@@ -1431,7 +1521,9 @@ class GoogleSheetsChecklist {
                 const currentOption = document.createElement('option');
                 currentOption.value = currentValue;
                 currentOption.textContent = currentValue;
-                currentOption.selected = true;
+                if (!isBlankDropdown) {
+                    currentOption.selected = true;
+                }
                 dropdown.appendChild(currentOption);
             }
             
@@ -1440,7 +1532,7 @@ class GoogleSheetsChecklist {
                 const option = document.createElement('option');
                 option.value = value;
                 option.textContent = value;
-                if (value === currentValue) {
+                if (!isBlankDropdown && value === currentValue) {
                     option.selected = true;
                 }
                 dropdown.appendChild(option);
@@ -1450,6 +1542,9 @@ class GoogleSheetsChecklist {
             const otherOption = document.createElement('option');
             otherOption.value = 'Other';
             otherOption.textContent = 'Other';
+            if (!isBlankDropdown && currentValue === 'Other') {
+                otherOption.selected = true;
+            }
             dropdown.appendChild(otherOption);
         });
 
@@ -2257,8 +2352,8 @@ class GoogleSheetsChecklist {
                 // Apply the specific filter logic
                 switch (filterType) {
                     case 'support-needed':
-                        // Filter for tasks where 'how' field equals 'Help Needed'
-                        show = how.trim().toLowerCase() === 'help needed';
+                        // Filter for tasks where 'how' field equals 'Help Needed' AND 'whoCanHelp' is empty
+                        show = how.trim().toLowerCase() === 'help needed' && whoCanHelp.trim() === '';
                         break;
                     case 'dom-needed':
                         // Filter for tasks where 'how' contains 'dom', 'to do', 'jumper' (with word boundaries) 
