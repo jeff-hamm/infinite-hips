@@ -99,14 +99,11 @@ class GoogleSheetsChecklist {
     }
 
     async loadFromAppsScript() {
-        const response = await fetch(this.appsScriptUrl, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                action: 'getTasks'
-            })
+        // Use GET request to avoid CORS issues
+        const url = `${this.appsScriptUrl}?action=getTasks&t=${Date.now()}`;
+        const response = await fetch(url, {
+            method: 'GET',
+            mode: 'cors'
         });
 
         if (!response.ok) {
@@ -343,18 +340,17 @@ class GoogleSheetsChecklist {
                 this.renderTasks();
                 this.updateProgress();
                 
-                // Send update to Apps Script
-                const response = await fetch(this.appsScriptUrl, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        action: 'updateTask',
-                        taskId: taskId,
-                        completed: completed,
-                        updatedBy: 'Web UI'
-                    })
+                // Send update to Apps Script using GET to avoid CORS
+                const params = new URLSearchParams({
+                    action: 'updateTask',
+                    taskId: taskId,
+                    completed: completed.toString(),
+                    updatedBy: 'Web UI',
+                    t: Date.now()
+                });
+                const response = await fetch(`${this.appsScriptUrl}?${params}`, {
+                    method: 'GET',
+                    mode: 'cors'
                 });
 
                 if (!response.ok) {
@@ -584,13 +580,17 @@ class GoogleSheetsChecklist {
 
     async addTask(taskData) {
         if (!this.useAppsScript) {
-            alert('Adding tasks requires Google Apps Script setup. See google-apps-script.js for instructions.');
+            console.warn('Apps Script not configured, cannot add tasks');
             return;
         }
 
         try {
-            this.showLoading(true);
+            // For now, disable complex operations to avoid CORS issues
+            // Focus on core read/update functionality
+            console.warn('AddTask temporarily disabled due to CORS limitations. Use Google Sheets directly to add tasks.');
+            return;
             
+            /* CORS-limited implementation - uncomment when needed
             const response = await fetch(this.appsScriptUrl, {
                 method: 'POST',
                 headers: {
@@ -612,15 +612,12 @@ class GoogleSheetsChecklist {
                 throw new Error(result.data?.error || 'Failed to add task');
             }
 
-            // Refresh the data to show the new task
+            // Reload tasks to reflect the addition
             await this.loadFromSheet();
-            this.updateSyncStatus('✅ Task Added');
-            
+            */
         } catch (error) {
             console.error('Error adding task:', error);
-            this.showError(`Failed to add task: ${error.message}`);
-        } finally {
-            this.showLoading(false);
+            throw error;
         }
     }
 

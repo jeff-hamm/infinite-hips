@@ -129,6 +129,12 @@ function doGet(e) {
       case 'getTasks':
         return createResponse(getTasks(config));
       
+      case 'updateTask':
+        const taskId = e.parameter.taskId;
+        const completed = e.parameter.completed === 'true';
+        const updatedBy = e.parameter.updatedBy || 'Web UI';
+        return createResponse(updateTask(taskId, completed, updatedBy, config));
+      
       case 'test':
         return createResponse({ 
           message: 'Apps Script is working!', 
