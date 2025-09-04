@@ -5,7 +5,7 @@
     --color-bg: #0d1117;
     --color-bg-alt: #161b22;
     --color-pink: #ff69b4;
-    --color-pink-dark: #ff1a8c;
+    --color-pink-dark: #ff69b4;
     --color-pink-light: #ffb3da;
     --color-gray1: #6c757d;
     --color-gray2: #495057;
@@ -37,8 +37,8 @@ body {
     padding: 20px;
     background-color: var(--color-bg);
     background-image: 
-        radial-gradient(circle at 25% 25%, #ff007a15 0%, transparent 50%),
-        radial-gradient(circle at 75% 75%, #ff1a8c15 0%, transparent 50%);
+        radial-gradient(circle at 25% 25%, #ff69b415 0%, transparent 50%),
+        radial-gradient(circle at 75% 75%, #ff69b415 0%, transparent 50%);
 }
 /* Header styles (merged, deduplicated) */
 /* Header styles (merged, deduplicated) */
@@ -429,7 +429,7 @@ strong {
 }
 .category-medical { border-left: 4px solid #ff69b4; }
 .category-home { border-left: 4px solid #ffb3da; }
-.category-equipment { border-left: 4px solid #ff1a8c; }
+.category-equipment { border-left: 4px solid #ff69b4; }
 .category-administrative { border-left: 4px solid #ff8eb3; }
 .category-transportation { border-left: 4px solid #ff4da6; }
 .category-shopping { border-left: 4px solid #ffcce5; }

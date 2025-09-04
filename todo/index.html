@@ -50,8 +50,83 @@
         </div>
 
         <div class="controls">
+            <button id="add-item-btn" class="add-item-btn">➕ Add New Task</button>
             <button id="refresh-btn" class="refresh-btn">🔄 Refresh from Sheet</button>
             <div id="last-sync" style="color: #7d8590; font-size: 12px;">Never synced</div>
+        </div>
+
+        <!-- Add Task Form -->
+        <div id="add-task-form" class="add-task-form" style="display: none;">
+            <h3>➕ Add New Task</h3>
+            <form id="new-task-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="task-text">Task Description *</label>
+                        <input type="text" id="task-text" name="taskText" required placeholder="Enter task description...">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="task-timeline">Timeline</label>
+                        <select id="task-timeline" name="timeline">
+                            <option value="">Select timeline...</option>
+                            <option value="Other">Other (specify below)</option>
+                        </select>
+                        <input type="text" id="task-timeline-other" name="timelineOther" placeholder="Enter custom timeline..." style="display: none; margin-top: 8px;">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="task-priority">Priority</label>
+                        <select id="task-priority" name="priority">
+                            <option value="">Select priority...</option>
+                            <option value="1- Critical">1- Critical</option>
+                            <option value="2- High">2- High</option>
+                            <option value="3- Medium">3- Medium</option>
+                            <option value="4- Low">4- Low</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                                        <div class="form-group">
+                        <label for="task-category">Category</label>
+                        <select id="task-category" name="category">
+                            <option value="">Select category...</option>
+                            <option value="Other">Other (specify below)</option>
+                        </select>
+                        <input type="text" id="task-category-other" name="categoryOther" placeholder="Enter custom category..." style="display: none; margin-top: 8px;">
+                    </div>
+                    
+                                        <div class="form-group">
+                        <label for="task-who-can-help">Who Can Help</label>
+                        <select id="task-who-can-help" name="whoCanHelp">
+                            <option value="">Select who can help...</option>
+                            <option value="Other">Other (specify below)</option>
+                        </select>
+                        <input type="text" id="task-who-can-help-other" name="whoCanHelpOther" placeholder="Enter who can help..." style="display: none; margin-top: 8px;">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="task-how">How (Instructions)</label>
+                        <textarea id="task-how" name="how" rows="2" placeholder="How to complete this task..."></textarea>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="task-notes">Notes</label>
+                        <textarea id="task-notes" name="notes" rows="2" placeholder="Additional notes or details..."></textarea>
+                    </div>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary">💾 Add Task</button>
+                    <button type="button" id="cancel-add-btn" class="btn-secondary">❌ Cancel</button>
+                </div>
+            </form>
         </div>
 
         <div id="loading" class="loading" style="display: none;">

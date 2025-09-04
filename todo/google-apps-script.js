@@ -152,13 +152,14 @@ function getTasksFromSheet(sheet) {
   const tasks = [];
   
   // Find column indices
-  const doneIndex = findColumnIndex(headers, ['done', 'completed', 'status']);
+  const doneIndex = findColumnIndex(headers, ['done','done?', 'completed', 'status']);
   const taskIndex = findColumnIndex(headers, ['task', 'description', 'title']);
   const timelineIndex = findColumnIndex(headers, ['timeline', 'phase', 'period']);
   const priorityIndex = findColumnIndex(headers, ['priority', 'urgency']);
   const categoryIndex = findColumnIndex(headers, ['category', 'type']);
   const howIndex = findColumnIndex(headers, ['how', 'method', 'instructions']);
   const notesIndex = findColumnIndex(headers, ['notes', 'comments', 'details']);
+  const whoCanHelpIndex = findColumnIndex(headers, ['whocanhelp', 'who can help', 'help', 'contact']);
   const lastModifiedIndex = findColumnIndex(headers, ['lastmodified', 'updated', 'modified']);
   
   // Process each row
@@ -180,6 +181,7 @@ function getTasksFromSheet(sheet) {
       category: row[categoryIndex]?.toString().trim() || '',
       how: row[howIndex]?.toString().trim() || '',
       notes: row[notesIndex]?.toString().trim() || '',
+      whoCanHelp: row[whoCanHelpIndex]?.toString().trim() || '',
       lastModified: row[lastModifiedIndex] ? new Date(row[lastModifiedIndex]).toISOString() : new Date().toISOString()
     };
     
@@ -264,6 +266,7 @@ function addTask(taskData) {
   const categoryIndex = findColumnIndex(headerMap, ['category', 'type']);
   const howIndex = findColumnIndex(headerMap, ['how', 'method', 'instructions']);
   const notesIndex = findColumnIndex(headerMap, ['notes', 'comments', 'details']);
+  const whoCanHelpIndex = findColumnIndex(headerMap, ['whocanhelp', 'who can help', 'help', 'contact']);
   const lastModifiedIndex = findColumnIndex(headerMap, ['lastmodified', 'updated', 'modified']);
   
   // Prepare new row data
@@ -276,6 +279,7 @@ function addTask(taskData) {
   if (categoryIndex >= 0) newRow[categoryIndex] = taskData.category || '';
   if (howIndex >= 0) newRow[howIndex] = taskData.how || '';
   if (notesIndex >= 0) newRow[notesIndex] = taskData.notes || '';
+  if (whoCanHelpIndex >= 0) newRow[whoCanHelpIndex] = taskData.whoCanHelp || '';
   if (lastModifiedIndex >= 0) newRow[lastModifiedIndex] = new Date();
   
   // Add the new row
@@ -326,6 +330,10 @@ function updateTaskDetails(taskId, updates) {
         break;
       case 'notes':
         columnIndex = findColumnIndex(headerMap, ['notes', 'comments', 'details']);
+        break;
+      case 'whocanhelp':
+      case 'who can help':
+        columnIndex = findColumnIndex(headerMap, ['whocanhelp', 'who can help', 'help', 'contact']);
         break;
     }
     

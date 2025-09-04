@@ -42,6 +42,16 @@ class GoogleSheetsChecklist {
     init() {
         // Event listeners
         document.getElementById('refresh-btn').addEventListener('click', () => this.loadFromSheet());
+        
+        // Add task form event listeners
+        document.getElementById('add-item-btn').addEventListener('click', () => this.showAddTaskForm());
+        document.getElementById('cancel-add-btn').addEventListener('click', () => this.hideAddTaskForm());
+        document.getElementById('new-task-form').addEventListener('submit', (e) => this.handleAddTask(e));
+        
+        // Handle "Other" option dropdowns
+        document.getElementById('task-timeline').addEventListener('change', (e) => this.handleOtherOption(e, 'task-timeline-other'));
+        document.getElementById('task-category').addEventListener('change', (e) => this.handleOtherOption(e, 'task-category-other'));
+        document.getElementById('task-who-can-help').addEventListener('change', (e) => this.handleOtherOption(e, 'task-who-can-help-other'));
 
         // Auto-refresh using configured interval
         setInterval(() => this.loadFromSheet(), this.refreshInterval);
@@ -166,7 +176,9 @@ class GoogleSheetsChecklist {
             priority: headers.indexOf('priority') !== -1 ? headers.indexOf('priority') : -1,
             category: headers.indexOf('category') !== -1 ? headers.indexOf('category') : -1,
             how: headers.indexOf('how') !== -1 ? headers.indexOf('how') : -1,
-            notes: headers.indexOf('notes') !== -1 ? headers.indexOf('notes') : -1
+            notes: headers.indexOf('notes') !== -1 ? headers.indexOf('notes') : -1,
+            whoCanHelp: headers.indexOf('who can help') !== -1 ? headers.indexOf('who can help') : 
+                        headers.indexOf('whocanhelp') !== -1 ? headers.indexOf('whocanhelp') : -1
         };
 
         // Process data rows
@@ -190,6 +202,7 @@ class GoogleSheetsChecklist {
                         category: columnMap.category >= 0 ? columns[columnMap.category]?.trim() || '' : '',
                         how: columnMap.how >= 0 ? columns[columnMap.how]?.trim() || '' : '',
                         notes: columnMap.notes >= 0 ? columns[columnMap.notes]?.trim() || '' : '',
+                        whoCanHelp: columnMap.whoCanHelp >= 0 ? columns[columnMap.whoCanHelp]?.trim() || '' : '',
                         source: 'google-sheets',
                         rowIndex: i + 1
                     });
@@ -265,6 +278,7 @@ class GoogleSheetsChecklist {
                 category: 'Medical Prep',
                 how: 'Daily shower with Hibiclens soap',
                 notes: 'Start 7 days before surgery',
+                whoCanHelp: 'Nurse coordinator',
                 source: 'sample',
                 rowIndex: 2
             },
@@ -277,6 +291,7 @@ class GoogleSheetsChecklist {
                 category: 'Logistics',
                 how: 'Call Scripps Mission Valley',
                 notes: '7:30am check-in confirmed',
+                whoCanHelp: 'Surgery scheduler',
                 source: 'sample',
                 rowIndex: 3
             },
@@ -289,6 +304,7 @@ class GoogleSheetsChecklist {
                 category: 'Logistics',
                 how: 'Family member or rideshare',
                 notes: 'Cannot drive home after surgery',
+                whoCanHelp: 'Family, friends',
                 source: 'sample',
                 rowIndex: 4
             },
@@ -301,6 +317,7 @@ class GoogleSheetsChecklist {
                 category: 'Home Prep',
                 how: 'Install raised toilet seat, shower chair',
                 notes: 'Make sure walker can fit through doorways',
+                whoCanHelp: 'Handyman, family',
                 source: 'sample',
                 rowIndex: 5
             },
@@ -313,6 +330,7 @@ class GoogleSheetsChecklist {
                 category: 'Medical Prep',
                 how: 'Pharmacy pickup',
                 notes: 'Pain management and antibiotics',
+                whoCanHelp: 'Pharmacist',
                 source: 'sample',
                 rowIndex: 6
             }
@@ -489,8 +507,8 @@ class GoogleSheetsChecklist {
                 
                 html += `<div class="todo-text ${task.completed ? 'todo-completed' : ''}"><h3>${taskText}</h3></div>`;
                 
-                // Add details section for priority, category, how, and notes
-                if (task.priority || task.category || task.how || task.notes) {
+                // Add details section for priority, category, how, notes, and whoCanHelp
+                if (task.priority || task.category || task.how || task.notes || task.whoCanHelp) {
                     html += `<div class="task-details">`;
                     
                     if (task.priority) {
@@ -505,6 +523,10 @@ class GoogleSheetsChecklist {
                     
                     if (task.category) {
                         html += `<div class="detail-item"><span class="detail-icon">📂</span><span class="detail-label">Category:</span> ${this.escapeHtml(task.category)}</div>`;
+                    }
+                    
+                    if (task.whoCanHelp) {
+                        html += `<div class="detail-item"><span class="detail-icon">👥</span><span class="detail-label">Who Can Help:</span> ${this.escapeHtml(task.whoCanHelp)}</div>`;
                     }
                     
                     if (task.how) {
@@ -527,6 +549,9 @@ class GoogleSheetsChecklist {
         });
 
         todoList.innerHTML = html;
+        
+        // Update form dropdowns with current data
+        this.populateFormDropdowns();
     }
 
     escapeHtml(text) {
@@ -584,6 +609,218 @@ class GoogleSheetsChecklist {
         
         const days = Math.floor(hours / 24);
         return `${days} day${days === 1 ? '' : 's'} ago`;
+    }
+
+    // Add Task Form Methods
+    showAddTaskForm() {
+        this.populateFormDropdowns();
+        document.getElementById('add-task-form').style.display = 'block';
+        document.getElementById('task-text').focus();
+    }
+
+    populateFormDropdowns() {
+        this.populateTimelineDropdown();
+        this.populateCategoryDropdown();
+        this.populateWhoCanHelpDropdown();
+    }
+
+    populateTimelineDropdown() {
+        const timelineSelect = document.getElementById('task-timeline');
+        const uniqueTimelines = [...new Set(this.tasks.map(task => task.timeline).filter(timeline => timeline && timeline.trim()))];
+        
+        // Sort timelines with custom logic (asap first, numbers descending, others ascending)
+        const sortedTimelines = uniqueTimelines.sort((a, b) => {
+            if (a.toLowerCase() === 'asap') return -1;
+            if (b.toLowerCase() === 'asap') return 1;
+            
+            const aStartsWithNumber = /^\d/.test(a);
+            const bStartsWithNumber = /^\d/.test(b);
+            
+            if (aStartsWithNumber && bStartsWithNumber) {
+                const aNum = parseInt(a.match(/^\d+/)[0]);
+                const bNum = parseInt(b.match(/^\d+/)[0]);
+                return bNum - aNum;
+            }
+            
+            if (aStartsWithNumber && !bStartsWithNumber) return -1;
+            if (!aStartsWithNumber && bStartsWithNumber) return 1;
+            
+            return a.localeCompare(b);
+        });
+
+        // Clear existing options except the first one and "Other"
+        const firstOption = timelineSelect.options[0];
+        const otherOption = Array.from(timelineSelect.options).find(opt => opt.value === 'Other');
+        timelineSelect.innerHTML = '';
+        
+        // Add back the default option
+        timelineSelect.appendChild(firstOption);
+        
+        // Add dynamic options
+        sortedTimelines.forEach(timeline => {
+            if (timeline !== 'Other') {
+                const option = document.createElement('option');
+                option.value = timeline;
+                option.textContent = timeline;
+                timelineSelect.appendChild(option);
+            }
+        });
+        
+        // Add "Other" option at the end
+        if (otherOption) {
+            timelineSelect.appendChild(otherOption);
+        } else {
+            const otherOpt = document.createElement('option');
+            otherOpt.value = 'Other';
+            otherOpt.textContent = 'Other (specify below)';
+            timelineSelect.appendChild(otherOpt);
+        }
+    }
+
+    populateWhoCanHelpDropdown() {
+        const whoCanHelpSelect = document.getElementById('task-who-can-help');
+        if (!whoCanHelpSelect) return;
+
+        // Get unique who-can-help values from tasks
+        const whoCanHelpValues = [...new Set(
+            this.tasks
+                .map(task => task['Who Can Help'])
+                .filter(value => value && value.trim() !== '')
+                .map(value => value.trim())
+        )].sort(); // Alphabetical sorting
+
+        // Remove existing dynamic options (keep default and "Other")
+        const existingOptions = Array.from(whoCanHelpSelect.options);
+        existingOptions.forEach(option => {
+            if (option.value !== '' && option.value !== 'Other') {
+                option.remove();
+            }
+        });
+
+        // Add dynamic options before "Other"
+        const otherOption = whoCanHelpSelect.querySelector('option[value="Other"]');
+        whoCanHelpValues.forEach(value => {
+            const option = document.createElement('option');
+            option.value = value;
+            option.textContent = value;
+            whoCanHelpSelect.insertBefore(option, otherOption);
+        });
+    }
+
+    populateCategoryDropdown() {
+        const categorySelect = document.getElementById('task-category');
+        const uniqueCategories = [...new Set(this.tasks.map(task => task.category).filter(category => category && category.trim()))];
+        
+        // Sort categories alphabetically
+        const sortedCategories = uniqueCategories.sort((a, b) => a.localeCompare(b));
+
+        // Clear existing options except the first one and "Other"
+        const firstOption = categorySelect.options[0];
+        const otherOption = Array.from(categorySelect.options).find(opt => opt.value === 'Other');
+        categorySelect.innerHTML = '';
+        
+        // Add back the default option
+        categorySelect.appendChild(firstOption);
+        
+        // Add dynamic options
+        sortedCategories.forEach(category => {
+            if (category !== 'Other') {
+                const option = document.createElement('option');
+                option.value = category;
+                option.textContent = category;
+                categorySelect.appendChild(option);
+            }
+        });
+        
+        // Add "Other" option at the end
+        if (otherOption) {
+            categorySelect.appendChild(otherOption);
+        } else {
+            const otherOpt = document.createElement('option');
+            otherOpt.value = 'Other';
+            otherOpt.textContent = 'Other (specify below)';
+            categorySelect.appendChild(otherOpt);
+        }
+    }
+
+    hideAddTaskForm() {
+        document.getElementById('add-task-form').style.display = 'none';
+        document.getElementById('new-task-form').reset();
+        // Hide any "other" fields
+        document.getElementById('task-timeline-other').style.display = 'none';
+        document.getElementById('task-category-other').style.display = 'none';
+    }
+
+    handleOtherOption(event, otherFieldId) {
+        const otherField = document.getElementById(otherFieldId);
+        if (event.target.value === 'Other') {
+            otherField.style.display = 'block';
+            otherField.focus();
+        } else {
+            otherField.style.display = 'none';
+            otherField.value = '';
+        }
+    }
+
+    async handleAddTask(event) {
+        event.preventDefault();
+        
+        const formData = new FormData(event.target);
+        
+        // Handle "Other" options
+        let timeline = formData.get('timeline') || 'General';
+        if (timeline === 'Other') {
+            timeline = formData.get('timelineOther')?.trim() || 'General';
+        }
+        
+        let category = formData.get('category') || '';
+        if (category === 'Other') {
+            category = formData.get('categoryOther')?.trim() || '';
+        }
+        
+        let whoCanHelp = formData.get('whoCanHelp') || '';
+        if (whoCanHelp === 'Other') {
+            whoCanHelp = formData.get('whoCanHelpOther')?.trim() || '';
+        }
+        
+        const taskData = {
+            text: formData.get('taskText').trim(),
+            timeline: timeline,
+            priority: formData.get('priority') || '',
+            category: category,
+            how: formData.get('how') || '',
+            notes: formData.get('notes') || '',
+            whoCanHelp: whoCanHelp,
+            completed: false
+        };
+
+        if (!taskData.text) {
+            alert('Please enter a task description.');
+            return;
+        }
+
+        try {
+            if (this.useAppsScript) {
+                // Try to add via Apps Script
+                await this.addTask(taskData);
+                this.updateSyncStatus('✅ Task Added');
+                this.hideAddTaskForm();
+                // Refresh to show the new task
+                setTimeout(() => this.loadFromSheet(), 1000);
+            } else {
+                // Fallback: Show instructions to add manually
+                const sheetUrl = `https://docs.google.com/spreadsheets/d/${this.sheetId}/edit#gid=${this.gid}`;
+                const message = `To add this task, please:\n\n1. Open the Google Sheet\n2. Add a new row with:\n   - Task: ${taskData.text}\n   - Timeline: ${taskData.timeline}\n   - Priority: ${taskData.priority}\n   - Category: ${taskData.category}\n   - How: ${taskData.how}\n   - Notes: ${taskData.notes}\n   - Who Can Help: ${taskData.whoCanHelp}\n\nOpen Google Sheet now?`;
+                
+                if (confirm(message)) {
+                    window.open(sheetUrl, '_blank');
+                }
+                this.hideAddTaskForm();
+            }
+        } catch (error) {
+            console.error('Error adding task:', error);
+            this.showError(`Failed to add task: ${error.message}`);
+        }
     }
 
     showLoading(show) {
