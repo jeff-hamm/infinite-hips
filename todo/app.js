@@ -36,6 +36,7 @@ class GoogleSheetsChecklist {
         this.useAppsScript = this.appsScriptUrl && this.appsScriptUrl !== 'YOUR_APPS_SCRIPT_WEB_APP_URL_HERE';
         this.retryCount = 0;
         this.isInitialLoad = true;
+        this.currentFilter = 'incomplete'; // Default to showing incomplete tasks only
         this.init();
     }
 
@@ -588,6 +589,9 @@ class GoogleSheetsChecklist {
         });
 
         todoList.innerHTML = html;
+        
+        // Apply the current filter to hide/show appropriate tasks
+        this.applyFilter(this.currentFilter);
         
         // Update form dropdowns with current data
         this.populateFormDropdowns();
@@ -1317,7 +1321,7 @@ class GoogleSheetsChecklist {
         });
 
         // Generate filter buttons HTML
-        let buttonsHtml = '<button class="filter-btn active" data-filter="all">All Tasks</button>';
+        let buttonsHtml = '<button class="filter-btn" data-filter="all">All Tasks</button>';
         
         sortedTimelines.forEach(timeline => {
             const safeTimeline = timeline.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase();
@@ -1327,7 +1331,7 @@ class GoogleSheetsChecklist {
         // Add category-based filters
         buttonsHtml += '<button class="filter-btn" data-filter="support-needed">Support Needed</button>';
         buttonsHtml += '<button class="filter-btn" data-filter="completed">Completed</button>';
-        buttonsHtml += '<button class="filter-btn" data-filter="incomplete">Incomplete</button>';
+        buttonsHtml += '<button class="filter-btn active" data-filter="incomplete">Incomplete</button>';
 
         filterContainer.innerHTML = buttonsHtml;
         filterContainer.style.display = 'flex';
@@ -1345,8 +1349,11 @@ class GoogleSheetsChecklist {
         document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
         button.classList.add('active');
 
+        // Update current filter state
+        this.currentFilter = button.dataset.filter;
+
         // Apply filter
-        this.applyFilter(button.dataset.filter);
+        this.applyFilter(this.currentFilter);
     }
 
     applyFilter(filterType) {
@@ -1376,7 +1383,7 @@ class GoogleSheetsChecklist {
 
             switch (filterType) {
                 case 'support-needed':
-                    show = whoCanHelp.includes('Family') || whoCanHelp.includes('Friends') || whoCanHelp.length > 0;
+                    show = whoCanHelp.length == 0;
                     break;
                 case 'completed':
                     show = completed;
