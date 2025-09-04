@@ -40,6 +40,27 @@ class GoogleSheetsChecklist {
         this.init();
     }
 
+    // Helper function to check if timeline matches "X days before" pattern
+    isBeforeSurgeryTimeline(timeline) {
+        if (!timeline) return false;
+        // Match patterns like "7 days before", "1 day before", "14 days before", etc. (case insensitive)
+        return /^\d+\s+days?\s+before/i.test(timeline.trim());
+    }
+
+    // Helper function to get the display timeline (maps "X days before" to "Before Surgery")
+    getDisplayTimeline(timeline) {
+        if (!timeline) return 'Other';
+        if (this.isBeforeSurgeryTimeline(timeline)) {
+            return 'Before Surgery';
+        }
+        return timeline;
+    }
+
+    // Helper function to get the filter timeline for filtering logic
+    getFilterTimeline(timeline) {
+        return this.getDisplayTimeline(timeline);
+    }
+
     init() {
         // Event listeners
         document.getElementById('refresh-btn').addEventListener('click', () => this.loadFromSheet());
@@ -426,21 +447,25 @@ class GoogleSheetsChecklist {
         // Generate filter buttons based on timeline data
         this.generateFilterButtons();
 
-        // Group tasks by timeline
+        // Group tasks by timeline using display timeline
         const timelineGroups = {};
         this.tasks.forEach(task => {
-            const timeline = task.timeline || 'Other';
-            if (!timelineGroups[timeline]) {
-                timelineGroups[timeline] = [];
+            const displayTimeline = this.getDisplayTimeline(task.timeline);
+            if (!timelineGroups[displayTimeline]) {
+                timelineGroups[displayTimeline] = [];
             }
-            timelineGroups[timeline].push(task);
+            timelineGroups[displayTimeline].push(task);
         });
 
-        // Sort groups by timeline order: 'asap' first, then numbers descending, then others ascending
+        // Sort groups by timeline order: 'asap' first, 'Before Surgery' second, then numbers descending, then others ascending
         const sortedTimelines = Object.keys(timelineGroups).sort((a, b) => {
             // 'asap' always comes first
             if (a.toLowerCase() === 'asap') return -1;
             if (b.toLowerCase() === 'asap') return 1;
+            
+            // 'Before Surgery' comes second
+            if (a === 'Before Surgery') return -1;
+            if (b === 'Before Surgery') return 1;
             
             // Check if strings start with numbers
             const aStartsWithNumber = /^\d/.test(a);
@@ -496,7 +521,7 @@ class GoogleSheetsChecklist {
                 // cleanPriority ? `priority-${cleanPriority.replace(/\s+/g, '-')}` : '';
                 
                 html += `<div class="todo-item ${priorityClass}" 
-                           data-timeline="${this.escapeHtml(task.timeline || 'Other')}"
+                           data-timeline="${this.escapeHtml(this.getDisplayTimeline(task.timeline))}"
                            data-who-can-help="${this.escapeHtml(task.whoCanHelp || '')}"
                            data-completed="${task.completed ? 'true' : 'false'}"
                            data-category="${this.escapeHtml(task.category || '')}">`;
@@ -524,10 +549,10 @@ class GoogleSheetsChecklist {
                     <h3 class="editable-text" data-task-id="${task.id}" data-field="text" onclick="sheetsChecklist.startEditingText(this)">${taskText}<span class="edit-icon">✏️</span></h3>
                 </div>`;
                 
-                // Add details section for priority, category, how, notes, and whoCanHelp
-                if (task.priority || task.category || task.how || task.notes || task.whoCanHelp) {
-                    html += `<div class="task-details">`;
+                // Add details section for priority, timeline, category, how, notes, and whoCanHelp
+                html += `<div class="task-details">`;
                     
+                    // Priority detail item
                     if (task.priority) {
                         const detailPriorityIcon = cleanPriority ? {
                             'critical': '❗',
@@ -535,11 +560,50 @@ class GoogleSheetsChecklist {
                             'medium': '📌', 
                             'low': '📝'
                         }[cleanPriority] || '⚪' : '⚪';
-                        html += `<div class="detail-item"><span class="detail-icon">${detailPriorityIcon}</span><span class="detail-label">Priority:</span> <span class="detail-text-non-editable">${this.escapeHtml(task.priority)}</span></div>`;
+                        html += `<div class="detail-item">
+                            <span class="detail-icon">${detailPriorityIcon}</span>
+                            <span class="detail-label">Priority:</span> 
+                            <span class="editable-text" data-task-id="${task.id}" data-field="priority" onclick="sheetsChecklist.startEditingDropdown(this)">${this.escapeHtml(task.priority)}<span class="edit-icon">✏️</span></span>
+                        </div>`;
+                    } else {
+                        // Show empty priority field that can be clicked to add priority
+                        html += `<div class="detail-item">
+                            <span class="detail-icon">⚪</span>
+                            <span class="detail-label">Priority:</span> 
+                            <span class="editable-text empty-field" data-task-id="${task.id}" data-field="priority" onclick="sheetsChecklist.startEditingDropdown(this)">Click to set priority...<span class="edit-icon">✏️</span></span>
+                        </div>`;
                     }
                     
+                    // Timeline detail item
+                    if (task.timeline) {
+                        html += `<div class="detail-item">
+                            <span class="detail-icon">📅</span>
+                            <span class="detail-label">Timeline:</span> 
+                            <span class="editable-text" data-task-id="${task.id}" data-field="timeline" onclick="sheetsChecklist.startEditingDropdown(this)">${this.escapeHtml(task.timeline)}<span class="edit-icon">✏️</span></span>
+                        </div>`;
+                    } else {
+                        // Show empty timeline field that can be clicked to add timeline
+                        html += `<div class="detail-item">
+                            <span class="detail-icon">📅</span>
+                            <span class="detail-label">Timeline:</span> 
+                            <span class="editable-text empty-field" data-task-id="${task.id}" data-field="timeline" onclick="sheetsChecklist.startEditingDropdown(this)">Click to set timeline...<span class="edit-icon">✏️</span></span>
+                        </div>`;
+                    }
+                    
+                    // Category detail item
                     if (task.category) {
-                        html += `<div class="detail-item"><span class="detail-icon">📂</span><span class="detail-label">Category:</span> <span class="detail-text-non-editable">${this.escapeHtml(task.category)}</span></div>`;
+                        html += `<div class="detail-item">
+                            <span class="detail-icon">📂</span>
+                            <span class="detail-label">Category:</span> 
+                            <span class="editable-text" data-task-id="${task.id}" data-field="category" onclick="sheetsChecklist.startEditingDropdown(this)">${this.escapeHtml(task.category)}<span class="edit-icon">✏️</span></span>
+                        </div>`;
+                    } else {
+                        // Show empty category field that can be clicked to add category
+                        html += `<div class="detail-item">
+                            <span class="detail-icon">📂</span>
+                            <span class="detail-label">Category:</span> 
+                            <span class="editable-text empty-field" data-task-id="${task.id}" data-field="category" onclick="sheetsChecklist.startEditingDropdown(this)">Click to set category...<span class="edit-icon">✏️</span></span>
+                        </div>`;
                     }
                     
                     if (task.how) {
@@ -579,7 +643,6 @@ class GoogleSheetsChecklist {
                     </div>`;
                     
                     html += `</div>`;
-                }
                 
                 html += `</div>`;
                 html += `</div>`;
@@ -617,6 +680,13 @@ class GoogleSheetsChecklist {
             // Update the task with the selected value (including empty value)
             this.updateTaskDetails(taskId, { whoCanHelp: dropdown.value });
         }
+    }
+
+    handleTimelineChange(dropdown) {
+        const taskId = dropdown.dataset.taskId;
+        
+        // Update the task with the selected timeline value (including empty value)
+        this.updateTaskDetails(taskId, { timeline: dropdown.value });
     }
 
     async updateWhoCanHelpField(input) {
@@ -701,6 +771,218 @@ class GoogleSheetsChecklist {
             return task.notes || '';
         }
         return '';
+    }
+
+    startEditingDropdown(element) {
+        // Prevent multiple edits at once
+        if (document.querySelector('.editing-dropdown')) {
+            return;
+        }
+
+        const taskId = element.dataset.taskId;
+        const field = element.dataset.field;
+        const currentValue = this.getOriginalDropdownValue(element);
+        
+        // Create dropdown select
+        const select = document.createElement('select');
+        select.className = 'editing-dropdown';
+        select.dataset.taskId = taskId;
+        select.dataset.field = field;
+        select.dataset.originalValue = currentValue;
+        
+        // Style the select
+        Object.assign(select.style, {
+            background: 'var(--color-bg)',
+            color: 'var(--color-text)',
+            border: '2px solid var(--color-accent)',
+            borderRadius: '4px',
+            padding: '8px',
+            fontSize: 'inherit',
+            fontFamily: 'inherit',
+            minWidth: '200px'
+        });
+
+        // Populate dropdown with available options
+        this.populateEditingDropdown(select, field, currentValue);
+        
+        // Replace the element with select
+        element.style.display = 'none';
+        element.parentNode.insertBefore(select, element.nextSibling);
+        
+        // Focus the select
+        select.focus();
+        
+        // Handle save/cancel
+        select.addEventListener('blur', () => this.finishEditingDropdown(select));
+        select.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                this.finishEditingDropdown(select);
+            } else if (e.key === 'Escape') {
+                this.cancelEditingDropdown(select);
+            }
+        });
+        select.addEventListener('change', () => this.finishEditingDropdown(select));
+    }
+
+    getOriginalDropdownValue(element) {
+        const field = element.dataset.field;
+        const taskId = element.dataset.taskId;
+        const task = this.tasks.find(t => t.id === taskId);
+        
+        if (!task) return '';
+        
+        if (field === 'timeline') {
+            return task.timeline || '';
+        } else if (field === 'priority') {
+            return task.priority || '';
+        } else if (field === 'category') {
+            return task.category || '';
+        }
+        return '';
+    }
+
+    populateEditingDropdown(select, field, currentValue) {
+        let values = [];
+        
+        if (field === 'timeline') {
+            // Get unique timeline values from tasks (excluding empty values and "X days before" patterns)
+            values = [...new Set(
+                this.tasks
+                    .map(task => task.Timeline || task.timeline)
+                    .filter(value => value && value.trim() !== '')
+                    .map(value => value.trim())
+                    .filter(value => !this.isBeforeSurgeryTimeline(value)) // Exclude "X days before" patterns
+            )].sort(); // Alphabetical sorting
+        } else if (field === 'priority') {
+            // Get unique priority values from tasks (excluding empty values)
+            values = [...new Set(
+                this.tasks
+                    .map(task => task.Priority || task.priority)
+                    .filter(value => value && value.trim() !== '')
+                    .map(value => value.trim())
+            )].sort(); // Alphabetical sorting
+        } else if (field === 'category') {
+            // Get unique category values from tasks (excluding empty values)
+            values = [...new Set(
+                this.tasks
+                    .map(task => task.Category || task.category)
+                    .filter(value => value && value.trim() !== '')
+                    .map(value => value.trim())
+            )].sort(); // Alphabetical sorting
+        }
+
+        // Clear and rebuild options
+        select.innerHTML = '';
+        
+        // Always add blank option first
+        const blankOption = document.createElement('option');
+        blankOption.value = '';
+        blankOption.textContent = '';
+        select.appendChild(blankOption);
+        
+        // Add current value if it exists and isn't in the values list
+        if (currentValue && currentValue !== '' && !values.includes(currentValue)) {
+            const currentOption = document.createElement('option');
+            currentOption.value = currentValue;
+            currentOption.textContent = currentValue;
+            currentOption.selected = true;
+            select.appendChild(currentOption);
+        }
+        
+        // Add all other values
+        values.forEach(value => {
+            const option = document.createElement('option');
+            option.value = value;
+            option.textContent = value;
+            if (value === currentValue) {
+                option.selected = true;
+            }
+            select.appendChild(option);
+        });
+    }
+
+    async finishEditingDropdown(select) {
+        const taskId = select.dataset.taskId;
+        const field = select.dataset.field;
+        const newValue = select.value;
+        const originalValue = select.dataset.originalValue;
+        
+        // Remove the select and show the original element
+        const originalElement = select.previousSibling;
+        select.remove();
+        originalElement.style.display = '';
+        
+        // Only update if value changed
+        if (newValue !== originalValue) {
+            try {
+                // Update the task data
+                const updateData = {};
+                updateData[field] = newValue;
+                await this.updateTaskDetails(taskId, updateData);
+                
+                // Update the display
+                this.updateElementDisplay(originalElement, newValue, field);
+            } catch (error) {
+                console.error('Error updating task:', error);
+                // Restore original display on error
+                this.updateElementDisplay(originalElement, originalValue, field);
+            }
+        }
+    }
+
+    cancelEditingDropdown(select) {
+        // Remove the select and show the original element
+        const originalElement = select.previousSibling;
+        select.remove();
+        originalElement.style.display = '';
+    }
+
+    updateElementDisplay(element, value, field) {
+        if (field === 'timeline') {
+            if (value && value.trim()) {
+                element.innerHTML = `${this.escapeHtml(value)}<span class="edit-icon">✏️</span>`;
+                element.classList.remove('empty-field');
+            } else {
+                element.innerHTML = `Click to set timeline...<span class="edit-icon">✏️</span>`;
+                element.classList.add('empty-field');
+            }
+        } else if (field === 'priority') {
+            if (value && value.trim()) {
+                element.innerHTML = `${this.escapeHtml(value)}<span class="edit-icon">✏️</span>`;
+                element.classList.remove('empty-field');
+                // Update the icon in the parent detail-item
+                const detailItem = element.closest('.detail-item');
+                const iconSpan = detailItem.querySelector('.detail-icon');
+                if (iconSpan) {
+                    const cleanPriority = value.toLowerCase().replace(/^\d+\s*-?\s*/, '').trim();
+                    const priorityIcon = {
+                        'critical': '❗',
+                        'high': '🔥',
+                        'medium': '📌', 
+                        'low': '📝'
+                    }[cleanPriority] || '⚪';
+                    iconSpan.textContent = priorityIcon;
+                }
+            } else {
+                element.innerHTML = `Click to set priority...<span class="edit-icon">✏️</span>`;
+                element.classList.add('empty-field');
+                // Reset icon to default
+                const detailItem = element.closest('.detail-item');
+                const iconSpan = detailItem.querySelector('.detail-icon');
+                if (iconSpan) {
+                    iconSpan.textContent = '⚪';
+                }
+            }
+        } else if (field === 'category') {
+            if (value && value.trim()) {
+                element.innerHTML = `${this.escapeHtml(value)}<span class="edit-icon">✏️</span>`;
+                element.classList.remove('empty-field');
+            } else {
+                element.innerHTML = `Click to set category...<span class="edit-icon">✏️</span>`;
+                element.classList.add('empty-field');
+            }
+        }
     }
 
     async finishEditingText(input) {
@@ -827,7 +1109,8 @@ class GoogleSheetsChecklist {
 
     populateDetailDropdowns() {
         // Get all editable dropdowns in the detail view
-        const editableDropdowns = document.querySelectorAll('.editable-dropdown[data-field="whoCanHelp"]');
+        const whoCanHelpDropdowns = document.querySelectorAll('.editable-dropdown[data-field="whoCanHelp"]');
+        const timelineDropdowns = document.querySelectorAll('.editable-dropdown[data-field="timeline"]');
         
         // Get unique who-can-help values from tasks (excluding empty values)
         const whoCanHelpValues = [...new Set(
@@ -836,8 +1119,17 @@ class GoogleSheetsChecklist {
                 .filter(value => value && value.trim() !== '')
                 .map(value => value.trim())
         )].sort(); // Alphabetical sorting
+
+        // Get unique timeline values from tasks (excluding empty values)
+        const timelineValues = [...new Set(
+            this.tasks
+                .map(task => task.Timeline || task.timeline)
+                .filter(value => value && value.trim() !== '')
+                .map(value => value.trim())
+        )].sort(); // Alphabetical sorting
         
-        editableDropdowns.forEach(dropdown => {
+        // Populate whoCanHelp dropdowns
+        whoCanHelpDropdowns.forEach(dropdown => {
             const currentValue = dropdown.value;
             
             // Clear all options and rebuild
@@ -874,6 +1166,40 @@ class GoogleSheetsChecklist {
             otherOption.value = 'Other';
             otherOption.textContent = 'Other';
             dropdown.appendChild(otherOption);
+        });
+
+        // Populate timeline dropdowns (no "Other" option as requested)
+        timelineDropdowns.forEach(dropdown => {
+            const currentValue = dropdown.value;
+            
+            // Clear all options and rebuild
+            dropdown.innerHTML = '';
+            
+            // Always add blank option first
+            const blankOption = document.createElement('option');
+            blankOption.value = '';
+            blankOption.textContent = '';
+            dropdown.appendChild(blankOption);
+            
+            // Add current value if it exists and isn't in the values list
+            if (currentValue && currentValue !== '' && !timelineValues.includes(currentValue)) {
+                const currentOption = document.createElement('option');
+                currentOption.value = currentValue;
+                currentOption.textContent = currentValue;
+                currentOption.selected = true;
+                dropdown.appendChild(currentOption);
+            }
+            
+            // Add all other values
+            timelineValues.forEach(value => {
+                const option = document.createElement('option');
+                option.value = value;
+                option.textContent = value;
+                if (value === currentValue) {
+                    option.selected = true;
+                }
+                dropdown.appendChild(option);
+            });
         });
     }
 
@@ -1292,14 +1618,18 @@ class GoogleSheetsChecklist {
         const filterContainer = document.getElementById('filter-buttons');
         if (!filterContainer) return;
 
-        // Get unique timeline values from tasks
-        const timelineValues = [...new Set(this.tasks.map(task => task.timeline || 'Other'))];
+        // Get unique timeline values from tasks, using display timeline instead of raw timeline
+        const timelineValues = [...new Set(this.tasks.map(task => this.getDisplayTimeline(task.timeline)))];
         
         // Sort timeline values similar to how they're displayed
         const sortedTimelines = timelineValues.sort((a, b) => {
             // 'asap' always comes first
             if (a.toLowerCase() === 'asap') return -1;
             if (b.toLowerCase() === 'asap') return 1;
+            
+            // 'Before Surgery' comes next
+            if (a === 'Before Surgery') return -1;
+            if (b === 'Before Surgery') return 1;
             
             // Check if strings start with numbers
             const aStartsWithNumber = /^\d/.test(a);
@@ -1376,7 +1706,8 @@ class GoogleSheetsChecklist {
         // Apply specific filters
         todoItems.forEach(item => {
             let show = false;
-            const timeline = item.dataset.timeline || 'Other';
+            const rawTimeline = item.dataset.timeline || 'Other';
+            const timeline = this.getDisplayTimeline(rawTimeline);
             const safeTimeline = timeline.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase();
             const whoCanHelp = item.dataset.whoCanHelp || '';
             const completed = item.dataset.completed === 'true';
