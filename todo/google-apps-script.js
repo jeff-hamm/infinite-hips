@@ -315,6 +315,7 @@ function updateTaskDetails(taskId, updates) {
   // Update each field that was provided
   Object.keys(updates).forEach(field => {
     let columnIndex = -1;
+    console.log(`Processing field: "${field}" with value: "${updates[field]}"`);
     
     switch (field.toLowerCase()) {
       case 'text':
@@ -337,13 +338,18 @@ function updateTaskDetails(taskId, updates) {
         columnIndex = findColumnIndex(headerMap, ['notes', 'comments', 'details']);
         break;
       case 'whocanhelp':
+      case 'whoCanHelp':
       case 'who can help':
         columnIndex = findColumnIndex(headerMap, ['whocanhelp', 'who can help', 'help', 'contact']);
         break;
     }
     
+    console.log(`Field "${field}" mapped to column index: ${columnIndex}`);
     if (columnIndex >= 0) {
+      console.log(`Updating cell at row ${rowIndex}, column ${columnIndex + 1} with value: "${updates[field]}"`);
       sheet.getRange(rowIndex, columnIndex + 1).setValue(updates[field]);
+    } else {
+      console.warn(`Column not found for field: "${field}"`);
     }
   });
   

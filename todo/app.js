@@ -10,7 +10,7 @@ class GoogleSheetsChecklist {
             sheetId: '1ziPiBhIYXTgVvs2HVokZQrFPjYdF9w-wcO9ivPwpgag',
             gid: '1860137714',
             appsScriptUrl: 'YOUR_APPS_SCRIPT_WEB_APP_URL_HERE',
-            refreshInterval: 30000,
+            refreshInterval: 120000, // 2 minutes instead of 30 seconds
             maxRetries: 3
         };
         
@@ -387,8 +387,8 @@ class GoogleSheetsChecklist {
                 // Update was successful
                 this.updateSyncStatus('✅ Task Updated');
                 
-                // Refresh data to ensure consistency
-                setTimeout(() => this.loadFromSheet(), 1000);
+                // Refresh data to ensure consistency (reduced frequency)
+                setTimeout(() => this.loadFromSheet(), 5000);
                 
             } catch (error) {
                 console.error('Error updating task:', error);
@@ -534,7 +534,7 @@ class GoogleSheetsChecklist {
                         html += `<div class="detail-item"><span class="detail-icon">📝</span><span class="detail-label">Notes:</span> ${notesContent}</div>`;
                     }
                     
-                    // Always show Helper field last (editable)
+                                        // Always show Helper field last (editable)
                     const whoCanHelpValue = task.whoCanHelp || '';
                     const displayValue = whoCanHelpValue || '';
                     html += `<div class="detail-item">
@@ -542,7 +542,8 @@ class GoogleSheetsChecklist {
                         <span class="detail-label">Helper:</span> 
                         <div class="editable-field-container">
                             <select class="editable-dropdown" data-task-id="${task.id}" data-field="whoCanHelp" onchange="sheetsChecklist.handleWhoCanHelpChange(this)">
-                                <option value="${this.escapeHtml(whoCanHelpValue)}">${this.escapeHtml(displayValue)}</option>
+                                <option value=""></option>
+                                ${whoCanHelpValue ? `<option value="${this.escapeHtml(whoCanHelpValue)}" selected>${this.escapeHtml(whoCanHelpValue)}</option>` : ''}
                                 <option value="Other">Other</option>
                             </select>
                             <input type="text" class="editable-other-input" style="display: none; margin-top: 8px;" placeholder="Enter helper name..." onblur="sheetsChecklist.updateWhoCanHelpField(this)" data-task-id="${task.id}">
@@ -674,31 +675,41 @@ class GoogleSheetsChecklist {
         
         editableDropdowns.forEach(dropdown => {
             const currentValue = dropdown.value;
-            const isEmptyValue = !currentValue || currentValue === '';
             
-            // Clear existing options except current value and "Other"
-            const existingOptions = Array.from(dropdown.options);
-            existingOptions.forEach(option => {
-                if (option.value !== currentValue && option.value !== 'Other') {
-                    option.remove();
-                }
-            });
+            // Clear all options and rebuild
+            dropdown.innerHTML = '';
             
-            // For empty values, replace the placeholder option
-            if (isEmptyValue) {
-                dropdown.innerHTML = '<option value=""></option><option value="Other">Other</option>';
+            // Always add blank option first
+            const blankOption = document.createElement('option');
+            blankOption.value = '';
+            blankOption.textContent = '';
+            dropdown.appendChild(blankOption);
+            
+            // Add current value if it exists and isn't in the values list
+            if (currentValue && currentValue !== '' && currentValue !== 'Other' && !whoCanHelpValues.includes(currentValue)) {
+                const currentOption = document.createElement('option');
+                currentOption.value = currentValue;
+                currentOption.textContent = currentValue;
+                currentOption.selected = true;
+                dropdown.appendChild(currentOption);
             }
             
-            // Add dynamic options before "Other"
-            const otherOption = dropdown.querySelector('option[value="Other"]');
+            // Add all other values
             whoCanHelpValues.forEach(value => {
-                if (value !== currentValue) {
-                    const option = document.createElement('option');
-                    option.value = value;
-                    option.textContent = value;
-                    dropdown.insertBefore(option, otherOption);
+                const option = document.createElement('option');
+                option.value = value;
+                option.textContent = value;
+                if (value === currentValue) {
+                    option.selected = true;
                 }
+                dropdown.appendChild(option);
             });
+            
+            // Always add "Other" option at the end
+            const otherOption = document.createElement('option');
+            otherOption.value = 'Other';
+            otherOption.textContent = 'Other';
+            dropdown.appendChild(otherOption);
         });
     }
 
@@ -889,7 +900,7 @@ class GoogleSheetsChecklist {
                 await this.addTask(taskData);
                 this.updateSyncStatus('✅ Task Added');
                 this.hideAddTaskForm();
-                // Refresh to show the new task
+                // Refresh to show the new task (reduced frequency)
                 setTimeout(() => this.loadFromSheet(), 1000);
             } else {
                 // Fallback: Show instructions to add manually
@@ -1016,7 +1027,6 @@ class GoogleSheetsChecklist {
                 throw new Error(result.data?.error || 'Failed to update task');
             }
 
-            // Refresh the data to show the updates
             await this.loadFromSheet();
             this.updateSyncStatus('✅ Task Updated');
             
