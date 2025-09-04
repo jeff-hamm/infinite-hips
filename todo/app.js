@@ -36,7 +36,7 @@ class GoogleSheetsChecklist {
         this.useAppsScript = this.appsScriptUrl && this.appsScriptUrl !== 'YOUR_APPS_SCRIPT_WEB_APP_URL_HERE';
         this.retryCount = 0;
         this.isInitialLoad = true;
-        this.currentFilter = 'all'; // Always default to 'all' on page refresh
+        this.currentFilter = 'support-needed'; // Always default to 'support-needed' on page refresh
         this.init();
     }
 
@@ -1956,12 +1956,12 @@ class GoogleSheetsChecklist {
         filterContainer.innerHTML = buttonsHtml;
         filterContainer.style.display = 'flex';
 
-        // On initial load, always default to 'all'. During data syncs, restore saved filter or current filter
+        // On initial load, always default to 'support-needed'. During data syncs, restore saved filter or current filter
         let activeButton = null;
         
         if (this.isInitialLoad) {
-            // On page refresh/initial load, always start with 'all'
-            activeButton = filterContainer.querySelector('[data-filter="all"]');
+            // On page refresh/initial load, always start with 'support-needed'
+            activeButton = filterContainer.querySelector('[data-filter="support-needed"]');
         } else {
             // During data syncs, try to restore the current filter first, then saved filter
             const filterToRestore = this.currentFilter || this.getSavedFilter();
@@ -1970,9 +1970,9 @@ class GoogleSheetsChecklist {
             }
         }
         
-        // If no active button found, default to 'all'
+        // If no active button found, default to 'support-needed'
         if (!activeButton) {
-            activeButton = filterContainer.querySelector('[data-filter="all"]');
+            activeButton = filterContainer.querySelector('[data-filter="support-needed"]');
         }
         
         if (activeButton) {
