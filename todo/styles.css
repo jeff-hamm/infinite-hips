@@ -27,7 +27,7 @@
     position: absolute;
     top: 8px;
     right: 8px;
-    font-size: 18px;
+    font-size: var(--font-size-icon-large);
     z-index: 10;
     opacity: 0.9;
 }
@@ -61,12 +61,12 @@
     padding: 16px;
     text-align: center;
     color: var(--color-bg);
-    font-size: 1.2em;
+    font-size: var(--font-size-heading-section);
     font-weight: bold;
 }
 
 .task-details {
-    font-size: 12px;
+    font-size: var(--font-size-text-medium);
     color: var(--color-text-light);
     margin-top: 8px;
     line-height: 1.4;
@@ -84,7 +84,7 @@
     color: var(--color-white);
     padding: 4px 8px;
     border-radius: 4px;
-    font-size: 10px;
+    font-size: var(--font-size-text-small);
     margin: 2px 4px 2px 0;
     display: inline-block;
 }
@@ -105,6 +105,7 @@
     display: flex;
     align-items: flex-start;
     gap: 6px;
+    font-size: var(--font-size-text-large);
 }
 
 .detail-text-non-editable {
@@ -112,15 +113,15 @@
 }
 
 .detail-icon {
-    font-size: 0.9em;
+    font-size: var(--font-size-icon-medium);
     flex-shrink: 0;
 }
 
 .detail-label {
     font-weight: 600;
     color: var(--color-white);
-    min-width: 60px;
-    flex-shrink: 1;
+    min-width: calc(11ch + 20px); /* 11 characters for "Helper/Dom:" + 20px padding */
+    flex-shrink: 0; /* Changed from 1 to 0 to prevent shrinking */
     word-wrap: break-word;
     word-break: break-all;
     overflow-wrap: anywhere;
@@ -128,7 +129,7 @@
 
 .priority-indicator {
     margin-left: 8px;
-    font-size: 0.9em;
+    font-size: var(--font-size-icon-medium);
 }
 
 /* Enhanced timeline group styling */
@@ -151,7 +152,7 @@
     color: var(--color-text-light);
     padding: 2px 6px;
     border-radius: 4px;
-    font-size: 10px;
+    font-size: var(--font-size-micro-tiny);
 }
 
 .todo-checkbox {
@@ -165,7 +166,7 @@
     color: var(--color-pink);
     line-height: 1.4;
     margin: 0;
-    font-size: 1.1em;
+    font-size: var(--font-size-heading-main);
     font-weight: bold;
 }
 
@@ -193,7 +194,7 @@
 }
 
 .edit-icon {
-    font-size: 0.7em;
+    font-size: var(--font-size-icon-small);
     margin-left: 6px;
     color: var(--color-text-muted);
     opacity: 0.3;
@@ -282,7 +283,7 @@
     border: 1px solid var(--color-gray4);
     border-radius: 6px;
     padding: 8px 12px;
-    font-size: 12px;
+    font-size: var(--font-size-tiny);
     color: var(--color-pink);
 }
 
@@ -320,7 +321,7 @@
     padding: 12px 20px;
     border-radius: 6px;
     cursor: pointer;
-    font-size: 14px;
+    font-size: var(--font-size-form);
     font-weight: bold;
     transition: all 0.3s ease;
     margin-right: 12px;
@@ -354,7 +355,7 @@
 .add-task-form h3 {
     color: var(--color-pink);
     margin: 0 0 20px 0;
-    font-size: 18px;
+    font-size: var(--font-size-heading-section);
 }
 
 .form-row {
@@ -371,7 +372,7 @@
 
 .form-group label {
     color: var(--color-text-light);
-    font-size: 14px;
+    font-size: var(--font-size-form);
     font-weight: 500;
     margin-bottom: 6px;
 }
@@ -384,7 +385,7 @@
     border-radius: 4px;
     padding: 10px 12px;
     color: var(--color-text);
-    font-size: 14px;
+    font-size: var(--font-size-form);
     transition: border-color 0.3s ease;
 }
 
@@ -417,7 +418,7 @@
     padding: 10px 20px;
     border-radius: 6px;
     cursor: pointer;
-    font-size: 14px;
+    font-size: var(--font-size-form);
     font-weight: 500;
     transition: all 0.3s ease;
 }
@@ -434,7 +435,7 @@
     padding: 10px 20px;
     border-radius: 6px;
     cursor: pointer;
-    font-size: 14px;
+    font-size: var(--font-size-form);
     font-weight: 500;
     transition: all 0.3s ease;
 }
@@ -471,7 +472,7 @@
     border-radius: 4px;
     padding: 3px 2px;
     color: var(--color-text);
-    font-size: 13px;
+    font-size: var(--font-size-text-large);
     min-width: 150px;
     transition: border-color 0.3s ease;
 }
@@ -498,7 +499,7 @@
     border-radius: 4px;
     padding: 6px 8px;
     color: var(--color-text);
-    font-size: 13px;
+    font-size: var(--font-size-text-large);
     width: 200px;
     transition: border-color 0.3s ease;
 }

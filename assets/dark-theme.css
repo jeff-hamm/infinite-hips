@@ -26,6 +26,26 @@
     --color-purple-dark: #4a1a2a;
     --color-text-light: #7d8590;
     --color-error: #ff4444;
+    
+    /* Font size variables - responsive using clamp() */
+    --font-size-heading-main: clamp(16px, 3.5vw, 26px);     /* Main task titles */
+    --font-size-heading-section: clamp(16px, 3vw, 24px);    /* Timeline titles, form headings */
+    --font-size-text-large: clamp(12px, 2.5vw, 18px);       /* Detail items, primary text */
+    --font-size-text-medium: clamp(10px, 2vw, 16px);        /* Task details, secondary text */
+    --font-size-text-small: clamp(8px, 1.5vw, 14px);        /* Category chips, form elements */
+    --font-size-icon-large: clamp(16px, 4vw, 24px);         /* Priority corner icons */
+    --font-size-icon-medium: clamp(11px, 2vw, 17px);        /* Detail icons, priority indicators */
+    --font-size-icon-small: clamp(9px, 1.8vw, 15px);        /* Edit icons */
+    --font-size-form: 14px;                                 /* Form inputs, buttons */
+    --font-size-tiny: 12px;                                 /* Sync status, timestamps */
+    --font-size-micro-tiny: 10px;                           /* Category tags, very small text */
+    
+    /* Main site font sizes */
+    --font-size-site-header: clamp(24px, 5vw, 40px);        /* Main site header h1 */
+    --font-size-site-subtitle: clamp(14px, 2.2vw, 18px);    /* Header subtitle/description */
+    --font-size-page-heading: clamp(20px, 3.5vw, 29px);     /* Page main headings */
+    --font-size-doc-text: clamp(13px, 2vw, 14px);           /* Document card text */
+    --font-size-doc-small: clamp(11px, 1.8vw, 13px);        /* Document card small text */
 }
 
 body {
@@ -54,14 +74,14 @@ body {
 }
 .header h1 {
     margin: 0;
-    font-size: 2.5em;
+    font-size: var(--font-size-site-header);
     text-shadow: 0 2px 4px rgba(0,0,0,0.3);
     font-weight: 600;
 }
 .header p {
     margin: 0.5rem 0 0 0;
     opacity: 0.95;
-    font-size: 1.1em;
+    font-size: var(--font-size-site-subtitle);
 }
     /* ...existing code... */
     .doc-grid {
@@ -89,7 +109,7 @@ body {
     .doc-card p {
         margin: 0 0 1rem 0;
         color: var(--color-text-muted);
-        font-size: 0.9em;
+        font-size: var(--font-size-doc-text);
     }
     .doc-links {
         display: flex;
@@ -102,7 +122,7 @@ body {
         color: white;
         text-decoration: none;
         border-radius: 6px;
-        font-size: 0.8em;
+        font-size: var(--font-size-doc-small);
         font-weight: 500;
         transition: all 0.2s ease;
         border: 1px solid var(--color-border-pink);
@@ -170,7 +190,7 @@ body {
 
 .header h1 {
     margin: 0;
-    font-size: 1.8em;
+    font-size: var(--font-size-page-heading);
     text-shadow: 0 2px 4px rgba(0,0,0,0.3);
     font-weight: 600;
 }
@@ -409,7 +429,7 @@ strong {
     padding: 0.75rem;
     text-align: left;
     color: #e9ecef;
-    font-size: 0.9em;
+    font-size: var(--font-size-doc-text);
 }
 .schedule-table th {
     background: linear-gradient(145deg, #4a4a4a 0%, #6c6c6c 100%);

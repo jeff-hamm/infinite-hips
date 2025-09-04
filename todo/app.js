@@ -552,14 +552,14 @@ class GoogleSheetsChecklist {
                     const displayValue = whoCanHelpValue || '';
                     html += `<div class="detail-item">
                         <span class="detail-icon">🤝</span>
-                        <span class="detail-label">Helper:</span> 
+                        <span class="detail-label">Helper/Dom:</span> 
                         <div class="editable-field-container">
                             <select class="editable-dropdown" data-task-id="${task.id}" data-field="whoCanHelp" onchange="sheetsChecklist.handleWhoCanHelpChange(this)">
                                 <option value=""></option>
                                 ${whoCanHelpValue ? `<option value="${this.escapeHtml(whoCanHelpValue)}" selected>${this.escapeHtml(whoCanHelpValue)}</option>` : ''}
                                 <option value="Other">Other</option>
                             </select>
-                            <input type="text" class="editable-other-input" style="display: none; margin-top: 8px;" placeholder="Enter helper name..." onblur="sheetsChecklist.updateWhoCanHelpField(this)" data-task-id="${task.id}">
+                            <input type="text" class="editable-other-input" style="display: none; margin-top: 8px;" placeholder="Enter helper/dom name..." onblur="sheetsChecklist.updateWhoCanHelpField(this)" data-task-id="${task.id}">
                         </div>
                     </div>`;
                     
