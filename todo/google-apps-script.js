@@ -69,6 +69,11 @@ function doGet(e) {
         const updatedBy = e.parameter.updatedBy || 'Web UI';
         return createResponse(updateTask(taskId, completed, updatedBy));
       
+      case 'updateTaskDetails':
+        const detailTaskId = e.parameter.taskId;
+        const updates = JSON.parse(e.parameter.updates);
+        return createResponse(updateTaskDetails(detailTaskId, updates));
+      
       case 'test':
         return createResponse({ 
           message: 'Apps Script is working!', 

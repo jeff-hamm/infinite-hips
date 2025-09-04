@@ -674,7 +674,7 @@ class GoogleSheetsChecklist {
         
         editableDropdowns.forEach(dropdown => {
             const currentValue = dropdown.value;
-            const isEmptyValue = !currentValue || currentValue === 'Click to set...';
+            const isEmptyValue = !currentValue || currentValue === '';
             
             // Clear existing options except current value and "Other"
             const existingOptions = Array.from(dropdown.options);
@@ -686,7 +686,7 @@ class GoogleSheetsChecklist {
             
             // For empty values, replace the placeholder option
             if (isEmptyValue) {
-                dropdown.innerHTML = '<option value="">Click to set...</option><option value="Other">Other</option>';
+                dropdown.innerHTML = '<option value=""></option><option value="Other">Other</option>';
             }
             
             // Add dynamic options before "Other"
@@ -995,16 +995,15 @@ class GoogleSheetsChecklist {
         try {
             this.showLoading(true);
             
-            const response = await fetch(this.appsScriptUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    action: 'updateTaskDetails',
-                    taskId: taskId,
-                    updates: updates
-                })
+            // Use GET request to avoid CORS preflight issues
+            const params = new URLSearchParams({
+                action: 'updateTaskDetails',
+                taskId: taskId,
+                updates: JSON.stringify(updates)
+            });
+            
+            const response = await fetch(`${this.appsScriptUrl}?${params.toString()}`, {
+                method: 'GET'
             });
 
             if (!response.ok) {
