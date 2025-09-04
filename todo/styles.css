@@ -10,26 +10,133 @@
     background: var(--color-bg-alt);
     border: 1px solid var(--color-gray4);
     border-radius: 8px;
-    padding: 16px;
+    padding: 0 16px 24px 16px;
     margin: 0;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.todo-main-content {
+    display: flex;
+    flex-direction: column; /* Stack todo-text-row and task-details vertically */
+    gap: 0;
+}
+
+.todo-text-row {
+    display: flex;
+    align-items: center; /* Center items vertically within the row */
+    gap: 12px;
+    width: 100%; /* Full width as requested */
+    min-height: 60px; /* Ensure adequate height for content */
+}
+
+.todo-left-column {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center; /* Center checkbox vertically within the row */
+    width: 40px; /* Fixed width for consistent alignment */
+    flex-shrink: 0;
+}
+
+.todo-right-column {
+    display: flex;
+    align-items: center; /* Center text and priority horizontally */
+    gap: 8px;
+    flex: 1; /* Take remaining space */
+}
+
+.todo-text {
+    flex: 1;
+    margin: 0; /* Remove margin since spacing is handled by parent gap */
+}
+
+.priority-right-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    flex-shrink: 0; /* Prevent shrinking */
+    padding: 2px 4px;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+    cursor: pointer;
+}
+
+.priority-right-section:hover {
+    background-color: rgba(255, 105, 180, 0.2);
+}
+
+.priority-right-section:hover .priority-text-label {
+    color: var(--color-pink);
+}
+
+.priority-top-icon {
     display: flex;
     align-items: center;
-    gap: 12px;
-    transition: all 0.3s ease;
+    justify-content: center;
+    font-size: var(--font-size-icon-large);
+    cursor: pointer;
+}
+
+.priority-text-label {
+    font-size: var(--font-size-micro-tiny);
+    color: var(--color-text-muted);
+    text-align: center;
+    margin-top: 0;
+    line-height: 1;
+    cursor: pointer;
+    padding: 1px 2px;
+    border-radius: 2px;
+    transition: color 0.2s ease;
     position: relative;
+}
+
+/* Fix dropdown alignment for priority items */
+.priority-right-section .priority-text-label + .editing-dropdown,
+.priority-right-section .priority-top-icon + .editing-dropdown {
+    position: absolute;
+    right: 0;
+    top: 0;
+    transform: translateY(0);
+    z-index: 1000;
+}
+
+.priority-text-label.empty-field {
+    color: var(--color-text-muted);
+    font-style: italic;
+}
+
+.todo-checkbox {
+    width: 20px;
+    height: 20px;
+    accent-color: var(--color-pink);
 }
 
 .todo-item:hover {
     border-color: var(--color-pink);
 }
 
-.priority-corner-icon {
+.priority-corner-section {
     position: absolute;
-    top: 8px;
+    bottom: 8px;
     right: 8px;
-    font-size: var(--font-size-icon-large);
     z-index: 10;
-    opacity: 0.9;
+    text-align: right;
+    line-height: 1.2;
+}
+
+.top-right-value {
+    font-size: var(--font-size-text-medium);
+    padding: 2px 6px;
+    border-radius: 3px;
+    display: inline-block;
+    margin-bottom: 2px;
+}
+
+.top-right-value .edit-icon {
+    font-size: var(--font-size-icon-tiny);
+    margin-left: 2px;
 }
 
 .todo-item.priority-critical {
@@ -66,10 +173,39 @@
 }
 
 .task-details {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
     font-size: var(--font-size-text-medium);
     color: var(--color-text-light);
     margin-top: 8px;
     line-height: 1.4;
+    width: 100%; /* Full width like todo-text-row */
+}
+
+.todo-left-column-spacer {
+    width: 40px; /* Same width as todo-left-column for alignment */
+    flex-shrink: 0;
+}
+
+.task-details-content {
+    flex: 1; /* Take remaining space */
+}
+
+/* Make sure detail items fit properly */
+.detail-item {
+    margin: 4px 0;
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    font-size: var(--font-size-text-large);
+}
+
+/* For mobile, maintain single column layout */
+@media (max-width: 768px) {
+    .detail-item {
+        margin: 2px 0;
+    }
 }
 
 .task-meta {
@@ -138,14 +274,6 @@
 }
 
 /* Enhanced task details styles */
-.detail-item {
-    margin: 4px 0;
-    display: flex;
-    align-items: flex-start;
-    gap: 6px;
-    font-size: var(--font-size-text-large);
-}
-
 .detail-text-non-editable {
     margin-left: 4px; /* Add left margin to non-editable text for alignment */
 }

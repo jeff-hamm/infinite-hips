@@ -315,7 +315,6 @@
         <div class="sync-notice" id="sync-notice">
             📊 This timeline combines your medical documents, Google Sheets tasks, and general hip replacement research
         </div>
-
         <div class="key-dates">
             <h3>🗓️ Key Dates</h3>
             <div class="date-item">
@@ -661,8 +660,12 @@
 
         // Initialize timeline
         function initializeTimeline() {
+            updateCountdown();
             generateTimelinePhases();
-                        
+            
+            // Update countdown every minute
+            setInterval(updateCountdown, 60000);
+            
             // Add click handlers for phase headers
             document.addEventListener('click', (e) => {
                 if (e.target.closest('.phase-header')) {

@@ -570,56 +570,71 @@ class GoogleSheetsChecklist {
                 html += `<div class="todo-item ${priorityClass}" 
                            data-timeline="${this.escapeHtml(this.getDisplayTimeline(task.timeline))}"
                            data-who-can-help="${this.escapeHtml(task.whoCanHelp || '')}"
+                           data-how="${this.escapeHtml(task.how || '')}"
                            data-completed="${task.completed ? 'true' : 'false'}"
                            data-category="${this.escapeHtml(task.category || '')}">`;
                 
-                // Add priority icon in upper right corner
-                let priorityIcon = '';
-                if (cleanPriority) {
-                    priorityIcon = {
-                        'critical': '❗',
-                        'high': '🔥',
-                        'medium': '📌', 
-                        'low': '📝'
-                    }[cleanPriority] || '';
-                    html += `<div class="priority-corner-icon">${priorityIcon}</div>`;
+                // Add simple category value in top right corner (no label)
+                let topRightItems = [];
+                
+                // Category value with icon
+                if (task.category) {
+                    topRightItems.push(`<span class="editable-text top-right-value" data-task-id="${task.id}" data-field="category" onclick="sheetsChecklist.startEditingDropdown(this)">📂 ${this.escapeHtml(task.category)}<span class="edit-icon">✏️</span></span>`);
                 }
                 
+                if (topRightItems.length > 0) {
+                    html += `<div class="priority-corner-section">${topRightItems.join('<br>')}</div>`;
+                }
+                
+                // Create the main content area with new structure
+                html += `<div class="todo-main-content">`;
+                
+                // Todo text row spans full width and contains left + right columns
+                html += `<div class="todo-text-row">`;
+                
+                // Left column with checkbox (inside todo-text-row)
+                html += `<div class="todo-left-column">`;
                 html += `<input type="checkbox" class="todo-checkbox" ${task.completed ? 'checked' : ''} 
                            onchange="sheetsChecklist.updateTaskInSheet('${task.id}', this.checked)"
                            title="Click to edit this task in Google Sheets">`;
-                html += `<div style="flex: 1;">`;
+                html += `</div>`;
+                
+                // Right column for todo text + priority (inside todo-text-row)
+                html += `<div class="todo-right-column">`;
+                
                 // Task text - clickable to edit
                 let taskText = this.escapeHtml(task.text);
-                
                 html += `<div class="todo-text ${task.completed ? 'todo-completed' : ''}">
                     <h3 class="editable-text" data-task-id="${task.id}" data-field="text" onclick="sheetsChecklist.startEditingText(this)">${taskText}<span class="edit-icon">✏️</span></h3>
                 </div>`;
                 
-                // Add details section for priority, timeline, category, how, notes, and whoCanHelp
+                // Priority icon/text on the right side of the text
+                const priorityIcon = cleanPriority ? {
+                    'critical': '❗',
+                    'high': '🔥',
+                    'medium': '📌', 
+                    'low': '📝'
+                }[cleanPriority] || '⚪' : '⚪';
+                
+                html += `<div class="priority-right-section" data-task-id="${task.id}" data-field="priority" onclick="sheetsChecklist.startEditingDropdown(this)" title="Click to change priority">`;
+                html += `<div class="priority-top-icon">${priorityIcon}</div>`;
+                
+                // Add priority text label under the icon
+                if (cleanPriority) {
+                    html += `<div class="priority-text-label">${cleanPriority}</div>`;
+                } else {
+                    // Show placeholder for empty priority
+                    html += `<div class="priority-text-label empty-field">set</div>`;
+                }
+                html += `</div>`; // Close priority-right-section
+                
+                html += `</div>`; // Close todo-right-column
+                html += `</div>`; // Close todo-text-row
+                
+                // Add details section with same layout structure
                 html += `<div class="task-details">`;
-                    
-                    // Priority detail item
-                    if (task.priority) {
-                        const detailPriorityIcon = cleanPriority ? {
-                            'critical': '❗',
-                            'high': '🔥',
-                            'medium': '📌', 
-                            'low': '📝'
-                        }[cleanPriority] || '⚪' : '⚪';
-                        html += `<div class="detail-item">
-                            <span class="detail-icon">${detailPriorityIcon}</span>
-                            <span class="detail-label">Priority:</span> 
-                            <span class="editable-text" data-task-id="${task.id}" data-field="priority" onclick="sheetsChecklist.startEditingDropdown(this)">${this.escapeHtml(task.priority)}<span class="edit-icon">✏️</span></span>
-                        </div>`;
-                    } else {
-                        // Show empty priority field that can be clicked to add priority
-                        html += `<div class="detail-item">
-                            <span class="detail-icon">⚪</span>
-                            <span class="detail-label">Priority:</span> 
-                            <span class="editable-text empty-field" data-task-id="${task.id}" data-field="priority" onclick="sheetsChecklist.startEditingDropdown(this)">Click to set priority...<span class="edit-icon">✏️</span></span>
-                        </div>`;
-                    }
+                html += `<div class="todo-left-column-spacer"></div>`; // Empty spacer to maintain alignment
+                html += `<div class="task-details-content">`;
                     
                     // Timeline detail item
                     if (task.timeline) {
@@ -634,22 +649,6 @@ class GoogleSheetsChecklist {
                             <span class="detail-icon">📅</span>
                             <span class="detail-label">Timeline:</span> 
                             <span class="editable-text empty-field" data-task-id="${task.id}" data-field="timeline" onclick="sheetsChecklist.startEditingDropdown(this)">Click to set timeline...<span class="edit-icon">✏️</span></span>
-                        </div>`;
-                    }
-                    
-                    // Category detail item
-                    if (task.category) {
-                        html += `<div class="detail-item">
-                            <span class="detail-icon">📂</span>
-                            <span class="detail-label">Category:</span> 
-                            <span class="editable-text" data-task-id="${task.id}" data-field="category" onclick="sheetsChecklist.startEditingDropdown(this)">${this.escapeHtml(task.category)}<span class="edit-icon">✏️</span></span>
-                        </div>`;
-                    } else {
-                        // Show empty category field that can be clicked to add category
-                        html += `<div class="detail-item">
-                            <span class="detail-icon">📂</span>
-                            <span class="detail-label">Category:</span> 
-                            <span class="editable-text empty-field" data-task-id="${task.id}" data-field="category" onclick="sheetsChecklist.startEditingDropdown(this)">Click to set category...<span class="edit-icon">✏️</span></span>
                         </div>`;
                     }
                     
@@ -689,10 +688,11 @@ class GoogleSheetsChecklist {
                         </div>
                     </div>`;
                     
-                    html += `</div>`;
+                    html += `</div>`; // Close task-details
                 
-                html += `</div>`;
-                html += `</div>`;
+                html += `</div>`; // Close todo-right-column
+                html += `</div>`; // Close todo-main-content
+                html += `</div>`; // Close todo-item
             });
 
             html += `</div>`; // Close timeline-group
@@ -843,24 +843,38 @@ class GoogleSheetsChecklist {
         const field = element.dataset.field;
         const currentValue = this.getOriginalDropdownValue(element);
         
+        // Add a unique ID to the element for better tracking
+        const elementId = `edit-${taskId}-${field}-${Date.now()}`;
+        element.dataset.elementId = elementId;
+        
         // Create dropdown select
         const select = document.createElement('select');
         select.className = 'editing-dropdown';
         select.dataset.taskId = taskId;
         select.dataset.field = field;
         select.dataset.originalValue = currentValue;
+        select.dataset.originalElementId = elementId;
         
         // Style the select
-        Object.assign(select.style, {
+        const baseStyle = {
             background: 'var(--color-bg)',
             color: 'var(--color-text)',
             border: '2px solid var(--color-accent)',
             borderRadius: '4px',
             padding: '8px',
             fontSize: 'inherit',
-            fontFamily: 'inherit',
-            minWidth: '200px'
-        });
+            fontFamily: 'inherit'
+        };
+        
+        // Set width based on field type
+        if (field === 'priority') {
+            baseStyle.minWidth = '100px';
+            baseStyle.width = 'auto';
+        } else {
+            baseStyle.minWidth = '200px';
+        }
+        
+        Object.assign(select.style, baseStyle);
 
         // Populate dropdown with available options
         this.populateEditingDropdown(select, field, currentValue);
@@ -872,17 +886,34 @@ class GoogleSheetsChecklist {
         // Focus the select
         select.focus();
         
-        // Handle save/cancel
-        select.addEventListener('blur', () => this.finishEditingDropdown(select));
+        // Handle save/cancel with proper event management
+        let isFinishing = false;
+        
+        const finishEdit = () => {
+            if (!isFinishing) {
+                isFinishing = true;
+                this.finishEditingDropdown(select);
+            }
+        };
+        
+        const cancelEdit = () => {
+            if (!isFinishing) {
+                isFinishing = true;
+                this.cancelEditingDropdown(select);
+            }
+        };
+        
+        select.addEventListener('blur', finishEdit);
         select.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
                 e.preventDefault();
-                this.finishEditingDropdown(select);
+                finishEdit();
             } else if (e.key === 'Escape') {
-                this.cancelEditingDropdown(select);
+                e.preventDefault();
+                cancelEdit();
             }
         });
-        select.addEventListener('change', () => this.finishEditingDropdown(select));
+        select.addEventListener('change', finishEdit);
     }
 
     getOriginalDropdownValue(element) {
@@ -963,20 +994,42 @@ class GoogleSheetsChecklist {
     }
 
     async finishEditingDropdown(select) {
+        // Prevent duplicate processing
+        if (select.dataset.processing === 'true') {
+            return;
+        }
+        select.dataset.processing = 'true';
+        
         const taskId = select.dataset.taskId;
         const field = select.dataset.field;
         const newValue = select.value;
         const originalValue = select.dataset.originalValue;
         
-        // Remove the select and show the original element
-        const originalElement = select.previousSibling;
-        select.remove();
-        originalElement.style.display = '';
+        // Find the original element more robustly
+        const originalElement = select.dataset.originalElementId ? 
+            document.querySelector(`[data-element-id="${select.dataset.originalElementId}"]`) :
+            select.previousSibling;
+        
+        // Safely remove the select only if it's still in the DOM
+        if (select.parentNode) {
+            try {
+                select.remove();
+            } catch (error) {
+                console.warn('Error removing select element:', error);
+            }
+        }
+        
+        // Show the original element
+        if (originalElement) {
+            originalElement.style.display = '';
+        }
         
         // Only update if value changed
         if (newValue !== originalValue) {
             // OPTIMISTIC UPDATE: Update the UI immediately
-            this.updateElementDisplay(originalElement, newValue, field);
+            if (originalElement) {
+                this.updateElementDisplay(originalElement, newValue, field);
+            }
             
             // Also update the local task data immediately
             const task = this.tasks.find(t => t.id === taskId);
@@ -1008,10 +1061,30 @@ class GoogleSheetsChecklist {
     }
 
     cancelEditingDropdown(select) {
-        // Remove the select and show the original element
-        const originalElement = select.previousSibling;
-        select.remove();
-        originalElement.style.display = '';
+        // Prevent duplicate processing
+        if (select.dataset.processing === 'true') {
+            return;
+        }
+        select.dataset.processing = 'true';
+        
+        // Find the original element more robustly
+        const originalElement = select.dataset.originalElementId ? 
+            document.querySelector(`[data-element-id="${select.dataset.originalElementId}"]`) :
+            select.previousSibling;
+        
+        // Safely remove the select only if it's still in the DOM
+        if (select.parentNode) {
+            try {
+                select.remove();
+            } catch (error) {
+                console.warn('Error removing select element:', error);
+            }
+        }
+        
+        // Show the original element
+        if (originalElement) {
+            originalElement.style.display = '';
+        }
     }
 
     updateElementDisplay(element, value, field) {
@@ -1024,31 +1097,45 @@ class GoogleSheetsChecklist {
                 element.classList.add('empty-field');
             }
         } else if (field === 'priority') {
-            if (value && value.trim()) {
-                element.innerHTML = `${this.escapeHtml(value)}<span class="edit-icon">✏️</span>`;
+            // For priority, we need to update both the text and the icon
+            const cleanPriority = value ? value.toLowerCase().replace(/^\d+\s*-?\s*/, '').trim() : '';
+            
+            if (cleanPriority) {
+                // Update the priority text
+                const priorityTextLabel = element.querySelector('.priority-text-label');
+                if (priorityTextLabel) {
+                    priorityTextLabel.textContent = cleanPriority;
+                    priorityTextLabel.classList.remove('empty-field');
+                }
+                
+                // Update the priority icon
+                const priorityIcon = {
+                    'critical': '❗',
+                    'high': '🔥',
+                    'medium': '📌', 
+                    'low': '📝'
+                }[cleanPriority] || '⚪';
+                
+                const priorityTopIcon = element.querySelector('.priority-top-icon');
+                if (priorityTopIcon) {
+                    priorityTopIcon.textContent = priorityIcon;
+                }
+                
                 element.classList.remove('empty-field');
-                // Update the icon in the parent detail-item
-                const detailItem = element.closest('.detail-item');
-                const iconSpan = detailItem.querySelector('.detail-icon');
-                if (iconSpan) {
-                    const cleanPriority = value.toLowerCase().replace(/^\d+\s*-?\s*/, '').trim();
-                    const priorityIcon = {
-                        'critical': '❗',
-                        'high': '🔥',
-                        'medium': '📌', 
-                        'low': '📝'
-                    }[cleanPriority] || '⚪';
-                    iconSpan.textContent = priorityIcon;
-                }
             } else {
-                element.innerHTML = `Click to set priority...<span class="edit-icon">✏️</span>`;
-                element.classList.add('empty-field');
-                // Reset icon to default
-                const detailItem = element.closest('.detail-item');
-                const iconSpan = detailItem.querySelector('.detail-icon');
-                if (iconSpan) {
-                    iconSpan.textContent = '⚪';
+                // Reset to empty state
+                const priorityTextLabel = element.querySelector('.priority-text-label');
+                if (priorityTextLabel) {
+                    priorityTextLabel.textContent = 'set';
+                    priorityTextLabel.classList.add('empty-field');
                 }
+                
+                const priorityTopIcon = element.querySelector('.priority-top-icon');
+                if (priorityTopIcon) {
+                    priorityTopIcon.textContent = '⚪';
+                }
+                
+                element.classList.add('empty-field');
             }
         } else if (field === 'category') {
             if (value && value.trim()) {
@@ -1951,6 +2038,7 @@ class GoogleSheetsChecklist {
 
         // Add category-based filters
         buttonsHtml += '<button class="filter-btn" data-filter="support-needed">Support Needed</button>';
+        buttonsHtml += '<button class="filter-btn" data-filter="dom-needed">Dom Needed</button>';
         buttonsHtml += '<button class="filter-btn" data-filter="completed">Completed</button>';
 
         filterContainer.innerHTML = buttonsHtml;
@@ -2023,6 +2111,7 @@ class GoogleSheetsChecklist {
             const timeline = this.getDisplayTimeline(rawTimeline);
             const safeTimeline = timeline.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase();
             const whoCanHelp = item.dataset.whoCanHelp || '';
+            const how = item.dataset.how || '';
             const completed = item.dataset.completed === 'true';
 
             // If 'completed' filter is selected, only show completed tasks
@@ -2039,7 +2128,16 @@ class GoogleSheetsChecklist {
                     // Apply the specific filter logic for incomplete tasks
                     switch (filterType) {
                         case 'support-needed':
-                            show = whoCanHelp.length == 0;
+                            // Filter for tasks where 'how' contains 'outsource' (with word boundaries) 
+                            // AND 'whocanhelp' is empty
+                            const outsourceRegex = /(^|\s)outsource(\s|$)/i;
+                            show = outsourceRegex.test(how) && whoCanHelp.length == 0;
+                            break;
+                        case 'dom-needed':
+                            // Filter for tasks where 'how' contains 'dom' or 'jumper' (with word boundaries) 
+                            // AND 'whocanhelp' is empty
+                            const domRegex = /(^|\s)(dom|jumper)(\s|$)/i;
+                            show = domRegex.test(how) && whoCanHelp.length == 0;
                             break;
                         default:
                             // Timeline-based filter

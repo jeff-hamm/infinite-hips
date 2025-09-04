@@ -36,6 +36,7 @@
     --font-size-icon-large: clamp(16px, 4vw, 24px);         /* Priority corner icons */
     --font-size-icon-medium: clamp(11px, 2vw, 17px);        /* Detail icons, priority indicators */
     --font-size-icon-small: clamp(9px, 1.8vw, 15px);        /* Edit icons */
+    --font-size-icon-tiny: clamp(8px, 1.5vw, 12px);         /* Very small icons */
     --font-size-form: 14px;                                 /* Form inputs, buttons */
     --font-size-tiny: 12px;                                 /* Sync status, timestamps */
     --font-size-micro-tiny: 10px;                           /* Category tags, very small text */
