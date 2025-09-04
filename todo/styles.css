@@ -16,10 +16,25 @@
     align-items: center;
     gap: 12px;
     transition: all 0.3s ease;
+    position: relative;
 }
 
 .todo-item:hover {
     border-color: var(--color-pink);
+}
+
+.priority-corner-icon {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    font-size: 18px;
+    z-index: 10;
+    opacity: 0.9;
+}
+
+.todo-item.priority-critical {
+    border-left: 4px solid #ff0000;
+    background: linear-gradient(145deg, var(--color-bg-alt) 0%, #4a0000 100%);
 }
 
 .todo-item.priority-high {

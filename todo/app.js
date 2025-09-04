@@ -442,16 +442,16 @@ class GoogleSheetsChecklist {
         sortedTimelines.forEach(timeline => {
             const tasks = timelineGroups[timeline];
             
-            // Sort tasks within timeline by priority (high -> medium -> low), then by completion status
-            const priorityOrder = { 'high': 0, 'medium': 1, 'low': 2, '': 3 };
+            // Sort tasks within timeline by priority (critical -> high -> medium -> low), then by completion status
+            const priorityOrder = { 'critical': 0, 'high': 1, 'medium': 2, 'low': 3, '': 4 };
             tasks.sort((a, b) => {
                 // First sort by completion (incomplete first)
                 if (a.completed !== b.completed) {
                     return a.completed ? 1 : -1;
                 }
                 // Then by priority
-                const aPriority = priorityOrder[a.priority?.toLowerCase()] ?? 3;
-                const bPriority = priorityOrder[b.priority?.toLowerCase()] ?? 3;
+                const aPriority = priorityOrder[a.priority?.toLowerCase().trim()] ?? 4;
+                const bPriority = priorityOrder[b.priority?.toLowerCase().trim()] ?? 4;
                 return aPriority - bPriority;
             });
 
@@ -460,29 +460,48 @@ class GoogleSheetsChecklist {
             html += `<div class="timeline-title">${timeline}</div>`;
 
             tasks.forEach(task => {
-                const priorityClass = task.priority ? `priority-${task.priority.toLowerCase()}` : '';
+                // Extract clean priority value from formats like "1- Critical" or "3 - Medium"
+                const cleanPriority = task.priority ? 
+                    task.priority.toLowerCase().replace(/^\d+\s*-\s*/, '').trim() : '';
+                const priorityClass = '';
+                // cleanPriority ? `priority-${cleanPriority.replace(/\s+/g, '-')}` : '';
                 
                 html += `<div class="todo-item ${priorityClass}">`;
+                
+                // Add priority icon in upper right corner
+                let priorityIcon = '';
+                if (cleanPriority) {
+                    priorityIcon = {
+                        'critical': '❗',
+                        'high': '🔥',
+                        'medium': '📌', 
+                        'low': '📝'
+                    }[cleanPriority] || '';
+                    html += `<div class="priority-corner-icon">${priorityIcon}</div>`;
+                }
+                
                 html += `<input type="checkbox" class="todo-checkbox" ${task.completed ? 'checked' : ''} 
                            onchange="sheetsChecklist.updateTaskInSheet('${task.id}', this.checked)"
                            title="Click to edit this task in Google Sheets">`;
                 html += `<div style="flex: 1;">`;
-                // Add priority icon to the task text
+                // Task text without priority icon
                 let taskText = this.escapeHtml(task.text);
-                if (task.priority) {
-                    const priorityIcon = {
-                        'high': '🔴',
-                        'medium': '🟡', 
-                        'low': '🟢'
-                    }[task.priority.toLowerCase()] || '';
-                    taskText = `${priorityIcon} ${taskText}`;
-                }
                 
                 html += `<div class="todo-text ${task.completed ? 'todo-completed' : ''}"><h3>${taskText}</h3></div>`;
                 
-                // Add details section for category, how, and notes
-                if (task.category || task.how || task.notes) {
+                // Add details section for priority, category, how, and notes
+                if (task.priority || task.category || task.how || task.notes) {
                     html += `<div class="task-details">`;
+                    
+                    if (task.priority) {
+                        const detailPriorityIcon = cleanPriority ? {
+                            'critical': '❗',
+                            'high': '🔥',
+                            'medium': '📌', 
+                            'low': '📝'
+                        }[cleanPriority] || '⚪' : '⚪';
+                        html += `<div class="detail-item"><span class="detail-icon">${detailPriorityIcon}</span><span class="detail-label">Priority:</span> ${this.escapeHtml(task.priority)}</div>`;
+                    }
                     
                     if (task.category) {
                         html += `<div class="detail-item"><span class="detail-icon">📂</span><span class="detail-label">Category:</span> ${this.escapeHtml(task.category)}</div>`;
