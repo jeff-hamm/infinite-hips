@@ -417,8 +417,12 @@ class GoogleSheetsChecklist {
         
         if (this.tasks.length === 0) {
             todoList.innerHTML = '<p style="text-align: center; color: #ff69b4; padding: 40px;">No tasks found in the Google Sheet.<br><a href="https://docs.google.com/spreadsheets/d/1ziPiBhIYXTgVvs2HVokZQrFPjYdF9w-wcO9ivPwpgag/edit?usp=sharing" target="_blank" style="color: #ff69b4;">Add some tasks to the sheet</a></p>';
+            this.hideFilterButtons();
             return;
         }
+
+        // Generate filter buttons based on timeline data
+        this.generateFilterButtons();
 
         // Group tasks by timeline
         const timelineGroups = {};
@@ -484,7 +488,11 @@ class GoogleSheetsChecklist {
                 const priorityClass = '';
                 // cleanPriority ? `priority-${cleanPriority.replace(/\s+/g, '-')}` : '';
                 
-                html += `<div class="todo-item ${priorityClass}">`;
+                html += `<div class="todo-item ${priorityClass}" 
+                           data-timeline="${this.escapeHtml(task.timeline || 'Other')}"
+                           data-who-can-help="${this.escapeHtml(task.whoCanHelp || '')}"
+                           data-completed="${task.completed ? 'true' : 'false'}"
+                           data-category="${this.escapeHtml(task.category || '')}">`;
                 
                 // Add priority icon in upper right corner
                 let priorityIcon = '';
@@ -1267,6 +1275,134 @@ class GoogleSheetsChecklist {
             console.warn('Failed to load cached data:', error);
         }
         return false;
+    }
+
+    // Filter functionality
+    generateFilterButtons() {
+        const filterContainer = document.getElementById('filter-buttons');
+        if (!filterContainer) return;
+
+        // Get unique timeline values from tasks
+        const timelineValues = [...new Set(this.tasks.map(task => task.timeline || 'Other'))];
+        
+        // Sort timeline values similar to how they're displayed
+        const sortedTimelines = timelineValues.sort((a, b) => {
+            // 'asap' always comes first
+            if (a.toLowerCase() === 'asap') return -1;
+            if (b.toLowerCase() === 'asap') return 1;
+            
+            // Check if strings start with numbers
+            const aStartsWithNumber = /^\d/.test(a);
+            const bStartsWithNumber = /^\d/.test(b);
+            
+            // If both start with numbers, sort descending by the number
+            if (aStartsWithNumber && bStartsWithNumber) {
+                const aNum = parseInt(a.match(/^\d+/)[0]);
+                const bNum = parseInt(b.match(/^\d+/)[0]);
+                return bNum - aNum; // descending
+            }
+            
+            // If one starts with number and other doesn't, number comes first
+            if (aStartsWithNumber && !bStartsWithNumber) return -1;
+            if (!aStartsWithNumber && bStartsWithNumber) return 1;
+            
+            // If neither starts with number, sort alphabetically ascending
+            return a.localeCompare(b);
+        });
+
+        // Generate filter buttons HTML
+        let buttonsHtml = '<button class="filter-btn active" data-filter="all">All Tasks</button>';
+        
+        sortedTimelines.forEach(timeline => {
+            const safeTimeline = timeline.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase();
+            buttonsHtml += `<button class="filter-btn" data-filter="${safeTimeline}">${timeline}</button>`;
+        });
+
+        // Add category-based filters
+        buttonsHtml += '<button class="filter-btn" data-filter="support-needed">Support Needed</button>';
+        buttonsHtml += '<button class="filter-btn" data-filter="completed">Completed</button>';
+        buttonsHtml += '<button class="filter-btn" data-filter="incomplete">Incomplete</button>';
+
+        filterContainer.innerHTML = buttonsHtml;
+        filterContainer.style.display = 'flex';
+
+        // Add event listeners to filter buttons
+        filterContainer.addEventListener('click', (e) => {
+            if (e.target.classList.contains('filter-btn')) {
+                this.handleFilterClick(e.target);
+            }
+        });
+    }
+
+    handleFilterClick(button) {
+        // Update active button
+        document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+        button.classList.add('active');
+
+        // Apply filter
+        this.applyFilter(button.dataset.filter);
+    }
+
+    applyFilter(filterType) {
+        const todoItems = document.querySelectorAll('.todo-item');
+        const timelineGroups = document.querySelectorAll('.timeline-group-old');
+
+        // Show all items initially
+        todoItems.forEach(item => {
+            item.style.display = '';
+        });
+
+        timelineGroups.forEach(group => {
+            group.style.display = '';
+        });
+
+        if (filterType === 'all') {
+            return; // Show all items
+        }
+
+        // Apply specific filters
+        todoItems.forEach(item => {
+            let show = false;
+            const timeline = item.dataset.timeline || 'Other';
+            const safeTimeline = timeline.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase();
+            const whoCanHelp = item.dataset.whoCanHelp || '';
+            const completed = item.dataset.completed === 'true';
+
+            switch (filterType) {
+                case 'support-needed':
+                    show = whoCanHelp.includes('Family') || whoCanHelp.includes('Friends') || whoCanHelp.length > 0;
+                    break;
+                case 'completed':
+                    show = completed;
+                    break;
+                case 'incomplete':
+                    show = !completed;
+                    break;
+                default:
+                    // Timeline-based filter
+                    show = safeTimeline === filterType;
+                    break;
+            }
+
+            if (!show) {
+                item.style.display = 'none';
+            }
+        });
+
+        // Hide empty timeline groups
+        timelineGroups.forEach(group => {
+            const visibleItems = group.querySelectorAll('.todo-item:not([style*="display: none"])');
+            if (visibleItems.length === 0) {
+                group.style.display = 'none';
+            }
+        });
+    }
+
+    hideFilterButtons() {
+        const filterContainer = document.getElementById('filter-buttons');
+        if (filterContainer) {
+            filterContainer.style.display = 'none';
+        }
     }
 }
 
