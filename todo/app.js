@@ -1879,6 +1879,9 @@ class GoogleSheetsChecklist {
     async handleAddTask(event) {
         event.preventDefault();
         
+        // Show loading spinner
+        this.showAddTaskLoading(true);
+        
         const formData = new FormData(event.target);
         
         // Handle "Other" options
@@ -1914,6 +1917,7 @@ class GoogleSheetsChecklist {
         };
 
         if (!taskData.text) {
+            this.showAddTaskLoading(false);
             alert('Please enter a task description.');
             return;
         }
@@ -1925,10 +1929,10 @@ class GoogleSheetsChecklist {
             if (this.useAppsScript) {
                 // Try to add via Apps Script
                 await this.addTask(taskData);
+                await this.loadFromSheet();
                 this.updateSyncStatus('✅ Task Added');
+                this.showAddTaskLoading(false);
                 this.hideAddTaskForm();
-                // Refresh to show the new task (reduced frequency)
-                setTimeout(() => this.loadFromSheet(), 1000);
             } else {
                 // Since Apps Script isn't configured, add the task locally and show success
                 // Generate a temporary ID for the task
@@ -1943,6 +1947,7 @@ class GoogleSheetsChecklist {
                 
                 // Show success message
                 this.updateSyncStatus('✅ Task Added Locally (Please add to Google Sheet manually)');
+                this.showAddTaskLoading(false);
                 this.hideAddTaskForm();
                 
                 // Show instructions to add manually to Google Sheet
@@ -1955,6 +1960,7 @@ class GoogleSheetsChecklist {
             }
         } catch (error) {
             console.error('Error adding task:', error);
+            this.showAddTaskLoading(false);
             this.showError(`Failed to add task: ${error.message}`);
         }
     }
@@ -1963,6 +1969,13 @@ class GoogleSheetsChecklist {
         // Only show loading indicator during initial load
         if (this.isInitialLoad) {
             document.getElementById('loading').style.display = show ? 'block' : 'none';
+        }
+    }
+
+    showAddTaskLoading(show) {
+        const loadingOverlay = document.getElementById('add-task-loading');
+        if (loadingOverlay) {
+            loadingOverlay.style.display = show ? 'flex' : 'none';
         }
     }
 
