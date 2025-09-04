@@ -9,7 +9,7 @@ class GoogleSheetsChecklist {
         const defaultConfig = {
             sheetId: '1ziPiBhIYXTgVvs2HVokZQrFPjYdF9w-wcO9ivPwpgag',
             gid: '1860137714',
-            appsScriptUrl: 'YOUR_APPS_SCRIPT_WEB_APP_URL_HERE',
+            appsScriptUrl: 'https://script.google.com/macros/s/AKfycbycobzIubmEzjq0_PhqA34reM4eVnZiFxSpiz9CnLSma48azXvZb5ICpa4N2id2Uyg/exec',
             refreshInterval: 60000, // 1 minute instead of 2 minutes
             maxRetries: 3
         };
@@ -77,7 +77,6 @@ class GoogleSheetsChecklist {
 
         // Auto-refresh using configured interval
         setInterval(() => this.loadFromSheet(), this.refreshInterval);
-
         // Network status monitoring
         window.addEventListener('online', () => {
             this.isOnline = true;
@@ -946,18 +945,34 @@ class GoogleSheetsChecklist {
         
         // Only update if value changed
         if (newValue !== originalValue) {
+            // OPTIMISTIC UPDATE: Update the UI immediately
+            this.updateElementDisplay(originalElement, newValue, field);
+            
+            // Also update the local task data immediately
+            const task = this.tasks.find(t => t.id === taskId);
+            if (task) {
+                task[field] = newValue;
+            }
+            
+            // Then send the server request in the background
             try {
-                // Update the task data
                 const updateData = {};
                 updateData[field] = newValue;
                 await this.updateTaskDetails(taskId, updateData);
-                
-                // Update the display
-                this.updateElementDisplay(originalElement, newValue, field);
+                // If successful, the UI is already updated so nothing to do
+                console.log(`Successfully updated ${field} to "${newValue}" for task ${taskId}`);
             } catch (error) {
                 console.error('Error updating task:', error);
-                // Restore original display on error
+                // ROLLBACK: Restore original value on error
                 this.updateElementDisplay(originalElement, originalValue, field);
+                
+                // Also rollback the local task data
+                if (task) {
+                    task[field] = originalValue;
+                }
+                
+                // Show error message to user
+                this.showError(`Failed to update ${field}: ${error.message}`);
             }
         }
     }
@@ -1026,19 +1041,45 @@ class GoogleSheetsChecklist {
         const originalElement = input.previousElementSibling;
         
         if (newValue !== originalText) {
+            // OPTIMISTIC UPDATE: Update the UI immediately
+            if (field === 'text') {
+                // For text field, preserve the edit icon
+                originalElement.innerHTML = this.escapeHtml(newValue) + '<span class="edit-icon">✏️</span>';
+            } else if (field === 'notes') {
+                if (newValue) {
+                    originalElement.innerHTML = this.linkifyUrls(newValue) + '<span class="edit-icon">✏️</span>';
+                    originalElement.classList.remove('empty-field');
+                } else {
+                    originalElement.innerHTML = 'Click to add notes...<span class="edit-icon">✏️</span>';
+                    originalElement.classList.add('empty-field');
+                }
+            }
+            
+            // Also update the local task data immediately
+            const task = this.tasks.find(t => t.id === taskId);
+            if (task) {
+                task[field] = newValue;
+            }
+            
+            // Clean up the input first so user sees the change immediately
+            this.cleanupTextEdit(input, originalElement);
+            
+            // Then send the server request in the background
             try {
-                // Update the task
                 const updateData = {};
                 updateData[field] = newValue;
                 await this.updateTaskDetails(taskId, updateData);
+                // If successful, the UI is already updated so nothing to do
+                console.log(`Successfully updated ${field} to "${newValue}" for task ${taskId}`);
+            } catch (error) {
+                console.error('Error updating text:', error);
                 
-                // Update the display immediately for better UX
+                // ROLLBACK: Restore original value on error
                 if (field === 'text') {
-                    // For text field, preserve the edit icon
-                    originalElement.innerHTML = this.escapeHtml(newValue) + '<span class="edit-icon">✏️</span>';
+                    originalElement.innerHTML = this.escapeHtml(originalText) + '<span class="edit-icon">✏️</span>';
                 } else if (field === 'notes') {
-                    if (newValue) {
-                        originalElement.innerHTML = this.linkifyUrls(newValue) + '<span class="edit-icon">✏️</span>';
+                    if (originalText) {
+                        originalElement.innerHTML = this.linkifyUrls(originalText) + '<span class="edit-icon">✏️</span>';
                         originalElement.classList.remove('empty-field');
                     } else {
                         originalElement.innerHTML = 'Click to add notes...<span class="edit-icon">✏️</span>';
@@ -1046,14 +1087,18 @@ class GoogleSheetsChecklist {
                     }
                 }
                 
-            } catch (error) {
-                console.error('Error updating text:', error);
+                // Also rollback the local task data
+                if (task) {
+                    task[field] = originalText;
+                }
+                
+                // Show error message to user
                 this.showError(`Failed to update ${field}: ${error.message}`);
             }
+        } else {
+            // No change, just clean up
+            this.cleanupTextEdit(input, originalElement);
         }
-        
-        // Clean up
-        this.cleanupTextEdit(input, originalElement);
     }
 
     cancelEditingText(input) {
@@ -1135,6 +1180,10 @@ class GoogleSheetsChecklist {
     showAddTaskForm() {
         this.populateFormDropdowns();
         document.getElementById('add-task-form').style.display = 'block';
+        
+        // Set default priority
+        document.getElementById('task-priority').value = '3 - Medium';
+        
         document.getElementById('task-text').focus();
     }
 
@@ -1242,7 +1291,18 @@ class GoogleSheetsChecklist {
 
     populateTimelineDropdown() {
         const timelineSelect = document.getElementById('task-timeline');
-        const uniqueTimelines = [...new Set(this.tasks.map(task => task.timeline).filter(timeline => timeline && timeline.trim()))];
+        if (!timelineSelect) {
+            console.error('task-timeline element not found');
+            return;
+        }
+        
+        // Get unique timeline values, excluding "X days before" patterns from the dropdown
+        const uniqueTimelines = [...new Set(
+            this.tasks
+                .map(task => task.timeline)
+                .filter(timeline => timeline && timeline.trim())
+                .filter(timeline => !this.isBeforeSurgeryTimeline(timeline)) // Exclude "X days before" patterns
+        )];
         
         // Sort timelines with custom logic (asap first, numbers descending, others ascending)
         const sortedTimelines = uniqueTimelines.sort((a, b) => {
@@ -1362,9 +1422,14 @@ class GoogleSheetsChecklist {
     hideAddTaskForm() {
         document.getElementById('add-task-form').style.display = 'none';
         document.getElementById('new-task-form').reset();
+        
+        // Reset priority to default value after form reset
+        document.getElementById('task-priority').value = '3 - Medium';
+        
         // Hide any "other" fields
         document.getElementById('task-timeline-other').style.display = 'none';
         document.getElementById('task-category-other').style.display = 'none';
+        document.getElementById('task-who-can-help-other').style.display = 'none';
     }
 
     handleOtherOption(event, otherFieldId) {
@@ -1402,7 +1467,7 @@ class GoogleSheetsChecklist {
         const taskData = {
             text: formData.get('taskText').trim(),
             timeline: timeline,
-            priority: formData.get('priority') || '',
+            priority: formData.get('priority') || '3 - Medium', // Default to Medium if empty
             category: category,
             how: formData.get('how') || '',
             notes: formData.get('notes') || '',
@@ -1415,6 +1480,9 @@ class GoogleSheetsChecklist {
             return;
         }
 
+        console.log('Adding task:', taskData);
+        console.log('useAppsScript:', this.useAppsScript);
+
         try {
             if (this.useAppsScript) {
                 // Try to add via Apps Script
@@ -1424,14 +1492,28 @@ class GoogleSheetsChecklist {
                 // Refresh to show the new task (reduced frequency)
                 setTimeout(() => this.loadFromSheet(), 1000);
             } else {
-                // Fallback: Show instructions to add manually
-                const sheetUrl = `https://docs.google.com/spreadsheets/d/${this.sheetId}/edit#gid=${this.gid}`;
-                const message = `To add this task, please:\n\n1. Open the Google Sheet\n2. Add a new row with:\n   - Task: ${taskData.text}\n   - Timeline: ${taskData.timeline}\n   - Priority: ${taskData.priority}\n   - Category: ${taskData.category}\n   - How: ${taskData.how}\n   - Notes: ${taskData.notes}\n   - Who Can Help: ${taskData.whoCanHelp}\n\nOpen Google Sheet now?`;
+                // Since Apps Script isn't configured, add the task locally and show success
+                // Generate a temporary ID for the task
+                const tempId = 'temp_' + Date.now();
+                taskData.id = tempId;
                 
-                if (confirm(message)) {
-                    window.open(sheetUrl, '_blank');
-                }
+                // Add to local tasks array
+                this.tasks.push(taskData);
+                
+                // Re-render the tasks to show the new one immediately
+                this.renderTasks();
+                
+                // Show success message
+                this.updateSyncStatus('✅ Task Added Locally (Please add to Google Sheet manually)');
                 this.hideAddTaskForm();
+                
+                // Show instructions to add manually to Google Sheet
+                const sheetUrl = `https://docs.google.com/spreadsheets/d/${this.sheetId}/edit#gid=${this.gid}`;
+                setTimeout(() => {
+                    if (confirm(`Task added locally! To persist this task, please add it to your Google Sheet.\n\nTask: ${taskData.text}\nTimeline: ${taskData.timeline}\nPriority: ${taskData.priority}\n\nOpen Google Sheet now?`)) {
+                        window.open(sheetUrl, '_blank');
+                    }
+                }, 500);
             }
         } catch (error) {
             console.error('Error adding task:', error);
@@ -1482,36 +1564,72 @@ class GoogleSheetsChecklist {
         }
 
         try {
-            // For now, disable complex operations to avoid CORS issues
-            // Focus on core read/update functionality
-            console.warn('AddTask temporarily disabled due to CORS limitations. Use Google Sheets directly to add tasks.');
-            return;
-            
-            /* CORS-limited implementation - uncomment when needed
-            const response = await fetch(this.appsScriptUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    action: 'addTask',
-                    task: taskData
-                })
+            // Use GET request with URL parameters to avoid CORS issues
+            const params = new URLSearchParams({
+                action: 'addTask',
+                text: taskData.text || '',
+                timeline: taskData.timeline || '',
+                priority: taskData.priority || '',
+                category: taskData.category || '',
+                how: taskData.how || '',
+                notes: taskData.notes || '',
+                whoCanHelp: taskData.whoCanHelp || '',
+                completed: taskData.completed ? 'TRUE' : 'FALSE'
             });
 
-            if (!response.ok) {
-                throw new Error(`Apps Script error: ${response.status}`);
-            }
-
-            const result = await response.json();
+            const url = `${this.appsScriptUrl}?${params.toString()}`;
+            console.log('Sending add task request to:', url);
+            console.log('Task data:', taskData);
             
-            if (!result.success) {
-                throw new Error(result.data?.error || 'Failed to add task');
+            try {
+                // First try a regular GET request to see if we can read the response
+                const response = await fetch(url, {
+                    method: 'GET'
+                });
+
+                console.log('Response status:', response.status);
+                console.log('Response ok:', response.ok);
+
+                if (response.ok) {
+                    const responseText = await response.text();
+                    console.log('Raw response text:', responseText);
+                    
+                    try {
+                        const result = JSON.parse(responseText);
+                        console.log('Parsed response:', result);
+                        
+                        if (result.success) {
+                            console.log('Task added successfully via Apps Script');
+                            return result;
+                        } else {
+                            console.error('Apps Script returned success=false:', result);
+                            throw new Error(result.error || result.data?.error || 'Apps Script reported failure');
+                        }
+                    } catch (parseError) {
+                        console.error('Failed to parse JSON response:', parseError);
+                        console.log('Response was:', responseText);
+                        throw new Error('Invalid JSON response from Apps Script');
+                    }
+                } else {
+                    const errorText = await response.text();
+                    console.error('HTTP error response:', errorText);
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+            } catch (corsError) {
+                console.log('CORS prevented response reading, trying no-cors mode:', corsError.message);
+                
+                // Fallback to no-cors mode - request goes through but we can't read response
+                await fetch(url, {
+                    method: 'GET',
+                    mode: 'no-cors'
+                });
+
+                console.log('Add task request sent (no-cors mode)');
+                
+                // Since we can't read the response, just assume it worked and reload after a delay
+                return { success: true, message: 'Request sent (response not readable due to CORS)' };
             }
 
-            // Reload tasks to reflect the addition
-            await this.loadFromSheet();
-            */
         } catch (error) {
             console.error('Error adding task:', error);
             throw error;

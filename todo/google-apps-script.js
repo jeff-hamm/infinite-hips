@@ -74,6 +74,20 @@ function doGet(e) {
         const updates = JSON.parse(e.parameter.updates);
         return createResponse(updateTaskDetails(detailTaskId, updates));
       
+      case 'addTask':
+        // Handle addTask via GET parameters
+        const newTask = {
+          text: e.parameter.text || '',
+          timeline: e.parameter.timeline || '',
+          priority: e.parameter.priority || '',
+          category: e.parameter.category || '',
+          how: e.parameter.how || '',
+          notes: e.parameter.notes || '',
+          whoCanHelp: e.parameter.whoCanHelp || '',
+          completed: e.parameter.completed === 'TRUE'
+        };
+        return createResponse(addTask(newTask));
+      
       case 'test':
         return createResponse({ 
           message: 'Apps Script is working!', 
