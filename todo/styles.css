@@ -107,6 +107,10 @@
     gap: 6px;
 }
 
+.detail-text-non-editable {
+    margin-left: 4px; /* Add left margin to non-editable text for alignment */
+}
+
 .detail-icon {
     font-size: 0.9em;
     flex-shrink: 0;
@@ -163,6 +167,62 @@
     margin: 0;
     font-size: 1.1em;
     font-weight: bold;
+}
+
+/* Editable Text Styles */
+.editable-text {
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    padding: 2px 4px;
+    border-radius: 3px;
+    position: relative;
+}
+
+.editable-text:hover {
+    background: rgba(255, 105, 180, 0.1);
+    outline: 1px solid rgba(255, 105, 180, 0.3);
+}
+
+.editable-text.empty-field {
+    color: var(--color-text-muted);
+    font-style: italic;
+}
+
+.editable-text.empty-field:hover {
+    color: var(--color-text);
+}
+
+.edit-icon {
+    font-size: 0.7em;
+    margin-left: 6px;
+    color: var(--color-text-muted);
+    opacity: 0.3;
+    transition: opacity 0.2s ease;
+}
+
+.editable-text:hover .edit-icon {
+    opacity: 0.6;
+}
+
+/* Hide edit icons when editing */
+.editable-text[style*="display: none"] + .editing-text + .edit-icon,
+.editing-text .edit-icon {
+    display: none !important;
+}
+
+/* Hide edit icon when its parent element is hidden */
+.editable-text[style*="display: none"] .edit-icon {
+    display: none !important;
+}
+
+.editing-text {
+    font-family: inherit !important;
+    outline: none !important;
+    box-shadow: 0 0 0 2px rgba(255, 105, 180, 0.4) !important;
+}
+
+.editing-text:focus {
+    box-shadow: 0 0 0 2px var(--color-pink) !important;
 }
 
 .todo-completed {

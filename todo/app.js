@@ -502,10 +502,12 @@ class GoogleSheetsChecklist {
                            onchange="sheetsChecklist.updateTaskInSheet('${task.id}', this.checked)"
                            title="Click to edit this task in Google Sheets">`;
                 html += `<div style="flex: 1;">`;
-                // Task text without priority icon
+                // Task text - clickable to edit
                 let taskText = this.escapeHtml(task.text);
                 
-                html += `<div class="todo-text ${task.completed ? 'todo-completed' : ''}"><h3>${taskText}</h3></div>`;
+                html += `<div class="todo-text ${task.completed ? 'todo-completed' : ''}">
+                    <h3 class="editable-text" data-task-id="${task.id}" data-field="text" onclick="sheetsChecklist.startEditingText(this)">${taskText}<span class="edit-icon">✏️</span></h3>
+                </div>`;
                 
                 // Add details section for priority, category, how, notes, and whoCanHelp
                 if (task.priority || task.category || task.how || task.notes || task.whoCanHelp) {
@@ -518,20 +520,31 @@ class GoogleSheetsChecklist {
                             'medium': '📌', 
                             'low': '📝'
                         }[cleanPriority] || '⚪' : '⚪';
-                        html += `<div class="detail-item"><span class="detail-icon">${detailPriorityIcon}</span><span class="detail-label">Priority:</span> ${this.escapeHtml(task.priority)}</div>`;
+                        html += `<div class="detail-item"><span class="detail-icon">${detailPriorityIcon}</span><span class="detail-label">Priority:</span> <span class="detail-text-non-editable">${this.escapeHtml(task.priority)}</span></div>`;
                     }
                     
                     if (task.category) {
-                        html += `<div class="detail-item"><span class="detail-icon">📂</span><span class="detail-label">Category:</span> ${this.escapeHtml(task.category)}</div>`;
+                        html += `<div class="detail-item"><span class="detail-icon">📂</span><span class="detail-label">Category:</span> <span class="detail-text-non-editable">${this.escapeHtml(task.category)}</span></div>`;
                     }
                     
                     if (task.how) {
-                        html += `<div class="detail-item"><span class="detail-icon">🔧</span><span class="detail-label">How:</span> ${this.escapeHtml(task.how)}</div>`;
+                        html += `<div class="detail-item"><span class="detail-icon">🔧</span><span class="detail-label">How:</span> <span class="detail-text-non-editable">${this.escapeHtml(task.how)}</span></div>`;
                     }
                     
                     if (task.notes) {
                         const notesContent = this.linkifyUrls(task.notes);
-                        html += `<div class="detail-item"><span class="detail-icon">📝</span><span class="detail-label">Notes:</span> ${notesContent}</div>`;
+                        html += `<div class="detail-item">
+                            <span class="detail-icon">📝</span>
+                            <span class="detail-label">Notes:</span> 
+                            <span class="editable-text" data-task-id="${task.id}" data-field="notes" onclick="sheetsChecklist.startEditingText(this)">${notesContent}<span class="edit-icon">✏️</span></span>
+                        </div>`;
+                    } else {
+                        // Show empty notes field that can be clicked to add notes
+                        html += `<div class="detail-item">
+                            <span class="detail-icon">📝</span>
+                            <span class="detail-label">Notes:</span> 
+                            <span class="editable-text empty-field" data-task-id="${task.id}" data-field="notes" onclick="sheetsChecklist.startEditingText(this)">Click to add notes...<span class="edit-icon">✏️</span></span>
+                        </div>`;
                     }
                     
                                         // Always show Helper field last (editable)
@@ -595,6 +608,131 @@ class GoogleSheetsChecklist {
         if (newValue) {
             await this.updateTaskDetails(taskId, { whoCanHelp: newValue });
         }
+    }
+
+    startEditingText(element) {
+        // Prevent multiple edits at once
+        if (document.querySelector('.editing-text')) {
+            return;
+        }
+
+        const taskId = element.dataset.taskId;
+        const field = element.dataset.field;
+        const currentText = this.getOriginalText(element);
+        
+        // Create text input
+        const input = document.createElement(field === 'notes' ? 'textarea' : 'input');
+        if (field !== 'notes') {
+            input.type = 'text';
+        }
+        input.value = currentText;
+        input.className = 'editing-text';
+        input.dataset.taskId = taskId;
+        input.dataset.field = field;
+        input.dataset.originalText = currentText;
+        
+        if (field === 'notes') {
+            input.rows = 3;
+            input.style.resize = 'vertical';
+        }
+        
+        // Style the input
+        Object.assign(input.style, {
+            background: 'var(--color-bg)',
+            border: '1px solid var(--color-pink)',
+            borderRadius: '4px',
+            padding: '8px',
+            color: 'var(--color-text)',
+            fontSize: field === 'text' ? '18px' : '14px',
+            fontWeight: field === 'text' ? 'bold' : 'normal',
+            width: '100%',
+            fontFamily: 'inherit'
+        });
+        
+        // Replace the element with input
+        element.style.display = 'none';
+        element.parentNode.insertBefore(input, element.nextSibling);
+        
+        // Focus and select all text
+        input.focus();
+        input.select();
+        
+        // Handle save/cancel
+        input.addEventListener('blur', () => this.finishEditingText(input));
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                this.finishEditingText(input);
+            } else if (e.key === 'Escape') {
+                this.cancelEditingText(input);
+            }
+        });
+    }
+
+    getOriginalText(element) {
+        const field = element.dataset.field;
+        const taskId = element.dataset.taskId;
+        const task = this.tasks.find(t => t.id === taskId);
+        
+        if (!task) return '';
+        
+        if (field === 'text') {
+            return task.text || '';
+        } else if (field === 'notes') {
+            // For notes, always return the raw text from the task data, not the HTML content
+            return task.notes || '';
+        }
+        return '';
+    }
+
+    async finishEditingText(input) {
+        const taskId = input.dataset.taskId;
+        const field = input.dataset.field;
+        const newValue = input.value.trim();
+        const originalText = input.dataset.originalText;
+        
+        // Get the original element
+        const originalElement = input.previousElementSibling;
+        
+        if (newValue !== originalText) {
+            try {
+                // Update the task
+                const updateData = {};
+                updateData[field] = newValue;
+                await this.updateTaskDetails(taskId, updateData);
+                
+                // Update the display immediately for better UX
+                if (field === 'text') {
+                    // For text field, preserve the edit icon
+                    originalElement.innerHTML = this.escapeHtml(newValue) + '<span class="edit-icon">✏️</span>';
+                } else if (field === 'notes') {
+                    if (newValue) {
+                        originalElement.innerHTML = this.linkifyUrls(newValue) + '<span class="edit-icon">✏️</span>';
+                        originalElement.classList.remove('empty-field');
+                    } else {
+                        originalElement.innerHTML = 'Click to add notes...<span class="edit-icon">✏️</span>';
+                        originalElement.classList.add('empty-field');
+                    }
+                }
+                
+            } catch (error) {
+                console.error('Error updating text:', error);
+                this.showError(`Failed to update ${field}: ${error.message}`);
+            }
+        }
+        
+        // Clean up
+        this.cleanupTextEdit(input, originalElement);
+    }
+
+    cancelEditingText(input) {
+        const originalElement = input.previousElementSibling;
+        this.cleanupTextEdit(input, originalElement);
+    }
+
+    cleanupTextEdit(input, originalElement) {
+        originalElement.style.display = '';
+        input.remove();
     }
 
     escapeHtml(text) {
