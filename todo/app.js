@@ -610,8 +610,16 @@ class GoogleSheetsChecklist {
         // URL regex pattern
         const urlRegex = /(https?:\/\/[^\s<>"']+)/gi;
         
-        // Replace URLs with anchor tags
-        return escapedText.replace(urlRegex, '<a href="$1" target="_blank" rel="noopener noreferrer" style="color: var(--color-pink); text-decoration: underline;">$1</a>');
+        // Replace URLs with anchor tags showing only hostname
+        return escapedText.replace(urlRegex, (match, url) => {
+            try {
+                const hostname = new URL(url).hostname.replace(/^www\./, '');
+                return `<a href="${url}" target="_blank" rel="noopener noreferrer" style="color: var(--color-pink); text-decoration: underline;">${hostname}</a>`;
+            } catch (e) {
+                // Fallback to full URL if URL parsing fails
+                return `<a href="${url}" target="_blank" rel="noopener noreferrer" style="color: var(--color-pink); text-decoration: underline;">${url}</a>`;
+            }
+        });
     }
 
     updateProgress() {
