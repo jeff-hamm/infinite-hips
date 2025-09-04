@@ -36,7 +36,7 @@ class GoogleSheetsChecklist {
         this.useAppsScript = this.appsScriptUrl && this.appsScriptUrl !== 'YOUR_APPS_SCRIPT_WEB_APP_URL_HERE';
         this.retryCount = 0;
         this.isInitialLoad = true;
-        this.currentFilter = 'incomplete'; // Default to showing incomplete tasks only
+        this.currentFilter = 'all'; // Default to showing all incomplete tasks
         this.init();
     }
 
@@ -1810,10 +1810,16 @@ class GoogleSheetsChecklist {
         // Add category-based filters
         buttonsHtml += '<button class="filter-btn" data-filter="support-needed">Support Needed</button>';
         buttonsHtml += '<button class="filter-btn" data-filter="completed">Completed</button>';
-        buttonsHtml += '<button class="filter-btn active" data-filter="incomplete">Incomplete</button>';
 
         filterContainer.innerHTML = buttonsHtml;
         filterContainer.style.display = 'flex';
+
+        // Set the first timeline button as active by default
+        const firstButton = filterContainer.querySelector('.filter-btn');
+        if (firstButton) {
+            firstButton.classList.add('active');
+            this.currentFilter = firstButton.dataset.filter;
+        }
 
         // Add event listeners to filter buttons
         filterContainer.addEventListener('click', (e) => {
@@ -1848,10 +1854,6 @@ class GoogleSheetsChecklist {
             group.style.display = '';
         });
 
-        if (filterType === 'all') {
-            return; // Show all items
-        }
-
         // Apply specific filters
         todoItems.forEach(item => {
             let show = false;
@@ -1861,20 +1863,28 @@ class GoogleSheetsChecklist {
             const whoCanHelp = item.dataset.whoCanHelp || '';
             const completed = item.dataset.completed === 'true';
 
-            switch (filterType) {
-                case 'support-needed':
-                    show = whoCanHelp.length == 0;
-                    break;
-                case 'completed':
-                    show = completed;
-                    break;
-                case 'incomplete':
-                    show = !completed;
-                    break;
-                default:
-                    // Timeline-based filter
-                    show = safeTimeline === filterType;
-                    break;
+            // If 'completed' filter is selected, only show completed tasks
+            if (filterType === 'completed') {
+                show = completed;
+            } else if (filterType === 'all') {
+                // For 'All Tasks' filter, show all incomplete tasks
+                show = !completed;
+            } else {
+                // For all other filters, always exclude completed tasks
+                if (completed) {
+                    show = false;
+                } else {
+                    // Apply the specific filter logic for incomplete tasks
+                    switch (filterType) {
+                        case 'support-needed':
+                            show = whoCanHelp.length == 0;
+                            break;
+                        default:
+                            // Timeline-based filter
+                            show = safeTimeline === filterType;
+                            break;
+                    }
+                }
             }
 
             if (!show) {
