@@ -63,7 +63,7 @@ body {
 /* Header styles (merged, deduplicated) */
 /* Header styles (merged, deduplicated) */
 .header {
-    background: var(--color-bg-alt) !important;
+    background: linear-gradient(145deg, var(--color-bg-alt) 0%, var(--color-purple-dark) 100%);
     color: var(--color-pink);
     padding: 2rem;
     border-radius: 15px;
