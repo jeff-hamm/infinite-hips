@@ -36,8 +36,25 @@ class GoogleSheetsChecklist {
         this.useAppsScript = this.appsScriptUrl && this.appsScriptUrl !== 'YOUR_APPS_SCRIPT_WEB_APP_URL_HERE';
         this.retryCount = 0;
         this.isInitialLoad = true;
-        this.currentFilter = 'all'; // Default to showing all incomplete tasks
+        this.currentFilter = 'all'; // Load saved filter or default to showing all incomplete tasks
         this.init();
+    }
+
+    getSavedFilter() {
+        try {
+            return localStorage.getItem('checklist-current-filter');
+        } catch (error) {
+            console.error('Error loading saved filter:', error);
+            return null;
+        }
+    }
+
+    saveCurrentFilter() {
+        try {
+            localStorage.setItem('checklist-current-filter', this.currentFilter);
+        } catch (error) {
+            console.error('Error saving current filter:', error);
+        }
     }
 
     // Helper function to check if timeline matches "X days before" pattern
@@ -1184,7 +1201,39 @@ class GoogleSheetsChecklist {
         // Set default priority
         document.getElementById('task-priority').value = '3 - Medium';
         
+        // Pre-populate timeline if a timeline filter is currently selected
+        this.prePopulateTimelineFromFilter();
+        
         document.getElementById('task-text').focus();
+    }
+
+    prePopulateTimelineFromFilter() {
+        const timelineSelect = document.getElementById('task-timeline');
+        if (!timelineSelect || !this.currentFilter) return;
+        
+        // Special filters shouldn't pre-populate the timeline
+        if (this.currentFilter === 'all' || this.currentFilter === 'support-needed' || this.currentFilter === 'completed') {
+            return;
+        }
+        
+        // Find the corresponding timeline value for the current filter
+        // We need to find a task that matches the current filter to get the raw timeline value
+        const matchingTask = this.tasks.find(task => {
+            const displayTimeline = this.getDisplayTimeline(task.timeline);
+            const safeTimeline = displayTimeline.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase();
+            return safeTimeline === this.currentFilter;
+        });
+        
+        if (matchingTask && matchingTask.timeline) {
+            // Check if this timeline value is available in the dropdown
+            const matchingOption = Array.from(timelineSelect.options).find(option => 
+                option.value === matchingTask.timeline
+            );
+            
+            if (matchingOption) {
+                timelineSelect.value = matchingTask.timeline;
+            }
+        }
     }
 
     populateDetailDropdowns() {
@@ -1814,11 +1863,23 @@ class GoogleSheetsChecklist {
         filterContainer.innerHTML = buttonsHtml;
         filterContainer.style.display = 'flex';
 
-        // Set the first timeline button as active by default
-        const firstButton = filterContainer.querySelector('.filter-btn');
-        if (firstButton) {
-            firstButton.classList.add('active');
-            this.currentFilter = firstButton.dataset.filter;
+        // Restore saved filter or default to the first button
+        const savedFilter = this.getSavedFilter();
+        let activeButton = null;
+        
+        if (savedFilter) {
+            // Try to find button matching saved filter
+            activeButton = filterContainer.querySelector(`[data-filter="${savedFilter}"]`);
+        }
+        
+        // If no saved filter or saved filter button not found, use first button
+        if (!activeButton) {
+            activeButton = filterContainer.querySelector('.filter-btn');
+        }
+        
+        if (activeButton) {
+            activeButton.classList.add('active');
+            this.currentFilter = activeButton.dataset.filter;
         }
 
         // Add event listeners to filter buttons
@@ -1836,6 +1897,9 @@ class GoogleSheetsChecklist {
 
         // Update current filter state
         this.currentFilter = button.dataset.filter;
+        
+        // Save the current filter so it persists across syncs
+        this.saveCurrentFilter();
 
         // Apply filter
         this.applyFilter(this.currentFilter);
