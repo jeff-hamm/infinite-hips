@@ -35,6 +35,7 @@ class GoogleSheetsChecklist {
         this.isOnline = navigator.onLine;
         this.useAppsScript = this.appsScriptUrl && this.appsScriptUrl !== 'YOUR_APPS_SCRIPT_WEB_APP_URL_HERE';
         this.retryCount = 0;
+        this.isInitialLoad = true;
         this.init();
     }
 
@@ -95,6 +96,8 @@ class GoogleSheetsChecklist {
             }
         } finally {
             this.showLoading(false);
+            // Mark initial load as complete
+            this.isInitialLoad = false;
         }
     }
 
@@ -409,22 +412,29 @@ class GoogleSheetsChecklist {
             timelineGroups[timeline].push(task);
         });
 
-        // Sort groups by timeline order (surgery workflow)
-        const timelineOrder = [
-            'Pre-Surgery (Sept 5-11)',
-            'Surgery Day (Sept 12)', 
-            'Recovery Week 1',
-            'Recovery Week 2-6',
-            'Recovery 3+ Months',
-            'Other'
-        ];
-
-        const sortedTimelines = timelineOrder.filter(timeline => timelineGroups[timeline]);
-        // Add any timelines not in the predefined order
-        Object.keys(timelineGroups).forEach(timeline => {
-            if (!timelineOrder.includes(timeline)) {
-                sortedTimelines.push(timeline);
+        // Sort groups by timeline order: 'asap' first, then numbers descending, then others ascending
+        const sortedTimelines = Object.keys(timelineGroups).sort((a, b) => {
+            // 'asap' always comes first
+            if (a.toLowerCase() === 'asap') return -1;
+            if (b.toLowerCase() === 'asap') return 1;
+            
+            // Check if strings start with numbers
+            const aStartsWithNumber = /^\d/.test(a);
+            const bStartsWithNumber = /^\d/.test(b);
+            
+            // If both start with numbers, sort descending by the number
+            if (aStartsWithNumber && bStartsWithNumber) {
+                const aNum = parseInt(a.match(/^\d+/)[0]);
+                const bNum = parseInt(b.match(/^\d+/)[0]);
+                return bNum - aNum; // descending
             }
+            
+            // If one starts with number and other doesn't, number comes first
+            if (aStartsWithNumber && !bStartsWithNumber) return -1;
+            if (!aStartsWithNumber && bStartsWithNumber) return 1;
+            
+            // If neither starts with number, sort alphabetically ascending
+            return a.localeCompare(b);
         });
 
         let html = '';
@@ -468,7 +478,7 @@ class GoogleSheetsChecklist {
                     taskText = `${priorityIcon} ${taskText}`;
                 }
                 
-                html += `<div class="todo-text ${task.completed ? 'todo-completed' : ''}">${taskText}</div>`;
+                html += `<div class="todo-text ${task.completed ? 'todo-completed' : ''}"><h3>${taskText}</h3></div>`;
                 
                 // Add details section for category, how, and notes
                 if (task.category || task.how || task.notes) {
@@ -483,7 +493,8 @@ class GoogleSheetsChecklist {
                     }
                     
                     if (task.notes) {
-                        html += `<div class="detail-item"><span class="detail-icon">📝</span><span class="detail-label">Notes:</span> ${this.escapeHtml(task.notes)}</div>`;
+                        const notesContent = this.linkifyUrls(task.notes);
+                        html += `<div class="detail-item"><span class="detail-icon">📝</span><span class="detail-label">Notes:</span> ${notesContent}</div>`;
                     }
                     
                     html += `</div>`;
@@ -503,6 +514,17 @@ class GoogleSheetsChecklist {
         const div = document.createElement('div');
         div.textContent = text;
         return div.innerHTML;
+    }
+
+    linkifyUrls(text) {
+        // First escape the HTML to prevent XSS
+        const escapedText = this.escapeHtml(text);
+        
+        // URL regex pattern
+        const urlRegex = /(https?:\/\/[^\s<>"']+)/gi;
+        
+        // Replace URLs with anchor tags
+        return escapedText.replace(urlRegex, '<a href="$1" target="_blank" rel="noopener noreferrer" style="color: var(--color-pink); text-decoration: underline;">$1</a>');
     }
 
     updateProgress() {
@@ -546,7 +568,10 @@ class GoogleSheetsChecklist {
     }
 
     showLoading(show) {
-        document.getElementById('loading').style.display = show ? 'block' : 'none';
+        // Only show loading indicator during initial load
+        if (this.isInitialLoad) {
+            document.getElementById('loading').style.display = show ? 'block' : 'none';
+        }
     }
 
     showError(message) {
