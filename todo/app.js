@@ -525,9 +525,20 @@ class GoogleSheetsChecklist {
                         html += `<div class="detail-item"><span class="detail-icon">📂</span><span class="detail-label">Category:</span> ${this.escapeHtml(task.category)}</div>`;
                     }
                     
-                    if (task.whoCanHelp) {
-                        html += `<div class="detail-item"><span class="detail-icon">👥</span><span class="detail-label">Who Can Help:</span> ${this.escapeHtml(task.whoCanHelp)}</div>`;
-                    }
+                    // Always show Who Can Help field (editable)
+                    const whoCanHelpValue = task.whoCanHelp || '';
+                    const displayValue = whoCanHelpValue || 'Click to set...';
+                    html += `<div class="detail-item">
+                        <span class="detail-icon">👥</span>
+                        <span class="detail-label">Who Can Help:</span> 
+                        <div class="editable-field-container">
+                            <select class="editable-dropdown" data-task-id="${task.id}" data-field="whoCanHelp" onchange="sheetsChecklist.handleWhoCanHelpChange(this)">
+                                <option value="${this.escapeHtml(whoCanHelpValue)}">${this.escapeHtml(displayValue)}</option>
+                                <option value="Other">Other</option>
+                            </select>
+                            <input type="text" class="editable-other-input" style="display: none; margin-top: 8px;" placeholder="Enter who can help..." onblur="sheetsChecklist.updateWhoCanHelpField(this)" data-task-id="${task.id}">
+                        </div>
+                    </div>`;
                     
                     if (task.how) {
                         html += `<div class="detail-item"><span class="detail-icon">🔧</span><span class="detail-label">How:</span> ${this.escapeHtml(task.how)}</div>`;
@@ -552,6 +563,37 @@ class GoogleSheetsChecklist {
         
         // Update form dropdowns with current data
         this.populateFormDropdowns();
+        
+        // Populate detail view dropdowns
+        this.populateDetailDropdowns();
+    }
+
+    handleWhoCanHelpChange(dropdown) {
+        const container = dropdown.parentElement;
+        const otherInput = container.querySelector('.editable-other-input');
+        const taskId = dropdown.dataset.taskId;
+        
+        if (dropdown.value === 'Other') {
+            // Show the "Other" input field
+            otherInput.style.display = 'block';
+            otherInput.focus();
+        } else {
+            // Hide the "Other" input field and update immediately
+            otherInput.style.display = 'none';
+            otherInput.value = '';
+            
+            // Update the task with the selected value (including empty value)
+            this.updateTaskDetails(taskId, { whoCanHelp: dropdown.value });
+        }
+    }
+
+    async updateWhoCanHelpField(input) {
+        const taskId = input.dataset.taskId;
+        const newValue = input.value.trim();
+        
+        if (newValue) {
+            await this.updateTaskDetails(taskId, { whoCanHelp: newValue });
+        }
     }
 
     escapeHtml(text) {
@@ -616,6 +658,48 @@ class GoogleSheetsChecklist {
         this.populateFormDropdowns();
         document.getElementById('add-task-form').style.display = 'block';
         document.getElementById('task-text').focus();
+    }
+
+    populateDetailDropdowns() {
+        // Get all editable dropdowns in the detail view
+        const editableDropdowns = document.querySelectorAll('.editable-dropdown[data-field="whoCanHelp"]');
+        
+        // Get unique who-can-help values from tasks (excluding empty values)
+        const whoCanHelpValues = [...new Set(
+            this.tasks
+                .map(task => task['Who Can Help'] || task.whoCanHelp)
+                .filter(value => value && value.trim() !== '')
+                .map(value => value.trim())
+        )].sort(); // Alphabetical sorting
+        
+        editableDropdowns.forEach(dropdown => {
+            const currentValue = dropdown.value;
+            const isEmptyValue = !currentValue || currentValue === 'Click to set...';
+            
+            // Clear existing options except current value and "Other"
+            const existingOptions = Array.from(dropdown.options);
+            existingOptions.forEach(option => {
+                if (option.value !== currentValue && option.value !== 'Other') {
+                    option.remove();
+                }
+            });
+            
+            // For empty values, replace the placeholder option
+            if (isEmptyValue) {
+                dropdown.innerHTML = '<option value="">Click to set...</option><option value="Other">Other</option>';
+            }
+            
+            // Add dynamic options before "Other"
+            const otherOption = dropdown.querySelector('option[value="Other"]');
+            whoCanHelpValues.forEach(value => {
+                if (value !== currentValue) {
+                    const option = document.createElement('option');
+                    option.value = value;
+                    option.textContent = value;
+                    dropdown.insertBefore(option, otherOption);
+                }
+            });
+        });
     }
 
     populateFormDropdowns() {
