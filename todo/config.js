@@ -18,7 +18,7 @@ window.CHECKLIST_CONFIG = {
     appsScriptUrl: 'https://script.google.com/macros/s/AKfycbycobzIubmEzjq0_PhqA34reM4eVnZiFxSpiz9CnLSma48azXvZb5ICpa4N2id2Uyg/exec',
     
     // Auto-refresh interval (30 seconds = 30000 milliseconds)
-    refreshInterval: 30000,
+    refreshInterval: 60000,
     
     // Maximum retry attempts for failed requests
     maxRetries: 3

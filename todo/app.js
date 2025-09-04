@@ -10,7 +10,7 @@ class GoogleSheetsChecklist {
             sheetId: '1ziPiBhIYXTgVvs2HVokZQrFPjYdF9w-wcO9ivPwpgag',
             gid: '1860137714',
             appsScriptUrl: 'YOUR_APPS_SCRIPT_WEB_APP_URL_HERE',
-            refreshInterval: 120000, // 2 minutes instead of 30 seconds
+            refreshInterval: 60000, // 1 minute instead of 2 minutes
             maxRetries: 3
         };
         
@@ -387,8 +387,8 @@ class GoogleSheetsChecklist {
                 // Update was successful
                 this.updateSyncStatus('✅ Task Updated');
                 
-                // Refresh data to ensure consistency (reduced frequency)
-                setTimeout(() => this.loadFromSheet(), 5000);
+                // Refresh data to ensure consistency
+                setTimeout(() => this.loadFromSheet(), 1000);
                 
             } catch (error) {
                 console.error('Error updating task:', error);
