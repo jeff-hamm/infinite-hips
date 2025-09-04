@@ -1,5 +1,46 @@
 // Header component for Infinite Hips website
+function getBasePath() {
+    // Check if a <base> tag exists and use it
+    const baseElement = document.querySelector('base[href]');
+    if (baseElement) {
+        const baseHref = baseElement.getAttribute('href');
+        // If base href is already set, use it as-is
+        return baseHref.endsWith('/') ? baseHref : baseHref + '/';
+    }
+    
+    // Fallback: Determine the base path based on current location
+    const path = window.location.pathname;
+    if (path.includes('/docs/') || path.includes('/todo/') || path.includes('/pt-search/')) {
+        return '../';
+    }
+    return '';
+}
+
 function createSiteHeader() {
+    const basePath = getBasePath();
+    const currentPath = window.location.pathname;
+    
+    // Define all quick links
+    const allLinks = [
+        { href: `${basePath}todo/index.html`, text: '📋 Help Out!', pathCheck: '/todo/' },
+        { href: `${basePath}docs/surgery-timeline-overview.html`, text: '📅 Recovery Timeline', pathCheck: 'surgery-timeline-overview' },
+        { href: `${basePath}docs/pre-surgery-checklist.html`, text: '✅ Pre-Surgery Checklist', pathCheck: 'pre-surgery-checklist' },
+        { href: `${basePath}pt-search/index.html`, text: '🔍 Physical Therapy Search', pathCheck: '/pt-search/' }
+    ];
+    
+    // Filter out the current page
+    const visibleLinks = allLinks.filter(link => !currentPath.includes(link.pathCheck));
+    
+    // Only show the Quick Access section if there are links to display
+    const quickAccessSection = visibleLinks.length > 0 ? `
+        <div class="section">
+            <h2>📋 Quick Access</h2>
+            <div class="quick-links">
+                ${visibleLinks.map(link => `<a href="${link.href}">${link.text}</a>`).join('')}
+            </div>
+        </div>
+    ` : '';
+    
     const headerHTML = `
         <div class="header" style="margin-bottom: 1rem;">
             <h1>🦘🪞 Infinite Hips Surgery Information</h1>
@@ -7,6 +48,7 @@ function createSiteHeader() {
             <p> Scripps Clinic | September 12, 2025 at 7:30am</p>
             <p id="countdown-timer" style="display: none;"></p>
         </div>
+        ${quickAccessSection}
     `;
     return headerHTML;
 }

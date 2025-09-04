@@ -43,23 +43,20 @@
 
     <div class="header">
         <h1>📋 Jumper's To-Do List</h1>
+        <div id="progress-bar" style="background: #30363d; border-radius: 10px; height: 8px; margin: 12px 0;">
+            <div id="progress-fill" style="background: #ff69b4; height: 100%; border-radius: 10px; width: 0%; transition: width 0.3s ease;"></div>
+        </div>
+        <div id="progress-text" style="font-size: 14px; color: #7d8590;">Loading tasks...</div>
+        <p style="margin-top: 12px;">
+            
+            <a href="https://docs.google.com/spreadsheets/d/1ziPiBhIYXTgVvs2HVokZQrFPjYdF9w-wcO9ivPwpgag/edit?usp=sharing" 
+                target="_blank" class="sheet-link">📝 Edit in Google Sheets</a>
+        </p>
     </div>
 
     <div class="container">
         <h1></h1>
         
-        <div class="shared-info">
-            <p>This checklist syncs with our shared Google Sheet. Check off items below or edit directly in the sheet.</p>
-            <div id="progress-bar" style="background: #30363d; border-radius: 10px; height: 8px; margin: 12px 0;">
-                <div id="progress-fill" style="background: #ff69b4; height: 100%; border-radius: 10px; width: 0%; transition: width 0.3s ease;"></div>
-            </div>
-            <div id="progress-text" style="font-size: 14px; color: #7d8590;">Loading tasks...</div>
-            <p style="margin-top: 12px;">
-                
-                <a href="https://docs.google.com/spreadsheets/d/1ziPiBhIYXTgVvs2HVokZQrFPjYdF9w-wcO9ivPwpgag/edit?usp=sharing" 
-                   target="_blank" class="sheet-link">📝 Edit in Google Sheets</a>
-            </p>
-        </div>
 
         <div class="filter-buttons" id="filter-buttons" style="display: none;">
             <!-- Filter buttons will be dynamically generated here -->
