@@ -36,7 +36,7 @@ class GoogleSheetsChecklist {
         this.useAppsScript = this.appsScriptUrl && this.appsScriptUrl !== 'YOUR_APPS_SCRIPT_WEB_APP_URL_HERE';
         this.retryCount = 0;
         this.isInitialLoad = true;
-        this.currentFilter = 'all'; // Load saved filter or default to showing all incomplete tasks
+        this.currentFilter = 'all'; // Always default to 'all' on page refresh
         this.init();
     }
 
@@ -1863,18 +1863,23 @@ class GoogleSheetsChecklist {
         filterContainer.innerHTML = buttonsHtml;
         filterContainer.style.display = 'flex';
 
-        // Restore saved filter or default to the first button
-        const savedFilter = this.getSavedFilter();
+        // On initial load, always default to 'all'. During data syncs, restore saved filter or current filter
         let activeButton = null;
         
-        if (savedFilter) {
-            // Try to find button matching saved filter
-            activeButton = filterContainer.querySelector(`[data-filter="${savedFilter}"]`);
+        if (this.isInitialLoad) {
+            // On page refresh/initial load, always start with 'all'
+            activeButton = filterContainer.querySelector('[data-filter="all"]');
+        } else {
+            // During data syncs, try to restore the current filter first, then saved filter
+            const filterToRestore = this.currentFilter || this.getSavedFilter();
+            if (filterToRestore) {
+                activeButton = filterContainer.querySelector(`[data-filter="${filterToRestore}"]`);
+            }
         }
         
-        // If no saved filter or saved filter button not found, use first button
+        // If no active button found, default to 'all'
         if (!activeButton) {
-            activeButton = filterContainer.querySelector('.filter-btn');
+            activeButton = filterContainer.querySelector('[data-filter="all"]');
         }
         
         if (activeButton) {
