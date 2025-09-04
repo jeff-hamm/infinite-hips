@@ -25,8 +25,3 @@ highlighter: rouge
 
 # Social links
 github_username: jeff-hamm
-
-# Build settings
-exclude:
-  - "*.jpg"
-  - "*.csv"
