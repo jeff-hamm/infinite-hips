@@ -198,7 +198,8 @@ class GoogleSheetsChecklist {
                         text: taskText,
                         completed: completed === 'true' || completed === '✓' || completed === 'yes' || completed === '1',
                         timeline: columnMap.timeline >= 0 ? columns[columnMap.timeline]?.trim() || 'General' : 'General',
-                        priority: columnMap.priority >= 0 ? columns[columnMap.priority]?.toLowerCase().trim() || 'medium' : 'medium',
+                        priority: columnMap.priority >= 0 ? 
+                            (columns[columnMap.priority]?.toLowerCase().replace(/^\d+\s*-\s*/, '').trim() || 'medium') : 'medium',
                         category: columnMap.category >= 0 ? columns[columnMap.category]?.trim() || '' : '',
                         how: columnMap.how >= 0 ? columns[columnMap.how]?.trim() || '' : '',
                         notes: columnMap.notes >= 0 ? columns[columnMap.notes]?.trim() || '' : '',
@@ -471,9 +472,14 @@ class GoogleSheetsChecklist {
                 if (a.completed !== b.completed) {
                     return a.completed ? 1 : -1;
                 }
-                // Then by priority
-                const aPriority = priorityOrder[a.priority?.toLowerCase().trim()] ?? 4;
-                const bPriority = priorityOrder[b.priority?.toLowerCase().trim()] ?? 4;
+                // Then by priority - clean the priority values to handle formats like "1- Critical"
+                const cleanAPriority = a.priority ? 
+                    a.priority.toLowerCase().replace(/^\d+\s*-\s*/, '').trim() : '';
+                const cleanBPriority = b.priority ? 
+                    b.priority.toLowerCase().replace(/^\d+\s*-\s*/, '').trim() : '';
+                
+                const aPriority = priorityOrder[cleanAPriority] ?? 4;
+                const bPriority = priorityOrder[cleanBPriority] ?? 4;
                 return aPriority - bPriority;
             });
 
