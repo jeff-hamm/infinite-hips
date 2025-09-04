@@ -474,8 +474,8 @@ class GoogleSheetsChecklist {
             });
 
             // Add timeline group header
-            html += `<div class="timeline-group">`;
-            html += `<div class="timeline-title">${timeline}</div>`;
+            html += `<div class="section timeline-group-old">`;
+            html += `<h2 class="timeline-title-old">${timeline}</h2>`;
 
             tasks.forEach(task => {
                 // Extract clean priority value from formats like "1- Critical" or "3 - Medium"
