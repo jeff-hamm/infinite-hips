@@ -83,7 +83,7 @@ class GoogleSheetsChecklist {
         document.getElementById('refresh-btn').addEventListener('click', () => this.loadFromSheet());
         
         // Add task form event listeners
-        document.getElementById('add-item-btn').addEventListener('click', () => this.showAddTaskForm());
+        document.getElementById('add-item-btn').addEventListener('click', () => this.toggleAddTaskForm());
         document.getElementById('cancel-add-btn').addEventListener('click', () => this.hideAddTaskForm());
         document.getElementById('new-task-form').addEventListener('submit', (e) => this.handleAddTask(e));
         
@@ -1324,20 +1324,29 @@ class GoogleSheetsChecklist {
     }
 
     // Add Task Form Methods
-    showAddTaskForm() {
-        this.populateFormDropdowns();
-        document.getElementById('add-task-form').style.display = 'block';
+    toggleAddTaskForm() {
+        const addTaskForm = document.getElementById('add-task-form');
         
-        // Set default priority
-        document.getElementById('task-priority').value = '3 - Medium';
-        
-        // Pre-populate timeline if a timeline filter is currently selected
-        this.prePopulateTimelineFromFilter();
-        
-        // Pre-populate How field if a specific filter is selected
-        this.prePopulateHowFromFilter();
-        
-        document.getElementById('task-text').focus();
+        // Check if form is currently visible
+        if (addTaskForm.style.display === 'block') {
+            // Form is open, close it
+            this.hideAddTaskForm();
+        } else {
+            // Form is closed, open it
+            this.populateFormDropdowns();
+            addTaskForm.style.display = 'block';
+            
+            // Set default priority
+            document.getElementById('task-priority').value = '3 - Medium';
+            
+            // Pre-populate timeline if a timeline filter is currently selected
+            this.prePopulateTimelineFromFilter();
+            
+            // Pre-populate How field if a specific filter is selected
+            this.prePopulateHowFromFilter();
+            
+            document.getElementById('task-text').focus();
+        }
     }
 
     prePopulateTimelineFromFilter() {
@@ -2157,12 +2166,12 @@ class GoogleSheetsChecklist {
         filterContainer.innerHTML = buttonsHtml;
         filterContainer.style.display = 'flex';
 
-        // On initial load, always default to 'support-needed'. During data syncs, restore saved filter or current filter
+        // On initial load, always default to 'all'. During data syncs, restore saved filter or current filter
         let activeButton = null;
         
         if (this.isInitialLoad) {
-            // On page refresh/initial load, always start with 'support-needed'
-            activeButton = filterContainer.querySelector('[data-filter="support-needed"]');
+            // On page refresh/initial load, always start with 'all'
+            activeButton = filterContainer.querySelector('[data-filter="all"]');
         } else {
             // During data syncs, try to restore the current filter first, then saved filter
             const filterToRestore = this.currentFilter || this.getSavedFilter();
@@ -2171,9 +2180,9 @@ class GoogleSheetsChecklist {
             }
         }
         
-        // If no active button found, default to 'support-needed'
+        // If no active button found, default to 'all'
         if (!activeButton) {
-            activeButton = filterContainer.querySelector('[data-filter="support-needed"]');
+            activeButton = filterContainer.querySelector('[data-filter="all"]');
         }
         
         if (activeButton) {
