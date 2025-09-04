@@ -491,13 +491,37 @@ class GoogleSheetsChecklist {
         sortedTimelines.forEach(timeline => {
             const tasks = timelineGroups[timeline];
             
-            // Sort tasks within timeline by priority (critical -> high -> medium -> low), then by completion status
+            // Sort tasks within timeline by: 1) raw timeline, 2) priority, 3) todo text
             const priorityOrder = { 'critical': 0, 'high': 1, 'medium': 2, 'low': 3, '': 4 };
             tasks.sort((a, b) => {
                 // First sort by completion (incomplete first)
                 if (a.completed !== b.completed) {
                     return a.completed ? 1 : -1;
                 }
+                
+                // Then by raw timeline field (for "Before Surgery" group, this handles "7 days before", "1 day before", etc.)
+                const aTimeline = a.timeline || '';
+                const bTimeline = b.timeline || '';
+                if (aTimeline !== bTimeline) {
+                    // For timeline comparison, try to extract numbers for "X days before" patterns
+                    const aMatch = aTimeline.match(/^(\d+)\s+days?\s+before/i);
+                    const bMatch = bTimeline.match(/^(\d+)\s+days?\s+before/i);
+                    
+                    if (aMatch && bMatch) {
+                        // Both are "X days before" - sort by number (ascending: 1 day, 7 days, 14 days)
+                        return parseInt(aMatch[1]) - parseInt(bMatch[1]);
+                    } else if (aMatch && !bMatch) {
+                        // A is "X days before", B is not - A comes first
+                        return -1;
+                    } else if (!aMatch && bMatch) {
+                        // B is "X days before", A is not - B comes first
+                        return 1;
+                    } else {
+                        // Neither is "X days before" - sort alphabetically
+                        return aTimeline.localeCompare(bTimeline);
+                    }
+                }
+                
                 // Then by priority - clean the priority values to handle formats like "1- Critical"
                 const cleanAPriority = a.priority ? 
                     a.priority.toLowerCase().replace(/^\d+\s*-\s*/, '').trim() : '';
@@ -506,7 +530,14 @@ class GoogleSheetsChecklist {
                 
                 const aPriority = priorityOrder[cleanAPriority] ?? 4;
                 const bPriority = priorityOrder[cleanBPriority] ?? 4;
-                return aPriority - bPriority;
+                if (aPriority !== bPriority) {
+                    return aPriority - bPriority;
+                }
+                
+                // Finally by todo text (alphabetically)
+                const aText = a.text || '';
+                const bText = b.text || '';
+                return aText.localeCompare(bText);
             });
 
             // Add timeline group header
