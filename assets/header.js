@@ -1,7 +1,7 @@
 // Header component for Infinite Hips website
 function createSiteHeader() {
     const headerHTML = `
-        <div class="header" style="border-bottom: 1px solid #30363d; margin-bottom: 1rem;">
+        <div class="header" style="margin-bottom: 1rem;">
             <h1>🦘🪞 Infinite Hips Surgery Information</h1>
             <p> Hip Replacement Surgery with Dr. Jeffrey Wilde</p>
             <p> Scripps Clinic | September 12, 2025 at 7:30am</p>
