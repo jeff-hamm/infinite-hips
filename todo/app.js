@@ -525,21 +525,6 @@ class GoogleSheetsChecklist {
                         html += `<div class="detail-item"><span class="detail-icon">📂</span><span class="detail-label">Category:</span> ${this.escapeHtml(task.category)}</div>`;
                     }
                     
-                    // Always show Who Can Help field (editable)
-                    const whoCanHelpValue = task.whoCanHelp || '';
-                    const displayValue = whoCanHelpValue || 'Click to set...';
-                    html += `<div class="detail-item">
-                        <span class="detail-icon">👥</span>
-                        <span class="detail-label">Who Can Help:</span> 
-                        <div class="editable-field-container">
-                            <select class="editable-dropdown" data-task-id="${task.id}" data-field="whoCanHelp" onchange="sheetsChecklist.handleWhoCanHelpChange(this)">
-                                <option value="${this.escapeHtml(whoCanHelpValue)}">${this.escapeHtml(displayValue)}</option>
-                                <option value="Other">Other</option>
-                            </select>
-                            <input type="text" class="editable-other-input" style="display: none; margin-top: 8px;" placeholder="Enter who can help..." onblur="sheetsChecklist.updateWhoCanHelpField(this)" data-task-id="${task.id}">
-                        </div>
-                    </div>`;
-                    
                     if (task.how) {
                         html += `<div class="detail-item"><span class="detail-icon">🔧</span><span class="detail-label">How:</span> ${this.escapeHtml(task.how)}</div>`;
                     }
@@ -548,6 +533,21 @@ class GoogleSheetsChecklist {
                         const notesContent = this.linkifyUrls(task.notes);
                         html += `<div class="detail-item"><span class="detail-icon">📝</span><span class="detail-label">Notes:</span> ${notesContent}</div>`;
                     }
+                    
+                    // Always show Helper field last (editable)
+                    const whoCanHelpValue = task.whoCanHelp || '';
+                    const displayValue = whoCanHelpValue || '';
+                    html += `<div class="detail-item">
+                        <span class="detail-icon">🤝</span>
+                        <span class="detail-label">Helper:</span> 
+                        <div class="editable-field-container">
+                            <select class="editable-dropdown" data-task-id="${task.id}" data-field="whoCanHelp" onchange="sheetsChecklist.handleWhoCanHelpChange(this)">
+                                <option value="${this.escapeHtml(whoCanHelpValue)}">${this.escapeHtml(displayValue)}</option>
+                                <option value="Other">Other</option>
+                            </select>
+                            <input type="text" class="editable-other-input" style="display: none; margin-top: 8px;" placeholder="Enter helper name..." onblur="sheetsChecklist.updateWhoCanHelpField(this)" data-task-id="${task.id}">
+                        </div>
+                    </div>`;
                     
                     html += `</div>`;
                 }

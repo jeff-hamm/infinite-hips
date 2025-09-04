@@ -403,7 +403,6 @@
 /* Editable Detail Field Styles */
 .editable-field-container {
     display: inline-block;
-    margin-left: 8px;
 }
 
 .editable-dropdown {
