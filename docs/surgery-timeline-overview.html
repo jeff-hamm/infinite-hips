@@ -316,15 +316,6 @@
             📊 This timeline combines your medical documents, Google Sheets tasks, and general hip replacement research
         </div>
 
-        <div class="timeline-header">
-            <div class="surgery-date">Hip Replacement Surgery</div>
-            <div class="surgery-date">September 12, 2025 • 7:30am Check-in</div>
-            <div class="countdown" id="countdown">Loading countdown...</div>
-            <div style="margin-top: 12px; font-size: var(--font-size-text-medium); color: var(--color-text-light);">
-                Dr. Jeffrey Wilde • Scripps Mission Valley
-            </div>
-        </div>
-
         <div class="key-dates">
             <h3>🗓️ Key Dates</h3>
             <div class="date-item">
@@ -670,12 +661,8 @@
 
         // Initialize timeline
         function initializeTimeline() {
-            updateCountdown();
             generateTimelinePhases();
-            
-            // Update countdown every minute
-            setInterval(updateCountdown, 60000);
-            
+                        
             // Add click handlers for phase headers
             document.addEventListener('click', (e) => {
                 if (e.target.closest('.phase-header')) {
@@ -692,29 +679,6 @@
                     }
                 }
             });
-        }
-
-        function updateCountdown() {
-            const now = new Date();
-            const timeDiff = surgeryDate - now;
-            const countdownEl = document.getElementById('countdown');
-            
-            if (timeDiff > 0) {
-                const days = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
-                const hours = Math.floor((timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                
-                if (days > 0) {
-                    countdownEl.textContent = `${days} days, ${hours} hours until surgery`;
-                } else if (hours > 0) {
-                    countdownEl.textContent = `${hours} hours until surgery`;
-                } else {
-                    const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
-                    countdownEl.textContent = `${minutes} minutes until surgery`;
-                }
-            } else {
-                const daysSince = Math.floor(-timeDiff / (1000 * 60 * 60 * 24));
-                countdownEl.textContent = `Surgery was ${daysSince} days ago`;
-            }
         }
 
         function generateTimelinePhases() {
