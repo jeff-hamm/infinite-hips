@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Surgery Checklist - Infinite Hips</title>
+    <title>Infinite Hips - HELP!</title>
     <link rel="stylesheet" href="../assets/dark-theme.css">
     <link rel="stylesheet" href="styles.css">
     <link rel="icon" type="image/png" href="../assets/favicon.png">
@@ -11,47 +11,29 @@
     <script src="../assets/header.js"></script>
     
     <!-- 🔧 CONFIGURATION OPTIONS -->
-    <!-- Option 1: External config file (recommended for cleaner HTML) -->
     <script src="config.js"></script>
-    
-    <!-- Option 2: Inline config (uncomment to override config.js) -->
-    <!--
-    <script>
-        window.CHECKLIST_CONFIG = {
-            // Google Sheets configuration
-            sheetId: '1ziPiBhIYXTgVvs2HVokZQrFPjYdF9w-wcO9ivPwpgag',
-            gid: '1860137714',
-            
-            // Apps Script URL for bidirectional sync
-            appsScriptUrl: 'https://script.google.com/macros/s/AKfycbycobzIubmEzjq0_PhqA34reM4eVnZiFxSpiz9CnLSma48azXvZb5ICpa4N2id2Uyg/exec',
-            
-            // Auto-refresh interval (milliseconds)
-            refreshInterval: 30000,
-            
-            // Maximum retry attempts
-            maxRetries: 3
-        };
-    </script>
-    -->
 </head>
 <body>
     <div id="header-container"></div>
     
-    <div class="nav">
-        <a href="../index.html">← Back to Main Index</a>
-    </div>
-
-    <div class="header">
-        <h1>📋 Jumper's To-Do List</h1>
+    <div class="section">
+        <div class="header-with-sync">
+            <h2>📋 Jumper's To-Do List</h2>
+        </div>
         <div id="progress-bar" style="background: #30363d; border-radius: 10px; height: 8px; margin: 12px 0;">
             <div id="progress-fill" style="background: #ff69b4; height: 100%; border-radius: 10px; width: 0%; transition: width 0.3s ease;"></div>
         </div>
-        <div id="progress-text" style="font-size: 14px; color: #7d8590;">Loading tasks...</div>
-        <p style="margin-top: 12px;">
-            
-            <a href="https://docs.google.com/spreadsheets/d/1ziPiBhIYXTgVvs2HVokZQrFPjYdF9w-wcO9ivPwpgag/edit?usp=sharing" 
-                target="_blank" class="sheet-link">📝 Edit in Google Sheets</a>
-        </p>
+
+    <!-- Floating sync status - child of body -->
+    <div id="sync-status" class="sync-status">
+        <button id="add-item-btn" class="floating-add-btn">
+            <span class="btn-text-full">+ Add New Task</span>
+            <span class="btn-text-mobile">+</span>
+        </button>
+        <div id="progress-text" class="progress-text">Loading tasks...</div>
+        <a href="https://docs.google.com/spreadsheets/d/1ziPiBhIYXTgVvs2HVokZQrFPjYdF9w-wcO9ivPwpgag/edit?usp=sharing" 
+            target="_blank" class="sheet-link">📝 Edit in Google Sheets</a>
+        <div id="sync-status-text" class="sync-status-text" style="display: none;"></div>
     </div>
 
     <div class="container">
@@ -60,12 +42,6 @@
 
         <div class="filter-buttons" id="filter-buttons" style="display: none;">
             <!-- Filter buttons will be dynamically generated here -->
-        </div>
-
-        <div class="controls">
-            <button id="add-item-btn" class="add-item-btn">✚ Add New Task</button>
-            <button id="refresh-btn" class="refresh-btn">🔄 Refresh from Sheet</button>
-            <div id="last-sync" style="color: #7d8590; font-size: 12px;">Never synced</div>
         </div>
 
         <!-- Add Task Form -->
@@ -174,9 +150,6 @@
             <!-- Tasks will be dynamically loaded here -->
         </div>
     </div>
-
-    <div id="sync-status" class="sync-status">
-        📊 Google Sheets
     </div>
 
     <script src="app.js"></script>

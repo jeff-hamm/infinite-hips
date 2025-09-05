@@ -20,6 +20,12 @@ function createSiteHeader() {
     const basePath = getBasePath();
     const currentPath = window.location.pathname;
     
+    // Check if we're at the main homepage (base path or base path + index.html)
+    const isHomePage = currentPath === '/' || 
+                      currentPath === '/index.html' || 
+                      currentPath === basePath || 
+                      currentPath === basePath + 'index.html';
+    
     // Define all quick links
     const allLinks = [
         { href: `${basePath}todo/index.html`, text: '📋 Help Out!', pathCheck: '/todo/' },
@@ -41,6 +47,19 @@ function createSiteHeader() {
         </div>
     ` : '';
     
+    // Show navigation with collapsible quick access when not on homepage
+    const navigationSection = visibleLinks.length > 0 ? `
+        <div class="nav">
+            ${!isHomePage ? `<a href="${basePath}index.html">← Back to Main Index</a>` : ''}
+            ${!isHomePage ? `
+                <button id="quick-access-toggle" class="quick-access-toggle">📋 Quick Access ▼</button>
+                <div id="quick-access-dropdown" class="quick-access-dropdown" style="display: none;">
+                    ${visibleLinks.map(link => `<a href="${link.href}">${link.text}</a>`).join('')}
+                </div>
+            ` : ''}
+        </div>
+    ` : '';
+    
     const headerHTML = `
         <div class="header" style="margin-bottom: 1rem;">
             <h1>🦘🪞 Infinite Hips Surgery Information</h1>
@@ -48,7 +67,7 @@ function createSiteHeader() {
             <p> Scripps Clinic | September 12, 2025 at 7:30am</p>
             <p id="countdown-timer" style="display: none;"></p>
         </div>
-        ${quickAccessSection}
+        ${!isHomePage ? navigationSection : quickAccessSection}
     `;
     return headerHTML;
 }
@@ -99,6 +118,26 @@ function initializeHeader() {
     const headerContainer = document.getElementById('header-container');
     if (headerContainer) {
         headerContainer.innerHTML = createSiteHeader();
+        
+        // Add quick access toggle functionality
+        const quickAccessToggle = document.getElementById('quick-access-toggle');
+        const quickAccessDropdown = document.getElementById('quick-access-dropdown');
+        
+        if (quickAccessToggle && quickAccessDropdown) {
+            quickAccessToggle.addEventListener('click', () => {
+                const isVisible = quickAccessDropdown.style.display !== 'none';
+                quickAccessDropdown.style.display = isVisible ? 'none' : 'block';
+                quickAccessToggle.textContent = isVisible ? '📋 Quick Access ▼' : '📋 Quick Access ▲';
+            });
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!quickAccessToggle.contains(e.target) && !quickAccessDropdown.contains(e.target)) {
+                    quickAccessDropdown.style.display = 'none';
+                    quickAccessToggle.textContent = '📋 Quick Access ▼';
+                }
+            });
+        }
     }
     
     // Start countdown timer

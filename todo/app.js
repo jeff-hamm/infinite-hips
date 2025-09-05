@@ -92,7 +92,7 @@ class GoogleSheetsChecklist {
 
     init() {
         // Event listeners
-        document.getElementById('refresh-btn').addEventListener('click', () => this.loadFromSheet());
+        // Note: refresh-btn is now dynamically created, event listener added in renderFilterButtons
         
         // Add task form event listeners
         document.getElementById('add-item-btn').addEventListener('click', () => this.toggleAddTaskForm());
@@ -1380,7 +1380,7 @@ class GoogleSheetsChecklist {
         }
         
         if (progressText) {
-            progressText.textContent = `${completedTasks} of ${totalTasks} tasks completed (${Math.round(percentage)}%)`;
+            progressText.textContent = `${completedTasks} of ${totalTasks} completed (${Math.round(percentage)}%)`;
         }
     }
 
@@ -1416,21 +1416,50 @@ class GoogleSheetsChecklist {
             // Form is open, close it
             this.hideAddTaskForm();
         } else {
-            // Form is closed, open it
-            this.populateFormDropdowns();
-            addTaskForm.style.display = 'block';
-            
-            // Set default priority
-            document.getElementById('task-priority').value = '3 - Medium';
-            
-            // Pre-populate timeline if a timeline filter is currently selected
-            this.prePopulateTimelineFromFilter();
-            
-            // Pre-populate How field if a specific filter is selected
-            this.prePopulateHowFromFilter();
-            
-            document.getElementById('task-text').focus();
+            // Form is closed, open it as modal
+            this.showAddTaskModal();
         }
+    }
+
+    showAddTaskModal() {
+        // Create backdrop
+        let backdrop = document.getElementById('modal-backdrop');
+        if (!backdrop) {
+            backdrop = document.createElement('div');
+            backdrop.id = 'modal-backdrop';
+            backdrop.className = 'modal-backdrop';
+            document.body.appendChild(backdrop);
+        }
+        backdrop.style.display = 'block';
+        
+        // Add modal-open class to button
+        const addButton = document.getElementById('add-item-btn');
+        if (addButton) {
+            addButton.classList.add('modal-open');
+        }
+        
+        // Show form
+        const addTaskForm = document.getElementById('add-task-form');
+        this.populateFormDropdowns();
+        addTaskForm.style.display = 'block';
+        
+        // Set default priority
+        document.getElementById('task-priority').value = '3 - Medium';
+        
+        // Pre-populate timeline if a timeline filter is currently selected
+        this.prePopulateTimelineFromFilter();
+        
+        // Pre-populate How field if a specific filter is selected
+        this.prePopulateHowFromFilter();
+        
+        // Close modal when clicking backdrop
+        backdrop.addEventListener('click', () => this.hideAddTaskForm());
+        
+        // Prevent form clicks from closing modal
+        addTaskForm.addEventListener('click', (e) => e.stopPropagation());
+        
+        // Focus the first input
+        document.getElementById('task-text').focus();
     }
 
     prePopulateTimelineFromFilter() {
@@ -1846,6 +1875,18 @@ class GoogleSheetsChecklist {
         document.getElementById('add-task-form').style.display = 'none';
         document.getElementById('new-task-form').reset();
         
+        // Remove modal-open class from button
+        const addButton = document.getElementById('add-item-btn');
+        if (addButton) {
+            addButton.classList.remove('modal-open');
+        }
+        
+        // Hide backdrop
+        const backdrop = document.getElementById('modal-backdrop');
+        if (backdrop) {
+            backdrop.style.display = 'none';
+        }
+        
         // Reset priority to default value after form reset
         document.getElementById('task-priority').value = '3 - Medium';
         
@@ -1998,12 +2039,22 @@ class GoogleSheetsChecklist {
     }
 
     updateSyncStatus(status) {
-        const syncStatus = document.getElementById('sync-status');
-        syncStatus.textContent = status;
-        
-        setTimeout(() => {
-            syncStatus.textContent = '📊 Google Sheets';
-        }, 3000);
+        const syncStatusText = document.getElementById('sync-status-text');
+        if (syncStatusText) {
+            syncStatusText.textContent = status;
+            syncStatusText.style.display = 'block';
+            
+            // Hide status text after 3 seconds
+            setTimeout(() => {
+                syncStatusText.style.display = 'none';
+            }, 3000);
+        }
+
+        // Also update the last-sync element in the filter buttons area
+        const lastSyncElement = document.getElementById('last-sync');
+        if (lastSyncElement) {
+            lastSyncElement.textContent = status;
+        }
     }
 
     // Additional Apps Script methods for enhanced functionality
@@ -2267,9 +2318,15 @@ class GoogleSheetsChecklist {
             buttonsHtml += `<button class="filter-btn" data-filter="${safeTimeline}">${timeline}</button>`;
         });
 
-        // Add completed items checkbox at the bottom
+        // Add completed items checkbox and refresh button at the bottom
         buttonsHtml += '<div style="flex-basis: 100%; height: 0;"></div>';
-        buttonsHtml += '<div style="margin-top: 10px;"><label style="color: var(--color-text); font-size: 14px; cursor: pointer;"><input type="checkbox" id="show-completed-checkbox" style="margin-right: 8px;"> Show Completed Items</label></div>';
+        buttonsHtml += '<div style="margin-top: 10px; display: flex; justify-content: space-between; align-items: center;">';
+        buttonsHtml += '<label style="color: var(--color-text); font-size: 14px; cursor: pointer;" class="show-completed-label"><input type="checkbox" id="show-completed-checkbox" style="margin-right: 8px;"> Show Completed Items</label>';
+        buttonsHtml += '<div style="display: flex; align-items: center; gap: 12px;">';
+        buttonsHtml += '<button id="refresh-btn" class="refresh-btn-inline" style="display: flex; align-items: center; gap: 6px; background: none; border: none; color: var(--color-text); cursor: pointer; font-size: 14px; padding: 4px 8px; border-radius: 4px; transition: all 0.3s ease;"><span style="font-size: 16px;">↻</span>Refresh from sheet</button>';
+        buttonsHtml += '<div id="last-sync" style="color: #7d8590; font-size: 12px;">Never synced</div>';
+        buttonsHtml += '</div>';
+        buttonsHtml += '</div>';
 
         filterContainer.innerHTML = buttonsHtml;
         filterContainer.style.display = 'flex';
@@ -2316,6 +2373,12 @@ class GoogleSheetsChecklist {
                 this.showCompleted = e.target.checked;
                 this.applyFilter(this.currentFilter);
             });
+        }
+
+        // Add event listener for the refresh button
+        const refreshBtn = filterContainer.querySelector('#refresh-btn');
+        if (refreshBtn) {
+            refreshBtn.addEventListener('click', () => this.loadFromSheet());
         }
     }
 
@@ -2417,14 +2480,60 @@ class GoogleSheetsChecklist {
     }
 }
 
+// Handle sync status visibility based on first todo item scroll position
+function handleSyncStatusVisibility() {
+    const syncStatus = document.querySelector('.sync-status');
+    
+    if (!syncStatus) return;
+    
+    function updateSyncStatusVisibility() {
+        const firstTodoItem = document.querySelector('.todo-item');
+        
+        if (!firstTodoItem) {
+            // No todo items yet, hide sync status
+            syncStatus.classList.remove('visible');
+            return;
+        }
+        
+        const firstItemRect = firstTodoItem.getBoundingClientRect();
+        const scrollY = window.scrollY;
+        
+        // Show sync status when first todo item is scrolled into view or we've scrolled past it
+        if (firstItemRect.top <= window.innerHeight || scrollY > 100) {
+            syncStatus.classList.add('visible');
+        } else {
+            syncStatus.classList.remove('visible');
+        }
+    }
+    
+    // Update on scroll and resize
+    window.addEventListener('scroll', updateSyncStatusVisibility);
+    window.addEventListener('resize', updateSyncStatusVisibility);
+    
+    // Also update when tasks are loaded/refreshed
+    const observer = new MutationObserver(() => {
+        setTimeout(updateSyncStatusVisibility, 100); // Small delay to ensure rendering
+    });
+    
+    const todoList = document.querySelector('#todo-list');
+    if (todoList) {
+        observer.observe(todoList, { childList: true, subtree: true });
+    }
+    
+    // Initial check
+    setTimeout(updateSyncStatusVisibility, 500); // Delay to ensure initial load
+}
+
 // Initialize the Google Sheets checklist when DOM is loaded
 if (typeof window !== 'undefined') {
     // Initialize when DOM is ready
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', () => {
             window.sheetsChecklist = new GoogleSheetsChecklist();
+            handleSyncStatusVisibility();
         });
     } else {
         window.sheetsChecklist = new GoogleSheetsChecklist();
+        handleSyncStatusVisibility();
     }
 }

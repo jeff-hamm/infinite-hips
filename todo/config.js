@@ -23,3 +23,21 @@ window.CHECKLIST_CONFIG = {
     // Maximum retry attempts for failed requests
     maxRetries: 3
 };
+
+    // <!-- Option 2: Inline config (uncomment to override config.js) -->
+    // <script>
+    //     window.CHECKLIST_CONFIG = {
+    //         // Google Sheets configuration
+    //         sheetId: '1ziPiBhIYXTgVvs2HVokZQrFPjYdF9w-wcO9ivPwpgag',
+    //         gid: '1860137714',
+            
+    //         // Apps Script URL for bidirectional sync
+    //         appsScriptUrl: 'https://script.google.com/macros/s/AKfycbycobzIubmEzjq0_PhqA34reM4eVnZiFxSpiz9CnLSma48azXvZb5ICpa4N2id2Uyg/exec',
+            
+    //         // Auto-refresh interval (milliseconds)
+    //         refreshInterval: 30000,
+            
+    //         // Maximum retry attempts
+    //         maxRetries: 3
+    //     };
+    // </script>
