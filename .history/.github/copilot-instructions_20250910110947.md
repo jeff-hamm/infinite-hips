@@ -68,13 +68,9 @@ Each medical document exists in 4 formats:
 
 ### Terminal Commands
 - **Batch operations preferred** - Use `&&` to chain commands
-- **Reduce confirmations** - Combine multiple operations into single commands
+- **Reduce confirmations** - Combine multiple operations
 - **Always use absolute paths**
 - **Clean up metadata files** - Remove `._*` files after operations
-- **Multiple file operations** - Use wildcards and loops when possible
-- **Delete operations** - Batch all deletions: `Remove-Item "file1" -Force && Remove-Item "file2" -Force`
-- **Git operations** - Chain git commands: `git add . && git commit -m "message" && git push`
-- **System file cleanup** - Always remove .DS_Store, Thumbs.db, and other system files in batches
 
 ### Code Editing
 - **Preserve medical accuracy** - Never alter medical information
