@@ -108,7 +108,7 @@ class GoogleSheetsChecklist {
         // Initialize date picker
         this.initializeDatePicker();
         
-        // Date toggle buttons for task form
+        // Date toggle buttons
         document.getElementById('single-date-btn').addEventListener('click', () => this.setDatePickerMode('single'));
         document.getElementById('date-range-btn').addEventListener('click', () => this.setDatePickerMode('range'));
 
@@ -2496,7 +2496,19 @@ class GoogleSheetsChecklist {
 
     // Date picker initialization and management
     initializeDatePicker() {
-        // Initialize task form date picker (in modal) with simple configuration
+        // Initialize global date filter picker (above modal)
+        this.globalDatePicker = flatpickr("#global-date-filter", {
+            mode: "single",
+            dateFormat: "Y-m-d",
+            allowInput: false,
+            theme: "dark",
+            position: "auto",
+            onChange: (selectedDates, dateStr, instance) => {
+                this.handleGlobalDateChange(selectedDates, dateStr, instance);
+            }
+        });
+        
+        // Initialize task form date picker (in modal)
         this.taskDatePicker = flatpickr("#task-date", {
             mode: "single",
             dateFormat: "Y-m-d",
@@ -2508,44 +2520,68 @@ class GoogleSheetsChecklist {
             }
         });
         
+        this.globalDateMode = 'single';
         this.taskDateMode = 'single';
     }
 
     setDatePickerMode(mode) {
-        // Update toggle button states for task form picker
-        document.getElementById('single-date-btn').classList.toggle('active', mode === 'single');
-        document.getElementById('date-range-btn').classList.toggle('active', mode === 'range');
+        // Update global date picker mode
+        this.setGlobalDatePickerMode(mode);
+    }
+
+    setGlobalDatePickerMode(mode) {
+        // Update toggle button states for global picker
+        document.getElementById('global-single-date-btn').classList.toggle('active', mode === 'single');
+        document.getElementById('global-date-range-btn').classList.toggle('active', mode === 'range');
         
-        // Update task datepicker mode
-        this.taskDatePicker.destroy();
-        this.taskDatePicker = flatpickr("#task-date", {
+        // Update global datepicker mode
+        this.globalDatePicker.destroy();
+        this.globalDatePicker = flatpickr("#global-date-filter", {
             mode: mode,
             dateFormat: "Y-m-d",
             allowInput: false,
             theme: "dark",
             position: "auto",
             onChange: (selectedDates, dateStr, instance) => {
-                this.handleTaskDateChange(selectedDates, dateStr, instance);
+                this.handleGlobalDateChange(selectedDates, dateStr, instance);
             }
         });
         
-        this.taskDateMode = mode;
+        this.globalDateMode = mode;
         
         // Clear current date value when switching modes
-        document.getElementById('task-date').value = '';
+        document.getElementById('global-date-filter').value = '';
+    }
+
+    handleGlobalDateChange(selectedDates, dateStr, instance) {
+        // Format the display value based on mode for global filter
+        if (this.globalDateMode === 'range' && selectedDates.length === 2) {
+            const startDate = selectedDates[0].toISOString().split('T')[0];
+            const endDate = selectedDates[1].toISOString().split('T')[0];
+            document.getElementById('global-date-filter').value = `${startDate} to ${endDate}`;
+        } else if (this.globalDateMode === 'single' && selectedDates.length === 1) {
+            document.getElementById('global-date-filter').value = selectedDates[0].toISOString().split('T')[0];
+        } else {
+            document.getElementById('global-date-filter').value = dateStr;
+        }
+        
+        // Apply date filter to tasks
+        this.applyDateFilter();
     }
 
     handleTaskDateChange(selectedDates, dateStr, instance) {
-        // Format the display value based on mode
-        if (this.taskDateMode === 'range' && selectedDates.length === 2) {
-            const startDate = selectedDates[0].toISOString().split('T')[0];
-            const endDate = selectedDates[1].toISOString().split('T')[0];
-            document.getElementById('task-date').value = `${startDate} to ${endDate}`;
-        } else if (this.taskDateMode === 'single' && selectedDates.length === 1) {
+        // Format the display value for task form (always single date)
+        if (selectedDates.length === 1) {
             document.getElementById('task-date').value = selectedDates[0].toISOString().split('T')[0];
         } else {
             document.getElementById('task-date').value = dateStr;
         }
+    }
+
+    applyDateFilter() {
+        // This will be called when the global date filter changes
+        // For now, just refresh the task display
+        this.displayTasks();
     }
 
     formatDateForDisplay(dateStr) {

@@ -108,9 +108,9 @@ class GoogleSheetsChecklist {
         // Initialize date picker
         this.initializeDatePicker();
         
-        // Date toggle buttons for task form
-        document.getElementById('single-date-btn').addEventListener('click', () => this.setDatePickerMode('single'));
-        document.getElementById('date-range-btn').addEventListener('click', () => this.setDatePickerMode('range'));
+        // Global date toggle buttons
+        document.getElementById('global-single-date-btn').addEventListener('click', () => this.setGlobalDatePickerMode('single'));
+        document.getElementById('global-date-range-btn').addEventListener('click', () => this.setGlobalDatePickerMode('range'));
 
         // Auto-refresh using configured interval
         setInterval(() => this.loadFromSheet(), this.refreshInterval);
@@ -2496,13 +2496,13 @@ class GoogleSheetsChecklist {
 
     // Date picker initialization and management
     initializeDatePicker() {
-        // Initialize task form date picker (in modal) with simple configuration
+        // Initialize task form date picker (in modal) with proper positioning
         this.taskDatePicker = flatpickr("#task-date", {
             mode: "single",
             dateFormat: "Y-m-d",
             allowInput: false,
             theme: "dark",
-            position: "auto",
+            position: "above center", // Position above the input to avoid modal overlap
             onChange: (selectedDates, dateStr, instance) => {
                 this.handleTaskDateChange(selectedDates, dateStr, instance);
             }
@@ -2523,7 +2523,7 @@ class GoogleSheetsChecklist {
             dateFormat: "Y-m-d",
             allowInput: false,
             theme: "dark",
-            position: "auto",
+            position: "above center", // Keep proper positioning
             onChange: (selectedDates, dateStr, instance) => {
                 this.handleTaskDateChange(selectedDates, dateStr, instance);
             }

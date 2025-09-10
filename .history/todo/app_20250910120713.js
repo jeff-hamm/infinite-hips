@@ -2496,7 +2496,7 @@ class GoogleSheetsChecklist {
 
     // Date picker initialization and management
     initializeDatePicker() {
-        // Initialize task form date picker (in modal) with simple configuration
+        // Initialize task form date picker (in modal) with custom positioning
         this.taskDatePicker = flatpickr("#task-date", {
             mode: "single",
             dateFormat: "Y-m-d",
@@ -2505,10 +2505,40 @@ class GoogleSheetsChecklist {
             position: "auto",
             onChange: (selectedDates, dateStr, instance) => {
                 this.handleTaskDateChange(selectedDates, dateStr, instance);
+            },
+            onOpen: (selectedDates, dateStr, instance) => {
+                this.positionDatePicker(instance);
             }
         });
         
         this.taskDateMode = 'single';
+    }
+
+    positionDatePicker(instance) {
+        // Custom positioning function to center the calendar
+        const calendar = instance.calendarContainer;
+        const input = instance.input;
+        
+        // Get viewport dimensions
+        const viewportWidth = window.innerWidth;
+        const viewportHeight = window.innerHeight;
+        
+        // Get calendar dimensions
+        const calendarWidth = calendar.offsetWidth;
+        const calendarHeight = calendar.offsetHeight;
+        
+        // Calculate center position
+        const left = (viewportWidth - calendarWidth) / 2;
+        const top = Math.max(50, (viewportHeight - calendarHeight) / 3); // Position in upper third
+        
+        // Apply positioning
+        calendar.style.position = 'fixed';
+        calendar.style.left = left + 'px';
+        calendar.style.top = top + 'px';
+        calendar.style.right = 'auto';
+        calendar.style.bottom = 'auto';
+        calendar.style.transform = 'none';
+        calendar.style.zIndex = '10000';
     }
 
     setDatePickerMode(mode) {
@@ -2523,9 +2553,14 @@ class GoogleSheetsChecklist {
             dateFormat: "Y-m-d",
             allowInput: false,
             theme: "dark",
-            position: "auto",
+            position: "auto center", // Keep consistent positioning
+            positionElement: document.querySelector("#task-date"),
             onChange: (selectedDates, dateStr, instance) => {
                 this.handleTaskDateChange(selectedDates, dateStr, instance);
+            },
+            onReady: function(selectedDates, dateStr, instance) {
+                // Add custom positioning logic after calendar is ready
+                instance.calendarContainer.style.position = 'fixed';
             }
         });
         

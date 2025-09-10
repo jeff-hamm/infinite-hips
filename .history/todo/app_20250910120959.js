@@ -2526,6 +2526,9 @@ class GoogleSheetsChecklist {
             position: "auto",
             onChange: (selectedDates, dateStr, instance) => {
                 this.handleTaskDateChange(selectedDates, dateStr, instance);
+            },
+            onOpen: (selectedDates, dateStr, instance) => {
+                this.positionDatePicker(instance);
             }
         });
         

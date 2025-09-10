@@ -1008,11 +1008,10 @@
 .task-date {
     font-size: var(--font-size-text-small);
     color: var(--color-text-muted);
-    /* margin-top: 4px;
+    margin-top: 4px;
     display: flex;
     align-items: center;
     gap: 4px;
-        */
 }
 
 .task-date-icon {
@@ -1043,15 +1042,23 @@
 
 /* Flatpickr modal positioning override */
 .flatpickr-calendar.open {
-    z-index: 10000 !important;
-    /* Higher than modal backdrop */
+    z-index: 10000 !important; /* Higher than modal backdrop */
+    position: fixed !important;
+    /* Force center alignment and proper vertical positioning */
     left: 50% !important;
-    /* Center horizontally */
-    /*    transform: translateX(-50%) !important; /* Adjust for centering */
+    transform: translateX(-50%) !important;
+    top: auto !important;
+    bottom: auto !important;
+    right: auto !important; /* Override any right positioning */
+}
+
+/* When modal is open, position calendar above the modal */
+.modal-open .flatpickr-calendar.open {
+    top: 20% !important; /* Position in upper part of viewport */
 }
 
 /* Ensure modal content doesn't interfere with calendar positioning */
 .add-task-form .date-input-container {
-    /* position: relative;
-    z-index: 1; */
+    position: relative;
+    z-index: 1;
 }

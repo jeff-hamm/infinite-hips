@@ -108,7 +108,7 @@ class GoogleSheetsChecklist {
         // Initialize date picker
         this.initializeDatePicker();
         
-        // Date toggle buttons for task form
+        // Date toggle buttons
         document.getElementById('single-date-btn').addEventListener('click', () => this.setDatePickerMode('single'));
         document.getElementById('date-range-btn').addEventListener('click', () => this.setDatePickerMode('range'));
 
@@ -2496,7 +2496,19 @@ class GoogleSheetsChecklist {
 
     // Date picker initialization and management
     initializeDatePicker() {
-        // Initialize task form date picker (in modal) with simple configuration
+        // Initialize global date filter picker (above modal)
+        this.globalDatePicker = flatpickr("#global-date-filter", {
+            mode: "single",
+            dateFormat: "Y-m-d",
+            allowInput: false,
+            theme: "dark",
+            position: "auto",
+            onChange: (selectedDates, dateStr, instance) => {
+                this.handleGlobalDateChange(selectedDates, dateStr, instance);
+            }
+        });
+        
+        // Initialize task form date picker (in modal)
         this.taskDatePicker = flatpickr("#task-date", {
             mode: "single",
             dateFormat: "Y-m-d",
@@ -2508,40 +2520,41 @@ class GoogleSheetsChecklist {
             }
         });
         
+        this.globalDateMode = 'single';
         this.taskDateMode = 'single';
     }
 
     setDatePickerMode(mode) {
-        // Update toggle button states for task form picker
+        // Update toggle button states
         document.getElementById('single-date-btn').classList.toggle('active', mode === 'single');
         document.getElementById('date-range-btn').classList.toggle('active', mode === 'range');
         
-        // Update task datepicker mode
-        this.taskDatePicker.destroy();
-        this.taskDatePicker = flatpickr("#task-date", {
+        // Update datepicker mode
+        this.datePicker.destroy();
+        this.datePicker = flatpickr("#task-date", {
             mode: mode,
             dateFormat: "Y-m-d",
             allowInput: false,
             theme: "dark",
             position: "auto",
             onChange: (selectedDates, dateStr, instance) => {
-                this.handleTaskDateChange(selectedDates, dateStr, instance);
+                this.handleDateChange(selectedDates, dateStr, instance);
             }
         });
         
-        this.taskDateMode = mode;
+        this.dateMode = mode;
         
         // Clear current date value when switching modes
         document.getElementById('task-date').value = '';
     }
 
-    handleTaskDateChange(selectedDates, dateStr, instance) {
+    handleDateChange(selectedDates, dateStr, instance) {
         // Format the display value based on mode
-        if (this.taskDateMode === 'range' && selectedDates.length === 2) {
+        if (this.dateMode === 'range' && selectedDates.length === 2) {
             const startDate = selectedDates[0].toISOString().split('T')[0];
             const endDate = selectedDates[1].toISOString().split('T')[0];
             document.getElementById('task-date').value = `${startDate} to ${endDate}`;
-        } else if (this.taskDateMode === 'single' && selectedDates.length === 1) {
+        } else if (this.dateMode === 'single' && selectedDates.length === 1) {
             document.getElementById('task-date').value = selectedDates[0].toISOString().split('T')[0];
         } else {
             document.getElementById('task-date').value = dateStr;

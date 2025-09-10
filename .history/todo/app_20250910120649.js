@@ -2496,15 +2496,20 @@ class GoogleSheetsChecklist {
 
     // Date picker initialization and management
     initializeDatePicker() {
-        // Initialize task form date picker (in modal) with simple configuration
+        // Initialize task form date picker (in modal) with proper positioning
         this.taskDatePicker = flatpickr("#task-date", {
             mode: "single",
             dateFormat: "Y-m-d",
             allowInput: false,
             theme: "dark",
-            position: "auto",
+            position: "auto center", // Let it auto-position vertically but center horizontally
+            positionElement: document.querySelector("#task-date"), // Explicitly set position element
             onChange: (selectedDates, dateStr, instance) => {
                 this.handleTaskDateChange(selectedDates, dateStr, instance);
+            },
+            onReady: function(selectedDates, dateStr, instance) {
+                // Add custom positioning logic after calendar is ready
+                instance.calendarContainer.style.position = 'fixed';
             }
         });
         
@@ -2523,9 +2528,14 @@ class GoogleSheetsChecklist {
             dateFormat: "Y-m-d",
             allowInput: false,
             theme: "dark",
-            position: "auto",
+            position: "auto center", // Keep consistent positioning
+            positionElement: document.querySelector("#task-date"),
             onChange: (selectedDates, dateStr, instance) => {
                 this.handleTaskDateChange(selectedDates, dateStr, instance);
+            },
+            onReady: function(selectedDates, dateStr, instance) {
+                // Add custom positioning logic after calendar is ready
+                instance.calendarContainer.style.position = 'fixed';
             }
         });
         
