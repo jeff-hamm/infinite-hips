@@ -13,21 +13,21 @@ class GoogleSheetsChecklist {
             refreshInterval: 60000, // 1 minute instead of 2 minutes
             maxRetries: 3
         };
-        
+
         // Merge configurations: window config > passed config > defaults
         const finalConfig = {
             ...defaultConfig,
             ...(window.CHECKLIST_CONFIG || {}),
             ...config
         };
-        
+
         // Apply configuration
         this.sheetId = finalConfig.sheetId;
         this.gid = finalConfig.gid;
         this.appsScriptUrl = finalConfig.appsScriptUrl;
         this.refreshInterval = finalConfig.refreshInterval;
         this.maxRetries = finalConfig.maxRetries;
-        
+
         // Initialize other properties
         this.tasks = [];
         this.lastSync = null;
@@ -93,12 +93,12 @@ class GoogleSheetsChecklist {
     init() {
         // Event listeners
         // Note: refresh-btn is now dynamically created, event listener added in renderFilterButtons
-        
+
         // Add task form event listeners
         document.getElementById('add-item-btn').addEventListener('click', () => this.toggleAddTaskForm());
         document.getElementById('cancel-add-btn').addEventListener('click', () => this.hideAddTaskForm());
         document.getElementById('new-task-form').addEventListener('submit', (e) => this.handleAddTask(e));
-        
+
         // Handle "Other" option dropdowns
         document.getElementById('task-timeline').addEventListener('change', (e) => this.handleOtherOption(e, 'task-timeline-other'));
         document.getElementById('task-category').addEventListener('change', (e) => this.handleOtherOption(e, 'task-category-other'));
@@ -107,7 +107,7 @@ class GoogleSheetsChecklist {
 
         // Initialize date picker
         this.initializeDatePicker();
-        
+
         // Date toggle buttons for task form
         document.getElementById('single-date-btn').addEventListener('click', () => this.setDatePickerMode('single'));
         document.getElementById('date-range-btn').addEventListener('click', () => this.setDatePickerMode('range'));
@@ -120,7 +120,7 @@ class GoogleSheetsChecklist {
             this.hideOfflineNotice();
             this.loadFromSheet();
         });
-        
+
         window.addEventListener('offline', () => {
             this.isOnline = false;
             this.showOfflineNotice();
@@ -157,7 +157,7 @@ class GoogleSheetsChecklist {
             console.error('Error loading from Google Sheets:', error);
             this.showError(`Failed to sync with Google Sheets: ${error.message}`);
             this.showOfflineNotice();
-            
+
             // Try to load cached data, or use sample data if no cache
             if (!this.loadCachedData()) {
                 this.loadSampleData();
@@ -182,14 +182,14 @@ class GoogleSheetsChecklist {
         }
 
         const result = await response.json();
-        
+
         if (!result.success) {
             throw new Error(result.data?.error || 'Apps Script returned error');
         }
 
         this.tasks = result.data.tasks || [];
         this.lastModified = result.data.lastModified;
-        
+
         // Cache the data
         this.saveToCache();
     }
@@ -207,14 +207,14 @@ class GoogleSheetsChecklist {
         }
 
         const csvText = await response.text();
-        
+
         // Check if we got an HTML error page instead of CSV
         if (csvText.includes('<HTML>') || csvText.includes('<!DOCTYPE')) {
             throw new Error('Sheet is not publicly accessible. Please make it viewable to anyone with the link.');
         }
-        
+
         this.parseCsvData(csvText);
-        
+
         // Cache the data
         this.saveToCache();
     }
@@ -235,8 +235,8 @@ class GoogleSheetsChecklist {
             category: headers.indexOf('category') !== -1 ? headers.indexOf('category') : -1,
             how: headers.indexOf('how') !== -1 ? headers.indexOf('how') : -1,
             notes: headers.indexOf('notes') !== -1 ? headers.indexOf('notes') : -1,
-            whoCanHelp: headers.indexOf('who can help') !== -1 ? headers.indexOf('who can help') : 
-                        headers.indexOf('whocanhelp') !== -1 ? headers.indexOf('whocanhelp') : -1
+            whoCanHelp: headers.indexOf('who can help') !== -1 ? headers.indexOf('who can help') :
+                headers.indexOf('whocanhelp') !== -1 ? headers.indexOf('whocanhelp') : -1
         };
 
         // Process data rows
@@ -245,18 +245,18 @@ class GoogleSheetsChecklist {
             if (!line) continue;
 
             const columns = this.parseCSVLine(line);
-            
+
             if (columns.length > columnMap.task && columns[columnMap.task]?.trim()) {
                 const completed = columns[columnMap.done]?.toLowerCase().trim();
                 const taskText = columns[columnMap.task]?.trim();
-                
+
                 if (taskText) {
                     tasks.push({
                         id: `sheet-${i}`,
                         text: taskText,
                         completed: completed === 'true' || completed === '✓' || completed === 'yes' || completed === '1',
                         timeline: columnMap.timeline >= 0 ? columns[columnMap.timeline]?.trim() || 'General' : 'General',
-                        priority: columnMap.priority >= 0 ? 
+                        priority: columnMap.priority >= 0 ?
                             (columns[columnMap.priority]?.toLowerCase().replace(/^\d+\s*-\s*/, '').trim() || 'medium') : 'medium',
                         category: columnMap.category >= 0 ? columns[columnMap.category]?.trim() || '' : '',
                         how: columnMap.how >= 0 ? columns[columnMap.how]?.trim() || '' : '',
@@ -270,7 +270,7 @@ class GoogleSheetsChecklist {
         }
 
         this.tasks = tasks;
-        
+
         // Cache the data
         localStorage.setItem('sheets-checklist-cache', JSON.stringify({
             tasks: this.tasks,
@@ -286,7 +286,7 @@ class GoogleSheetsChecklist {
 
         for (let i = 0; i < line.length; i++) {
             const char = line[i];
-            
+
             if (char === '"') {
                 inQuotes = !inQuotes;
             } else if (char === ',' && !inQuotes) {
@@ -296,7 +296,7 @@ class GoogleSheetsChecklist {
                 current += char;
             }
         }
-        
+
         result.push(current.replace(/^"|"$/g, ''));
         return result;
     }
@@ -311,7 +311,7 @@ class GoogleSheetsChecklist {
                 this.updateLastSyncDisplay();
                 this.renderTasks();
                 this.updateProgress();
-                
+
                 // Show age of cached data
                 const age = Date.now() - (data.timestamp || 0);
                 const ageMinutes = Math.floor(age / 60000);
@@ -394,11 +394,11 @@ class GoogleSheetsChecklist {
                 rowIndex: 6
             }
         ];
-        
+
         this.renderTasks();
         this.updateProgress();
         this.updateSyncStatus('📋 Sample Data');
-        
+
         // Show sample data notice
         document.getElementById('sample-notice').style.display = 'block';
     }
@@ -414,12 +414,12 @@ class GoogleSheetsChecklist {
         if (this.useAppsScript) {
             try {
                 this.showLoading(true);
-                
+
                 // Update the task locally first for immediate feedback
                 task.completed = completed;
                 this.renderTasks();
                 this.updateProgress();
-                
+
                 // Send update to Apps Script using GET to avoid CORS
                 const params = new URLSearchParams({
                     action: 'updateTask',
@@ -438,25 +438,25 @@ class GoogleSheetsChecklist {
                 }
 
                 const result = await response.json();
-                
+
                 if (!result.success) {
                     throw new Error(result.data?.error || 'Failed to update task');
                 }
 
                 // Update was successful
                 this.updateSyncStatus('✅ Task Updated');
-                
+
                 // Refresh data to ensure consistency
                 setTimeout(() => this.loadFromSheet(), 1000);
-                
+
             } catch (error) {
                 console.error('Error updating task:', error);
-                
+
                 // Revert the local change
                 task.completed = !completed;
                 this.renderTasks();
                 this.updateProgress();
-                
+
                 this.showError(`Failed to update task: ${error.message}`);
             } finally {
                 this.showLoading(false);
@@ -464,7 +464,7 @@ class GoogleSheetsChecklist {
         } else {
             // Fallback: Open Google Sheets for manual editing
             const sheetUrl = `https://docs.google.com/spreadsheets/d/${this.sheetId}/edit#gid=${this.gid}&range=A${task.rowIndex}`;
-            
+
             if (confirm(`This will open the Google Sheet to edit row ${task.rowIndex}.\n\nTo enable direct editing, set up the Google Apps Script (see instructions in google-apps-script.js file).\n\nContinue to open sheet?`)) {
                 window.open(sheetUrl, '_blank');
             }
@@ -473,7 +473,7 @@ class GoogleSheetsChecklist {
 
     renderTasks() {
         const todoList = document.getElementById('todo-list');
-        
+
         if (this.tasks.length === 0) {
             todoList.innerHTML = '<p style="text-align: center; color: #ff69b4; padding: 40px;">No tasks found in the Google Sheet.<br><a href="https://docs.google.com/spreadsheets/d/1ziPiBhIYXTgVvs2HVokZQrFPjYdF9w-wcO9ivPwpgag/edit?usp=sharing" target="_blank" style="color: #ff69b4;">Add some tasks to the sheet</a></p>';
             this.hideFilterButtons();
@@ -498,26 +498,26 @@ class GoogleSheetsChecklist {
             // 'asap' always comes first
             if (a.toLowerCase() === 'asap') return -1;
             if (b.toLowerCase() === 'asap') return 1;
-            
+
             // 'Before Surgery' comes second
             if (a === 'Before Surgery') return -1;
             if (b === 'Before Surgery') return 1;
-            
+
             // Check if strings start with numbers
             const aStartsWithNumber = /^\d/.test(a);
             const bStartsWithNumber = /^\d/.test(b);
-            
+
             // If both start with numbers, sort descending by the number
             if (aStartsWithNumber && bStartsWithNumber) {
                 const aNum = parseInt(a.match(/^\d+/)[0]);
                 const bNum = parseInt(b.match(/^\d+/)[0]);
                 return bNum - aNum; // descending
             }
-            
+
             // If one starts with number and other doesn't, number comes first
             if (aStartsWithNumber && !bStartsWithNumber) return -1;
             if (!aStartsWithNumber && bStartsWithNumber) return 1;
-            
+
             // If neither starts with number, sort alphabetically ascending
             return a.localeCompare(b);
         });
@@ -526,7 +526,7 @@ class GoogleSheetsChecklist {
 
         sortedTimelines.forEach(timeline => {
             const tasks = timelineGroups[timeline];
-            
+
             // Sort tasks within timeline by: 1) raw timeline, 2) priority, 3) todo text
             const priorityOrder = { 'critical': 0, 'high': 1, 'medium': 2, 'low': 3, '': 4 };
             tasks.sort((a, b) => {
@@ -534,7 +534,7 @@ class GoogleSheetsChecklist {
                 if (a.completed !== b.completed) {
                     return a.completed ? 1 : -1;
                 }
-                
+
                 // Then by raw timeline field (for "Before Surgery" group, this handles "7 days before", "1 day before", etc.)
                 const aTimeline = a.timeline || '';
                 const bTimeline = b.timeline || '';
@@ -542,7 +542,7 @@ class GoogleSheetsChecklist {
                     // For timeline comparison, try to extract numbers for "X days before" patterns
                     const aMatch = aTimeline.match(/^(\d+)\s+days?\s+before/i);
                     const bMatch = bTimeline.match(/^(\d+)\s+days?\s+before/i);
-                    
+
                     if (aMatch && bMatch) {
                         // Both are "X days before" - sort by number (descending: 14 days, 7 days, 1 day)
                         return parseInt(bMatch[1]) - parseInt(aMatch[1]);
@@ -557,19 +557,19 @@ class GoogleSheetsChecklist {
                         return aTimeline.localeCompare(bTimeline);
                     }
                 }
-                
+
                 // Then by priority - clean the priority values to handle formats like "1- Critical"
-                const cleanAPriority = a.priority ? 
+                const cleanAPriority = a.priority ?
                     a.priority.toLowerCase().replace(/^\d+\s*-\s*/, '').trim() : '';
-                const cleanBPriority = b.priority ? 
+                const cleanBPriority = b.priority ?
                     b.priority.toLowerCase().replace(/^\d+\s*-\s*/, '').trim() : '';
-                
+
                 const aPriority = priorityOrder[cleanAPriority] ?? 4;
                 const bPriority = priorityOrder[cleanBPriority] ?? 4;
                 if (aPriority !== bPriority) {
                     return aPriority - bPriority;
                 }
-                
+
                 // Finally by todo text (alphabetically)
                 const aText = a.text || '';
                 const bText = b.text || '';
@@ -582,63 +582,63 @@ class GoogleSheetsChecklist {
 
             tasks.forEach(task => {
                 // Extract clean priority value from formats like "1- Critical" or "3 - Medium"
-                const cleanPriority = task.priority ? 
+                const cleanPriority = task.priority ?
                     task.priority.toLowerCase().replace(/^\d+\s*-\s*/, '').trim() : '';
                 const priorityClass = '';
                 // cleanPriority ? `priority-${cleanPriority.replace(/\s+/g, '-')}` : '';
-                
+
                 html += `<div class="todo-item ${priorityClass}" 
                            data-timeline="${this.escapeHtml(this.getDisplayTimeline(task.timeline))}"
                            data-who-can-help="${this.escapeHtml(task.whoCanHelp || '')}"
                            data-how="${this.escapeHtml(task.how || '')}"
                            data-completed="${task.completed ? 'true' : 'false'}"
                            data-category="${this.escapeHtml(task.category || '')}">`;
-                
-                // Add simple category value in top right corner (no label)
+
+                // Add simple category value in top right corner (no label) - now using 'how' field as category
                 let topRightItems = [];
-                
-                // Category value with icon
-                if (task.category) {
-                    topRightItems.push(`<span class="editable-text top-right-value" data-task-id="${task.id}" data-field="category" onclick="sheetsChecklist.startEditingDropdown(this)">📂 ${this.escapeHtml(task.category)}<span class="edit-icon">✏️</span></span>`);
+
+                // Category value with icon (using 'how' field)
+                if (task.how) {
+                    topRightItems.push(`<span class="editable-text top-right-value" data-task-id="${task.id}" data-field="how" onclick="sheetsChecklist.startEditingDropdown(this)">📂 ${this.escapeHtml(task.how)}<span class="edit-icon">✏️</span></span>`);
                 }
-                
+
                 if (topRightItems.length > 0) {
                     html += `<div class="priority-corner-section">${topRightItems.join('<br>')}</div>`;
                 }
-                
+
                 // Create the main content area with new structure
                 html += `<div class="todo-main-content">`;
-                
+
                 // Todo text row spans full width and contains left + right columns
                 html += `<div class="todo-text-row">`;
-                
+
                 // Left column with checkbox (inside todo-text-row)
                 html += `<div class="todo-left-column">`;
                 html += `<input type="checkbox" class="todo-checkbox" ${task.completed ? 'checked' : ''} 
                            onchange="sheetsChecklist.updateTaskInSheet('${task.id}', this.checked)"
                            title="Click to edit this task in Google Sheets">`;
                 html += `</div>`;
-                
+
                 // Right column for todo text + priority (inside todo-text-row)
                 html += `<div class="todo-right-column">`;
-                
+
                 // Task text - clickable to edit
                 let taskText = this.escapeHtml(task.text);
                 html += `<div class="todo-text ${task.completed ? 'todo-completed' : ''}">
                     <h3 class="editable-text" data-task-id="${task.id}" data-field="text" onclick="sheetsChecklist.startEditingText(this)">${taskText}<span class="edit-icon">✏️</span></h3>
                 </div>`;
-                
+
                 // Priority icon/text on the right side of the text
                 const priorityIcon = cleanPriority ? {
                     'critical': '❗',
                     'high': '🔥',
-                    'medium': '📌', 
+                    'medium': '📌',
                     'low': '📝'
                 }[cleanPriority] || '⚪' : '⚪';
-                
+
                 html += `<div class="priority-right-section" data-task-id="${task.id}" data-field="priority" onclick="sheetsChecklist.startEditingDropdown(this)" title="Click to change priority">`;
                 html += `<div class="priority-top-icon">${priorityIcon}</div>`;
-                
+
                 // Add priority text label under the icon
                 if (cleanPriority) {
                     html += `<div class="priority-text-label">${cleanPriority}</div>`;
@@ -647,102 +647,95 @@ class GoogleSheetsChecklist {
                     html += `<div class="priority-text-label empty-field">set</div>`;
                 }
                 html += `</div>`; // Close priority-right-section
-                
+
                 html += `</div>`; // Close todo-right-column
                 html += `</div>`; // Close todo-text-row
-                
+
                 // Add details section with same layout structure
                 html += `<div class="task-details">`;
                 html += `<div class="todo-left-column-spacer"></div>`; // Empty spacer to maintain alignment
                 html += `<div class="task-details-content">`;
-                    
-                    // Timeline detail item
-                    if (task.timeline) {
-                        html += `<div class="detail-item">
+
+                // Timeline detail item
+                if (task.timeline) {
+                    html += `<div class="detail-item">
                             <span class="detail-icon">📅</span>
                             <span class="detail-label">Timeline:</span> 
                             <span class="editable-text" data-task-id="${task.id}" data-field="timeline" onclick="sheetsChecklist.startEditingDropdown(this)">${this.escapeHtml(task.timeline)}<span class="edit-icon">✏️</span></span>
                         </div>`;
-                    } else {
-                        // Show empty timeline field that can be clicked to add timeline
-                        html += `<div class="detail-item">
+                } else {
+                    // Show empty timeline field that can be clicked to add timeline
+                    html += `<div class="detail-item">
                             <span class="detail-icon">📅</span>
                             <span class="detail-label">Timeline:</span> 
                             <span class="editable-text empty-field" data-task-id="${task.id}" data-field="timeline" onclick="sheetsChecklist.startEditingDropdown(this)">Click to set timeline...<span class="edit-icon">✏️</span></span>
                         </div>`;
-                    }
-                    
-                    // Date detail item
-                    if (task.date) {
-                        html += `<div class="detail-item">
-                            <div class="task-date">${this.formatDateForDisplay(task.date)}</div>
+                }
+
+                // Date detail item
+                if (task.date) {
+                    html += `<div class="detail-item">
+                            <span class="detail-icon">📅</span>
+                            <span class="detail-label">Date:</span>
+                            <span class="editable-text" data-task-id="${task.id}" data-field="date" onclick="sheetsChecklist.startEditingDate(this)">${this.escapeHtml(task.date)}<span class="edit-icon">✏️</span><span class="clear-icon" onclick="event.stopPropagation(); sheetsChecklist.clearDateField('${task.id}')" title="Clear date">✕</span></span>
                         </div>`;
-                    }
-                    
-                    if (task.how) {
-                        html += `<div class="detail-item">
-                            <span class="detail-icon">🔧</span>
-                            <span class="detail-label">How:</span> 
-                            <span class="editable-text" data-task-id="${task.id}" data-field="how" onclick="sheetsChecklist.startEditingDropdown(this)">${this.escapeHtml(task.how)}<span class="edit-icon">✏️</span></span>
+                } else {
+                    // Show empty date field that can be clicked to add date
+                    html += `<div class="detail-item">
+                            <span class="detail-icon">📅</span>
+                            <span class="detail-label">Date:</span>
+                            <span class="editable-text empty-field" data-task-id="${task.id}" data-field="date" onclick="sheetsChecklist.startEditingDate(this)">Click to set date...<span class="edit-icon">✏️</span></span>
                         </div>`;
-                    } else {
-                        // Show empty how field that can be clicked to add how
-                        html += `<div class="detail-item">
-                            <span class="detail-icon">🔧</span>
-                            <span class="detail-label">How:</span> 
-                            <span class="editable-text empty-field" data-task-id="${task.id}" data-field="how" onclick="sheetsChecklist.startEditingDropdown(this)">Click to set how...<span class="edit-icon">✏️</span></span>
-                        </div>`;
-                    }
-                    
-                    if (task.notes) {
-                        const notesContent = this.linkifyUrls(task.notes);
-                        html += `<div class="detail-item">
+                }
+                if (task.notes) {
+                    const notesContent = this.linkifyUrls(task.notes);
+                    html += `<div class="detail-item">
                             <span class="detail-icon">📝</span>
                             <span class="detail-label">Notes:</span> 
                             <span class="editable-text" data-task-id="${task.id}" data-field="notes" onclick="sheetsChecklist.startEditingText(this)">${notesContent}<span class="edit-icon">✏️</span></span>
                         </div>`;
-                    } else {
-                        // Show empty notes field that can be clicked to add notes
-                        html += `<div class="detail-item">
+                } else {
+                    // Show empty notes field that can be clicked to add notes
+                    html += `<div class="detail-item">
                             <span class="detail-icon">📝</span>
                             <span class="detail-label">Notes:</span> 
                             <span class="editable-text empty-field" data-task-id="${task.id}" data-field="notes" onclick="sheetsChecklist.startEditingText(this)">Click to add notes...<span class="edit-icon">✏️</span></span>
                         </div>`;
-                    }
-                    
-                                        // Always show Helper field last (editable with multiple values)
-                    const whoCanHelpValue = task.whoCanHelp || '';
-                    const helpers = this.parseWhoCanHelp(whoCanHelpValue);
-                    
-                    html += `<div class="detail-item">
+                }
+
+                // Always show Helper field last (editable with multiple values)
+                const whoCanHelpValue = task.whoCanHelp || '';
+                const helpers = this.parseWhoCanHelp(whoCanHelpValue);
+
+                html += `<div class="detail-item">
                         <span class="detail-icon">🤝</span>
                         <span class="detail-label">Helper/Dom:</span> 
                         <div class="helper-dropdowns-container" data-task-id="${task.id}">`;
-                    
-                    // Add dropdown for each existing helper
-                    helpers.forEach((helper, index) => {
-                        html += `
+
+                // Add dropdown for each existing helper
+                helpers.forEach((helper, index) => {
+                    html += `
                             <select class="editable-dropdown helper-dropdown" data-task-id="${task.id}" data-helper-index="${index}" onchange="sheetsChecklist.handleHelperDropdownChange(this)">
                                 <option value=""></option>
                                 <option value="${this.escapeHtml(helper)}" selected>${this.escapeHtml(helper)}</option>
                                 <option value="Other">Other</option>
                             </select>`;
-                    });
-                    
-                    // Always add one blank dropdown for new entries
-                    html += `
+                });
+
+                // Always add one blank dropdown for new entries
+                html += `
                         <select class="editable-dropdown helper-dropdown blank-helper-dropdown" data-task-id="${task.id}" data-helper-index="${helpers.length}" onchange="sheetsChecklist.handleHelperDropdownChange(this)">
                             <option value="" selected></option>
                             <option value="Other">Other</option>
                         </select>`;
-                    
-                    html += `
+
+                html += `
                             <input type="text" class="editable-other-input" style="display: none; margin-top: 8px;" placeholder="Enter helper/dom name..." onblur="sheetsChecklist.updateHelperField(this)" data-task-id="${task.id}">
                         </div>
                     </div>`;
-                    
-                    html += `</div>`; // Close task-details
-                
+
+                html += `</div>`; // Close task-details
+
                 html += `</div>`; // Close todo-right-column
                 html += `</div>`; // Close todo-main-content
                 html += `</div>`; // Close todo-item
@@ -752,26 +745,26 @@ class GoogleSheetsChecklist {
         });
 
         todoList.innerHTML = html;
-        
+
         // Apply the current filter to hide/show appropriate tasks
         this.applyFilter(this.currentFilter);
-        
+
         // Preserve form data if Add Task form is visible, update form dropdowns, then restore form data
         const addTaskForm = document.getElementById('add-task-form');
         const formIsVisible = addTaskForm && addTaskForm.style.display !== 'none';
         let preservedFormData = null;
-        
+
         if (formIsVisible) {
             preservedFormData = this.preserveFormData();
         }
-        
+
         // Update form dropdowns with current data
         this.populateFormDropdowns();
-        
+
         if (formIsVisible && preservedFormData) {
             this.restoreFormData(preservedFormData);
         }
-        
+
         // Populate detail view dropdowns
         this.populateDetailDropdowns();
     }
@@ -780,7 +773,7 @@ class GoogleSheetsChecklist {
         const container = dropdown.parentElement;
         const otherInput = container.querySelector('.editable-other-input');
         const taskId = dropdown.dataset.taskId;
-        
+
         if (dropdown.value === 'Other') {
             // Show the "Other" input field
             otherInput.style.display = 'block';
@@ -789,7 +782,7 @@ class GoogleSheetsChecklist {
             // Hide the "Other" input field and update immediately
             otherInput.style.display = 'none';
             otherInput.value = '';
-            
+
             // Update the task with the selected value (including empty value)
             this.updateTaskDetails(taskId, { whoCanHelp: dropdown.value });
         }
@@ -797,7 +790,7 @@ class GoogleSheetsChecklist {
 
     handleTimelineChange(dropdown) {
         const taskId = dropdown.dataset.taskId;
-        
+
         // Update the task with the selected timeline value (including empty value)
         this.updateTaskDetails(taskId, { timeline: dropdown.value });
     }
@@ -805,7 +798,7 @@ class GoogleSheetsChecklist {
     async updateWhoCanHelpField(input) {
         const taskId = input.dataset.taskId;
         const newValue = input.value.trim();
-        
+
         if (newValue) {
             await this.updateTaskDetails(taskId, { whoCanHelp: newValue });
         }
@@ -816,7 +809,7 @@ class GoogleSheetsChecklist {
         const otherInput = container.querySelector('.editable-other-input');
         const taskId = dropdown.dataset.taskId;
         const helperIndex = parseInt(dropdown.dataset.helperIndex);
-        
+
         if (dropdown.value === 'Other') {
             // Show the "Other" input field
             otherInput.style.display = 'block';
@@ -826,7 +819,7 @@ class GoogleSheetsChecklist {
             // Hide the "Other" input field
             otherInput.style.display = 'none';
             otherInput.value = '';
-            
+
             // Update the helpers array
             this.updateHelpersArray(taskId, helperIndex, dropdown.value);
         }
@@ -836,11 +829,11 @@ class GoogleSheetsChecklist {
         const taskId = input.dataset.taskId;
         const helperIndex = parseInt(input.dataset.helperIndex);
         const newValue = input.value.trim();
-        
+
         if (newValue) {
             await this.updateHelpersArray(taskId, helperIndex, newValue);
         }
-        
+
         // Hide the input field
         input.style.display = 'none';
         input.value = '';
@@ -849,10 +842,10 @@ class GoogleSheetsChecklist {
     async updateHelpersArray(taskId, helperIndex, newValue) {
         const task = this.tasks.find(t => t.id === taskId);
         if (!task) return;
-        
+
         // Get current helpers array
         const helpers = this.parseWhoCanHelp(task.whoCanHelp || '');
-        
+
         if (newValue && newValue.trim() !== '') {
             // Set the value at the specified index
             helpers[helperIndex] = newValue.trim();
@@ -862,7 +855,7 @@ class GoogleSheetsChecklist {
                 helpers.splice(helperIndex, 1);
             }
         }
-        
+
         // Format back to string and update
         const formattedValue = this.formatWhoCanHelp(helpers);
         await this.updateTaskDetails(taskId, { whoCanHelp: formattedValue });
@@ -877,7 +870,7 @@ class GoogleSheetsChecklist {
         const taskId = element.dataset.taskId;
         const field = element.dataset.field;
         const currentText = this.getOriginalText(element);
-        
+
         // Create text input
         const input = document.createElement(field === 'notes' ? 'textarea' : 'input');
         if (field !== 'notes') {
@@ -888,12 +881,12 @@ class GoogleSheetsChecklist {
         input.dataset.taskId = taskId;
         input.dataset.field = field;
         input.dataset.originalText = currentText;
-        
+
         if (field === 'notes') {
             input.rows = 3;
             input.style.resize = 'vertical';
         }
-        
+
         // Style the input
         Object.assign(input.style, {
             background: 'var(--color-bg)',
@@ -906,21 +899,33 @@ class GoogleSheetsChecklist {
             width: '100%',
             fontFamily: 'inherit'
         });
-        
+
         // Replace the element with input
         element.style.display = 'none';
         element.parentNode.insertBefore(input, element.nextSibling);
-        
+
         // Focus and select all text
         input.focus();
         input.select();
-        
+
         // Handle save/cancel
         input.addEventListener('blur', () => this.finishEditingText(input));
         input.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                this.finishEditingText(input);
+            if (e.key === 'Enter') {
+                if (field === 'notes') {
+                    // For notes field (textarea), only submit on Shift+Enter
+                    if (e.shiftKey) {
+                        e.preventDefault();
+                        this.finishEditingText(input);
+                    }
+                    // Allow normal Enter to create new lines
+                } else {
+                    // For other fields, Enter submits (original behavior)
+                    if (!e.shiftKey) {
+                        e.preventDefault();
+                        this.finishEditingText(input);
+                    }
+                }
             } else if (e.key === 'Escape') {
                 this.cancelEditingText(input);
             }
@@ -931,16 +936,179 @@ class GoogleSheetsChecklist {
         const field = element.dataset.field;
         const taskId = element.dataset.taskId;
         const task = this.tasks.find(t => t.id === taskId);
-        
+
         if (!task) return '';
-        
+
         if (field === 'text') {
             return task.text || '';
         } else if (field === 'notes') {
             // For notes, always return the raw text from the task data, not the HTML content
             return task.notes || '';
+        } else if (field === 'date') {
+            return task.date || '';
         }
         return '';
+    }
+
+    startEditingDate(element) {
+        // Prevent multiple edits at once
+        if (document.querySelector('.editing-date')) {
+            return;
+        }
+
+        const taskId = element.dataset.taskId;
+        const field = element.dataset.field;
+        const currentDate = this.getOriginalText(element);
+
+        // Create date input
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.value = currentDate;
+        input.className = 'editing-date';
+        input.dataset.taskId = taskId;
+        input.dataset.field = field;
+        input.dataset.originalText = currentDate;
+        input.placeholder = 'Click to select date...';
+
+        // Style the input
+        Object.assign(input.style, {
+            background: 'var(--color-bg)',
+            border: '1px solid var(--color-pink)',
+            borderRadius: '4px',
+            padding: '8px',
+            color: 'var(--color-text)',
+            fontSize: '14px',
+            width: '100%',
+            fontFamily: 'inherit'
+        });
+
+        // Replace the element with input
+        element.style.display = 'none';
+        element.parentNode.insertBefore(input, element.nextSibling);
+
+        // Initialize Flatpickr on the input
+        const datePicker = flatpickr(input, this.getFlatpickrConfig({
+            onChange: (selectedDates, dateStr, instance) => {
+                input.value = dateStr;
+            },
+            onClose: () => {
+                this.finishEditingDate(input, datePicker);
+            }
+        }));
+
+        // Open the date picker immediately
+        datePicker.open();
+
+        // Handle escape key to cancel
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                this.cancelEditingDate(input, datePicker);
+            }
+        });
+    }
+
+    async finishEditingDate(input, datePicker) {
+        const taskId = input.dataset.taskId;
+        const field = input.dataset.field;
+        const newValue = input.value.trim();
+        const originalText = input.dataset.originalText;
+
+        // Get the original element
+        const originalElement = input.previousElementSibling;
+
+        if (newValue !== originalText) {
+            // OPTIMISTIC UPDATE: Update the UI immediately
+            if (newValue) {
+                originalElement.innerHTML = this.escapeHtml(newValue) + '<span class="edit-icon">✏️</span><span class="clear-icon" onclick="event.stopPropagation(); sheetsChecklist.clearDateField(\'' + taskId + '\')" title="Clear date">✕</span>';
+                originalElement.classList.remove('empty-field');
+            } else {
+                originalElement.innerHTML = 'Click to set date...<span class="edit-icon">✏️</span>';
+                originalElement.classList.add('empty-field');
+            }
+
+            // Also update the local task data immediately
+            const task = this.tasks.find(t => t.id === taskId);
+            if (task) {
+                task[field] = newValue;
+            }
+
+            // Clean up the input first so user sees the change immediately
+            this.cleanupDateEdit(input, originalElement, datePicker);
+
+            // Then send the server request in the background
+            try {
+                const updateData = {};
+                updateData[field] = newValue;
+                await this.updateTaskDetails(taskId, updateData);
+                console.log(`Successfully updated ${field} to "${newValue}" for task ${taskId}`);
+            } catch (error) {
+                console.error('Error updating date:', error);
+                // If server update fails, revert the UI change
+                if (originalText) {
+                    originalElement.innerHTML = this.escapeHtml(originalText) + '<span class="edit-icon">✏️</span><span class="clear-icon" onclick="event.stopPropagation(); sheetsChecklist.clearDateField(\'' + taskId + '\')" title="Clear date">✕</span>';
+                    originalElement.classList.remove('empty-field');
+                } else {
+                    originalElement.innerHTML = 'Click to set date...<span class="edit-icon">✏️</span>';
+                    originalElement.classList.add('empty-field');
+                }
+
+                // Also revert the local task data
+                if (task) {
+                    task[field] = originalText;
+                }
+
+                this.showError(`Failed to update date: ${error.message}`);
+            }
+        } else {
+            // No change, just clean up
+            this.cleanupDateEdit(input, originalElement, datePicker);
+        }
+    }
+
+    cancelEditingDate(input, datePicker) {
+        const originalElement = input.previousElementSibling;
+        this.cleanupDateEdit(input, originalElement, datePicker);
+    }
+
+    cleanupDateEdit(input, originalElement, datePicker) {
+        if (datePicker) {
+            datePicker.destroy();
+        }
+        originalElement.style.display = '';
+        input.remove();
+    }
+
+    async clearDateField(taskId) {
+        try {
+            // Find the task
+            const task = this.tasks.find(t => t.id === taskId);
+            if (!task) {
+                console.error('Task not found:', taskId);
+                return;
+            }
+
+            console.log(`Clearing date for task ${taskId}, current value: "${task.date}"`);
+
+            // Store original value for potential rollback
+            const originalDate = task.date;
+
+            // OPTIMISTIC UPDATE: Update the UI immediately
+            task.date = '';  // Set to empty string to match other empty date handling
+
+            // Force re-render to show the change immediately
+            this.renderTasks();
+
+            // Send the server request - if this fails, the optimistic update will be reverted
+            await this.updateTaskDetails(taskId, { date: '' });
+            console.log(`Successfully cleared date for task ${taskId}`);
+
+        } catch (error) {
+            console.error('Error clearing date:', error);
+            this.showError(`Failed to clear date: ${error.message}`);
+
+            // The updateTaskDetails method will handle reloading from server on error
+            // which will revert our optimistic update
+        }
     }
 
     startEditingDropdown(element) {
@@ -952,11 +1120,11 @@ class GoogleSheetsChecklist {
         const taskId = element.dataset.taskId;
         const field = element.dataset.field;
         const currentValue = this.getOriginalDropdownValue(element);
-        
+
         // Add a unique ID to the element for better tracking
         const elementId = `edit-${taskId}-${field}-${Date.now()}`;
         element.dataset.elementId = elementId;
-        
+
         // Create dropdown select
         const select = document.createElement('select');
         select.className = 'editing-dropdown';
@@ -964,7 +1132,7 @@ class GoogleSheetsChecklist {
         select.dataset.field = field;
         select.dataset.originalValue = currentValue;
         select.dataset.originalElementId = elementId;
-        
+
         // Style the select
         const baseStyle = {
             background: 'var(--color-bg)',
@@ -975,7 +1143,7 @@ class GoogleSheetsChecklist {
             fontSize: 'inherit',
             fontFamily: 'inherit'
         };
-        
+
         // Set width based on field type
         if (field === 'priority') {
             baseStyle.minWidth = '100px';
@@ -983,36 +1151,36 @@ class GoogleSheetsChecklist {
         } else {
             baseStyle.minWidth = '200px';
         }
-        
+
         Object.assign(select.style, baseStyle);
 
         // Populate dropdown with available options
         this.populateEditingDropdown(select, field, currentValue);
-        
+
         // Replace the element with select
         element.style.display = 'none';
         element.parentNode.insertBefore(select, element.nextSibling);
-        
+
         // Focus the select
         select.focus();
-        
+
         // Handle save/cancel with proper event management
         let isFinishing = false;
-        
+
         const finishEdit = () => {
             if (!isFinishing) {
                 isFinishing = true;
                 this.finishEditingDropdown(select);
             }
         };
-        
+
         const cancelEdit = () => {
             if (!isFinishing) {
                 isFinishing = true;
                 this.cancelEditingDropdown(select);
             }
         };
-        
+
         select.addEventListener('blur', finishEdit);
         select.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
@@ -1030,9 +1198,9 @@ class GoogleSheetsChecklist {
         const field = element.dataset.field;
         const taskId = element.dataset.taskId;
         const task = this.tasks.find(t => t.id === taskId);
-        
+
         if (!task) return '';
-        
+
         if (field === 'timeline') {
             return task.timeline || '';
         } else if (field === 'priority') {
@@ -1047,7 +1215,7 @@ class GoogleSheetsChecklist {
 
     populateEditingDropdown(select, field, currentValue) {
         let values = [];
-        
+
         if (field === 'timeline') {
             // Get unique timeline values from tasks (excluding empty values and "X days before" patterns)
             values = [...new Set(
@@ -1085,13 +1253,13 @@ class GoogleSheetsChecklist {
 
         // Clear and rebuild options
         select.innerHTML = '';
-        
+
         // Always add blank option first
         const blankOption = document.createElement('option');
         blankOption.value = '';
         blankOption.textContent = '';
         select.appendChild(blankOption);
-        
+
         // Add current value if it exists and isn't in the values list
         if (currentValue && currentValue !== '' && !values.includes(currentValue)) {
             const currentOption = document.createElement('option');
@@ -1100,7 +1268,7 @@ class GoogleSheetsChecklist {
             currentOption.selected = true;
             select.appendChild(currentOption);
         }
-        
+
         // Add all other values
         values.forEach(value => {
             const option = document.createElement('option');
@@ -1119,17 +1287,17 @@ class GoogleSheetsChecklist {
             return;
         }
         select.dataset.processing = 'true';
-        
+
         const taskId = select.dataset.taskId;
         const field = select.dataset.field;
         const newValue = select.value;
         const originalValue = select.dataset.originalValue;
-        
+
         // Find the original element more robustly
-        const originalElement = select.dataset.originalElementId ? 
+        const originalElement = select.dataset.originalElementId ?
             document.querySelector(`[data-element-id="${select.dataset.originalElementId}"]`) :
             select.previousSibling;
-        
+
         // Safely remove the select only if it's still in the DOM
         if (select.parentNode) {
             try {
@@ -1138,25 +1306,25 @@ class GoogleSheetsChecklist {
                 console.warn('Error removing select element:', error);
             }
         }
-        
+
         // Show the original element
         if (originalElement) {
             originalElement.style.display = '';
         }
-        
+
         // Only update if value changed
         if (newValue !== originalValue) {
             // OPTIMISTIC UPDATE: Update the UI immediately
             if (originalElement) {
                 this.updateElementDisplay(originalElement, newValue, field);
             }
-            
+
             // Also update the local task data immediately
             const task = this.tasks.find(t => t.id === taskId);
             if (task) {
                 task[field] = newValue;
             }
-            
+
             // Then send the server request in the background
             try {
                 const updateData = {};
@@ -1168,12 +1336,12 @@ class GoogleSheetsChecklist {
                 console.error('Error updating task:', error);
                 // ROLLBACK: Restore original value on error
                 this.updateElementDisplay(originalElement, originalValue, field);
-                
+
                 // Also rollback the local task data
                 if (task) {
                     task[field] = originalValue;
                 }
-                
+
                 // Show error message to user
                 this.showError(`Failed to update ${field}: ${error.message}`);
             }
@@ -1186,12 +1354,12 @@ class GoogleSheetsChecklist {
             return;
         }
         select.dataset.processing = 'true';
-        
+
         // Find the original element more robustly
-        const originalElement = select.dataset.originalElementId ? 
+        const originalElement = select.dataset.originalElementId ?
             document.querySelector(`[data-element-id="${select.dataset.originalElementId}"]`) :
             select.previousSibling;
-        
+
         // Safely remove the select only if it's still in the DOM
         if (select.parentNode) {
             try {
@@ -1200,7 +1368,7 @@ class GoogleSheetsChecklist {
                 console.warn('Error removing select element:', error);
             }
         }
-        
+
         // Show the original element
         if (originalElement) {
             originalElement.style.display = '';
@@ -1219,7 +1387,7 @@ class GoogleSheetsChecklist {
         } else if (field === 'priority') {
             // For priority, we need to update both the text and the icon
             const cleanPriority = value ? value.toLowerCase().replace(/^\d+\s*-?\s*/, '').trim() : '';
-            
+
             if (cleanPriority) {
                 // Update the priority text
                 const priorityTextLabel = element.querySelector('.priority-text-label');
@@ -1227,20 +1395,20 @@ class GoogleSheetsChecklist {
                     priorityTextLabel.textContent = cleanPriority;
                     priorityTextLabel.classList.remove('empty-field');
                 }
-                
+
                 // Update the priority icon
                 const priorityIcon = {
                     'critical': '❗',
                     'high': '🔥',
-                    'medium': '📌', 
+                    'medium': '📌',
                     'low': '📝'
                 }[cleanPriority] || '⚪';
-                
+
                 const priorityTopIcon = element.querySelector('.priority-top-icon');
                 if (priorityTopIcon) {
                     priorityTopIcon.textContent = priorityIcon;
                 }
-                
+
                 element.classList.remove('empty-field');
             } else {
                 // Reset to empty state
@@ -1249,12 +1417,12 @@ class GoogleSheetsChecklist {
                     priorityTextLabel.textContent = 'set';
                     priorityTextLabel.classList.add('empty-field');
                 }
-                
+
                 const priorityTopIcon = element.querySelector('.priority-top-icon');
                 if (priorityTopIcon) {
                     priorityTopIcon.textContent = '⚪';
                 }
-                
+
                 element.classList.add('empty-field');
             }
         } else if (field === 'category') {
@@ -1281,10 +1449,10 @@ class GoogleSheetsChecklist {
         const field = input.dataset.field;
         const newValue = input.value.trim();
         const originalText = input.dataset.originalText;
-        
+
         // Get the original element
         const originalElement = input.previousElementSibling;
-        
+
         if (newValue !== originalText) {
             // OPTIMISTIC UPDATE: Update the UI immediately
             if (field === 'text') {
@@ -1299,16 +1467,16 @@ class GoogleSheetsChecklist {
                     originalElement.classList.add('empty-field');
                 }
             }
-            
+
             // Also update the local task data immediately
             const task = this.tasks.find(t => t.id === taskId);
             if (task) {
                 task[field] = newValue;
             }
-            
+
             // Clean up the input first so user sees the change immediately
             this.cleanupTextEdit(input, originalElement);
-            
+
             // Then send the server request in the background
             try {
                 const updateData = {};
@@ -1318,7 +1486,7 @@ class GoogleSheetsChecklist {
                 console.log(`Successfully updated ${field} to "${newValue}" for task ${taskId}`);
             } catch (error) {
                 console.error('Error updating text:', error);
-                
+
                 // ROLLBACK: Restore original value on error
                 if (field === 'text') {
                     originalElement.innerHTML = this.escapeHtml(originalText) + '<span class="edit-icon">✏️</span>';
@@ -1331,12 +1499,12 @@ class GoogleSheetsChecklist {
                         originalElement.classList.add('empty-field');
                     }
                 }
-                
+
                 // Also rollback the local task data
                 if (task) {
                     task[field] = originalText;
                 }
-                
+
                 // Show error message to user
                 this.showError(`Failed to update ${field}: ${error.message}`);
             }
@@ -1365,12 +1533,15 @@ class GoogleSheetsChecklist {
     linkifyUrls(text) {
         // First escape the HTML to prevent XSS
         const escapedText = this.escapeHtml(text);
-        
+
+        // Convert newlines to <br> tags for proper display
+        const textWithBreaks = escapedText.replace(/\n/g, '<br>');
+
         // URL regex pattern
         const urlRegex = /(https?:\/\/[^\s<>"']+)/gi;
-        
+
         // Replace URLs with anchor tags showing only hostname
-        return escapedText.replace(urlRegex, (match, url) => {
+        return textWithBreaks.replace(urlRegex, (match, url) => {
             try {
                 const hostname = new URL(url).hostname.replace(/^www\./, '');
                 return `<a href="${url}" target="_blank" rel="noopener noreferrer" style="color: var(--color-pink); text-decoration: underline;">${hostname}</a>`;
@@ -1385,14 +1556,14 @@ class GoogleSheetsChecklist {
         const totalTasks = this.tasks.length;
         const completedTasks = this.tasks.filter(task => task.completed).length;
         const percentage = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
-        
+
         const progressFill = document.getElementById('progress-fill');
         const progressText = document.getElementById('progress-text');
-        
+
         if (progressFill) {
             progressFill.style.width = `${percentage}%`;
         }
-        
+
         if (progressText) {
             progressText.textContent = `${completedTasks} of ${totalTasks} completed (${Math.round(percentage)}%)`;
         }
@@ -1410,13 +1581,13 @@ class GoogleSheetsChecklist {
         const now = new Date();
         const diff = now - date;
         const minutes = Math.floor(diff / 60000);
-        
+
         if (minutes < 1) return 'just now';
         if (minutes < 60) return `${minutes} minute${minutes === 1 ? '' : 's'} ago`;
-        
+
         const hours = Math.floor(minutes / 60);
         if (hours < 24) return `${hours} hour${hours === 1 ? '' : 's'} ago`;
-        
+
         const days = Math.floor(hours / 24);
         return `${days} day${days === 1 ? '' : 's'} ago`;
     }
@@ -1424,7 +1595,7 @@ class GoogleSheetsChecklist {
     // Add Task Form Methods
     toggleAddTaskForm() {
         const addTaskForm = document.getElementById('add-task-form');
-        
+
         // Check if form is currently visible
         if (addTaskForm.style.display === 'block') {
             // Form is open, close it
@@ -1445,33 +1616,33 @@ class GoogleSheetsChecklist {
             document.body.appendChild(backdrop);
         }
         backdrop.style.display = 'block';
-        
+
         // Add modal-open class to button
         const addButton = document.getElementById('add-item-btn');
         if (addButton) {
             addButton.classList.add('modal-open');
         }
-        
+
         // Show form
         const addTaskForm = document.getElementById('add-task-form');
         this.populateFormDropdowns();
         addTaskForm.style.display = 'block';
-        
+
         // Set default priority
         document.getElementById('task-priority').value = '3 - Medium';
-        
+
         // Pre-populate timeline if a timeline filter is currently selected
         this.prePopulateTimelineFromFilter();
-        
+
         // Pre-populate How field if a specific filter is selected
         this.prePopulateHowFromFilter();
-        
+
         // Close modal when clicking backdrop
         backdrop.addEventListener('click', () => this.hideAddTaskForm());
-        
+
         // Prevent form clicks from closing modal
         addTaskForm.addEventListener('click', (e) => e.stopPropagation());
-        
+
         // Focus the first input
         document.getElementById('task-text').focus();
     }
@@ -1479,12 +1650,12 @@ class GoogleSheetsChecklist {
     prePopulateTimelineFromFilter() {
         const timelineSelect = document.getElementById('task-timeline');
         if (!timelineSelect || !this.currentFilter) return;
-        
+
         // Special filters shouldn't pre-populate the timeline
         if (this.currentFilter === 'all' || this.currentFilter === 'support-needed' || this.currentFilter === 'dom-needed' || this.currentFilter === 'team-needed' || this.currentFilter === 'help-offered') {
             return;
         }
-        
+
         // Find the corresponding timeline value for the current filter
         // We need to find a task that matches the current filter to get the raw timeline value
         const matchingTask = this.tasks.find(task => {
@@ -1492,13 +1663,13 @@ class GoogleSheetsChecklist {
             const safeTimeline = displayTimeline.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase();
             return safeTimeline === this.currentFilter;
         });
-        
+
         if (matchingTask && matchingTask.timeline) {
             // Check if this timeline value is available in the dropdown
-            const matchingOption = Array.from(timelineSelect.options).find(option => 
+            const matchingOption = Array.from(timelineSelect.options).find(option =>
                 option.value === matchingTask.timeline
             );
-            
+
             if (matchingOption) {
                 timelineSelect.value = matchingTask.timeline;
             }
@@ -1508,7 +1679,7 @@ class GoogleSheetsChecklist {
     prePopulateHowFromFilter() {
         const howSelect = document.getElementById('task-how');
         if (!howSelect || !this.currentFilter) return;
-        
+
         // Pre-populate How field based on specific filters
         if (this.currentFilter === 'support-needed') {
             // Set How field to 'Help Needed'
@@ -1523,31 +1694,56 @@ class GoogleSheetsChecklist {
         // Get all editable dropdowns in the detail view
         const helperDropdowns = document.querySelectorAll('.helper-dropdown');
         const timelineDropdowns = document.querySelectorAll('.editable-dropdown[data-field="timeline"]');
-        
-        // Get unique who-can-help values from all tasks, split by comma/whitespace
+
+        // Get unique who-can-help values from all tasks, split by comma/whitespace (case-insensitive)
         const allHelperValues = [];
         this.tasks.forEach(task => {
             const helpers = this.parseWhoCanHelp(task.whoCanHelp || '');
             allHelperValues.push(...helpers);
         });
-        const whoCanHelpValues = [...new Set(allHelperValues)].sort(); // Alphabetical sorting
 
-        // Get unique timeline values from tasks (excluding empty values)
-        const timelineValues = [...new Set(
-            this.tasks
-                .map(task => task.Timeline || task.timeline)
-                .filter(value => value && value.trim() !== '')
-                .map(value => value.trim())
-        )].sort(); // Alphabetical sorting
-        
+        // Remove case-sensitive duplicates while preserving original case
+        const uniqueHelpers = [];
+        const seenLowercase = new Set();
+
+        allHelperValues.forEach(value => {
+            const lowerValue = value.toLowerCase();
+            if (!seenLowercase.has(lowerValue)) {
+                seenLowercase.add(lowerValue);
+                uniqueHelpers.push(value);
+            }
+        });
+
+        const whoCanHelpValues = uniqueHelpers.sort(); // Alphabetical sorting
+
+        // Get unique timeline values from tasks (excluding empty values, case-insensitive)
+        const allTimelineValues = this.tasks
+            .map(task => task.Timeline || task.timeline)
+            .filter(value => value && value.trim() !== '')
+            .map(value => value.trim());
+
+        // Remove case-sensitive duplicates while preserving original case
+        const uniqueTimelines = [];
+        const seenTimelineLowercase = new Set();
+
+        allTimelineValues.forEach(value => {
+            const lowerValue = value.toLowerCase();
+            if (!seenTimelineLowercase.has(lowerValue)) {
+                seenTimelineLowercase.add(lowerValue);
+                uniqueTimelines.push(value);
+            }
+        });
+
+        const timelineValues = uniqueTimelines.sort(); // Alphabetical sorting
+
         // Populate helper dropdowns
         helperDropdowns.forEach(dropdown => {
             const currentValue = dropdown.value;
             const isBlankDropdown = dropdown.classList.contains('blank-helper-dropdown') || dropdown.querySelector('option[value=""]')?.hasAttribute('selected');
-            
+
             // Clear all options and rebuild
             dropdown.innerHTML = '';
-            
+
             // Add appropriate blank option
             const blankOption = document.createElement('option');
             blankOption.value = '';
@@ -1558,9 +1754,10 @@ class GoogleSheetsChecklist {
                 blankOption.textContent = '';
             }
             dropdown.appendChild(blankOption);
-            
-            // Add current value if it exists and isn't in the values list
-            if (currentValue && currentValue !== '' && currentValue !== 'Other' && !whoCanHelpValues.includes(currentValue)) {
+
+            // Add current value if it exists and isn't in the values list (case-insensitive check)
+            if (currentValue && currentValue !== '' && currentValue !== 'Other' &&
+                !whoCanHelpValues.some(val => val.toLowerCase() === currentValue.toLowerCase())) {
                 const currentOption = document.createElement('option');
                 currentOption.value = currentValue;
                 currentOption.textContent = currentValue;
@@ -1569,7 +1766,7 @@ class GoogleSheetsChecklist {
                 }
                 dropdown.appendChild(currentOption);
             }
-            
+
             // Add all other values
             whoCanHelpValues.forEach(value => {
                 const option = document.createElement('option');
@@ -1580,7 +1777,7 @@ class GoogleSheetsChecklist {
                 }
                 dropdown.appendChild(option);
             });
-            
+
             // Always add "Other" option at the end
             const otherOption = document.createElement('option');
             otherOption.value = 'Other';
@@ -1594,25 +1791,26 @@ class GoogleSheetsChecklist {
         // Populate timeline dropdowns (no "Other" option as requested)
         timelineDropdowns.forEach(dropdown => {
             const currentValue = dropdown.value;
-            
+
             // Clear all options and rebuild
             dropdown.innerHTML = '';
-            
+
             // Always add blank option first
             const blankOption = document.createElement('option');
             blankOption.value = '';
             blankOption.textContent = '';
             dropdown.appendChild(blankOption);
-            
-            // Add current value if it exists and isn't in the values list
-            if (currentValue && currentValue !== '' && !timelineValues.includes(currentValue)) {
+
+            // Add current value if it exists and isn't in the values list (case-insensitive check)
+            if (currentValue && currentValue !== '' &&
+                !timelineValues.some(val => val.toLowerCase() === currentValue.toLowerCase())) {
                 const currentOption = document.createElement('option');
                 currentOption.value = currentValue;
                 currentOption.textContent = currentValue;
                 currentOption.selected = true;
                 dropdown.appendChild(currentOption);
             }
-            
+
             // Add all other values
             timelineValues.forEach(value => {
                 const option = document.createElement('option');
@@ -1629,7 +1827,7 @@ class GoogleSheetsChecklist {
     preserveFormData() {
         // Preserve current form values before repopulating dropdowns
         const formData = {};
-        
+
         const taskText = document.getElementById('task-text');
         const taskTimeline = document.getElementById('task-timeline');
         const taskTimelineOther = document.getElementById('task-timeline-other');
@@ -1641,7 +1839,7 @@ class GoogleSheetsChecklist {
         const taskHow = document.getElementById('task-how');
         const taskHowOther = document.getElementById('task-how-other');
         const taskNotes = document.getElementById('task-notes');
-        
+
         if (taskText) formData.taskText = taskText.value;
         if (taskTimeline) formData.taskTimeline = taskTimeline.value;
         if (taskTimelineOther) {
@@ -1665,14 +1863,14 @@ class GoogleSheetsChecklist {
             formData.taskHowOtherVisible = taskHowOther.style.display !== 'none';
         }
         if (taskNotes) formData.taskNotes = taskNotes.value;
-        
+
         return formData;
     }
 
     restoreFormData(formData) {
         // Restore preserved form values after repopulating dropdowns
         if (!formData) return;
-        
+
         const taskText = document.getElementById('task-text');
         const taskTimeline = document.getElementById('task-timeline');
         const taskTimelineOther = document.getElementById('task-timeline-other');
@@ -1684,7 +1882,7 @@ class GoogleSheetsChecklist {
         const taskHow = document.getElementById('task-how');
         const taskHowOther = document.getElementById('task-how-other');
         const taskNotes = document.getElementById('task-notes');
-        
+
         if (taskText && formData.taskText !== undefined) taskText.value = formData.taskText;
         if (taskTimeline && formData.taskTimeline !== undefined) taskTimeline.value = formData.taskTimeline;
         if (taskTimelineOther && formData.taskTimelineOther !== undefined) {
@@ -1731,32 +1929,43 @@ class GoogleSheetsChecklist {
             console.error('task-timeline element not found');
             return;
         }
-        
+
         // Get unique timeline values, excluding "X days before" patterns from the dropdown
-        const uniqueTimelines = [...new Set(
-            this.tasks
-                .map(task => task.timeline)
-                .filter(timeline => timeline && timeline.trim())
-                .filter(timeline => !this.isBeforeSurgeryTimeline(timeline)) // Exclude "X days before" patterns
-        )];
-        
+        const timelineValues = this.tasks
+            .map(task => task.timeline)
+            .filter(timeline => timeline && timeline.trim())
+            .filter(timeline => !this.isBeforeSurgeryTimeline(timeline)) // Exclude "X days before" patterns
+            .map(timeline => timeline.trim());
+
+        // Remove case-sensitive duplicates while preserving original case
+        const uniqueTimelines = [];
+        const seenLowercase = new Set();
+
+        timelineValues.forEach(timeline => {
+            const lowerTimeline = timeline.toLowerCase();
+            if (!seenLowercase.has(lowerTimeline)) {
+                seenLowercase.add(lowerTimeline);
+                uniqueTimelines.push(timeline);
+            }
+        });
+
         // Sort timelines with custom logic (asap first, numbers descending, others ascending)
         const sortedTimelines = uniqueTimelines.sort((a, b) => {
             if (a.toLowerCase() === 'asap') return -1;
             if (b.toLowerCase() === 'asap') return 1;
-            
+
             const aStartsWithNumber = /^\d/.test(a);
             const bStartsWithNumber = /^\d/.test(b);
-            
+
             if (aStartsWithNumber && bStartsWithNumber) {
                 const aNum = parseInt(a.match(/^\d+/)[0]);
                 const bNum = parseInt(b.match(/^\d+/)[0]);
                 return bNum - aNum;
             }
-            
+
             if (aStartsWithNumber && !bStartsWithNumber) return -1;
             if (!aStartsWithNumber && bStartsWithNumber) return 1;
-            
+
             return a.localeCompare(b);
         });
 
@@ -1764,10 +1973,10 @@ class GoogleSheetsChecklist {
         const firstOption = timelineSelect.options[0];
         const otherOption = Array.from(timelineSelect.options).find(opt => opt.value === 'Other');
         timelineSelect.innerHTML = '';
-        
+
         // Add back the default option
         timelineSelect.appendChild(firstOption);
-        
+
         // Add dynamic options
         sortedTimelines.forEach(timeline => {
             if (timeline !== 'Other') {
@@ -1777,7 +1986,7 @@ class GoogleSheetsChecklist {
                 timelineSelect.appendChild(option);
             }
         });
-        
+
         // Add "Other" option at the end
         if (otherOption) {
             timelineSelect.appendChild(otherOption);
@@ -1793,13 +2002,25 @@ class GoogleSheetsChecklist {
         const whoCanHelpSelect = document.getElementById('task-who-can-help');
         if (!whoCanHelpSelect) return;
 
-        // Get unique who-can-help values from tasks
-        const whoCanHelpValues = [...new Set(
-            this.tasks
-                .map(task => task.whoCanHelp)
-                .filter(value => value && value.trim() !== '')
-                .map(value => value.trim())
-        )].sort(); // Alphabetical sorting
+        // Get unique who-can-help values from tasks (case-insensitive)
+        const whoCanHelpValues = this.tasks
+            .map(task => task.whoCanHelp)
+            .filter(value => value && value.trim() !== '')
+            .map(value => value.trim());
+
+        // Remove case-sensitive duplicates while preserving original case
+        const uniqueWhoCanHelp = [];
+        const seenLowercase = new Set();
+
+        whoCanHelpValues.forEach(value => {
+            const lowerValue = value.toLowerCase();
+            if (!seenLowercase.has(lowerValue)) {
+                seenLowercase.add(lowerValue);
+                uniqueWhoCanHelp.push(value);
+            }
+        });
+
+        const sortedWhoCanHelp = uniqueWhoCanHelp.sort(); // Alphabetical sorting
 
         // Remove existing dynamic options (keep default and "Other")
         const existingOptions = Array.from(whoCanHelpSelect.options);
@@ -1811,7 +2032,7 @@ class GoogleSheetsChecklist {
 
         // Add dynamic options before "Other"
         const otherOption = whoCanHelpSelect.querySelector('option[value="Other"]');
-        whoCanHelpValues.forEach(value => {
+        sortedWhoCanHelp.forEach(value => {
             const option = document.createElement('option');
             option.value = value;
             option.textContent = value;
@@ -1822,7 +2043,7 @@ class GoogleSheetsChecklist {
     populateCategoryDropdown() {
         const categorySelect = document.getElementById('task-category');
         const uniqueCategories = [...new Set(this.tasks.map(task => task.category).filter(category => category && category.trim()))];
-        
+
         // Sort categories alphabetically
         const sortedCategories = uniqueCategories.sort((a, b) => a.localeCompare(b));
 
@@ -1830,10 +2051,10 @@ class GoogleSheetsChecklist {
         const firstOption = categorySelect.options[0];
         const otherOption = Array.from(categorySelect.options).find(opt => opt.value === 'Other');
         categorySelect.innerHTML = '';
-        
+
         // Add back the default option
         categorySelect.appendChild(firstOption);
-        
+
         // Add dynamic options
         sortedCategories.forEach(category => {
             if (category !== 'Other') {
@@ -1843,7 +2064,7 @@ class GoogleSheetsChecklist {
                 categorySelect.appendChild(option);
             }
         });
-        
+
         // Add "Other" option at the end
         if (otherOption) {
             categorySelect.appendChild(otherOption);
@@ -1859,13 +2080,25 @@ class GoogleSheetsChecklist {
         const howSelect = document.getElementById('task-how');
         if (!howSelect) return;
 
-        // Get unique how values from tasks
-        const howValues = [...new Set(
-            this.tasks
-                .map(task => task.how)
-                .filter(value => value && value.trim() !== '')
-                .map(value => value.trim())
-        )].sort(); // Alphabetical sorting
+        // Get unique how values from tasks (case-insensitive)
+        const howValues = this.tasks
+            .map(task => task.how)
+            .filter(value => value && value.trim() !== '')
+            .map(value => value.trim());
+
+        // Remove case-sensitive duplicates while preserving original case
+        const uniqueHow = [];
+        const seenLowercase = new Set();
+
+        howValues.forEach(value => {
+            const lowerValue = value.toLowerCase();
+            if (!seenLowercase.has(lowerValue)) {
+                seenLowercase.add(lowerValue);
+                uniqueHow.push(value);
+            }
+        });
+
+        const sortedHow = uniqueHow.sort(); // Alphabetical sorting
 
         // Remove existing dynamic options (keep default and "Other")
         const existingOptions = Array.from(howSelect.options);
@@ -1877,7 +2110,7 @@ class GoogleSheetsChecklist {
 
         // Add dynamic options before "Other"
         const otherOption = howSelect.querySelector('option[value="Other"]');
-        howValues.forEach(value => {
+        sortedHow.forEach(value => {
             const option = document.createElement('option');
             option.value = value;
             option.textContent = value;
@@ -1888,22 +2121,22 @@ class GoogleSheetsChecklist {
     hideAddTaskForm() {
         document.getElementById('add-task-form').style.display = 'none';
         document.getElementById('new-task-form').reset();
-        
+
         // Remove modal-open class from button
         const addButton = document.getElementById('add-item-btn');
         if (addButton) {
             addButton.classList.remove('modal-open');
         }
-        
+
         // Hide backdrop
         const backdrop = document.getElementById('modal-backdrop');
         if (backdrop) {
             backdrop.style.display = 'none';
         }
-        
+
         // Reset priority to default value after form reset
         document.getElementById('task-priority').value = '3 - Medium';
-        
+
         // Hide any "other" fields
         document.getElementById('task-timeline-other').style.display = 'none';
         document.getElementById('task-category-other').style.display = 'none';
@@ -1913,7 +2146,7 @@ class GoogleSheetsChecklist {
     handleOtherOption(event, otherFieldId) {
         const otherField = document.getElementById(otherFieldId);
         const otherContainer = document.getElementById(otherFieldId + '-container');
-        
+
         if (event.target.value === 'Other') {
             if (otherContainer) {
                 otherContainer.style.display = 'block';
@@ -1933,33 +2166,33 @@ class GoogleSheetsChecklist {
 
     async handleAddTask(event) {
         event.preventDefault();
-        
+
         // Show loading spinner
         this.showAddTaskLoading(true);
-        
+
         const formData = new FormData(event.target);
-        
+
         // Handle "Other" options
         let timeline = formData.get('timeline') || 'General';
         if (timeline === 'Other') {
             timeline = formData.get('timelineOther')?.trim() || 'General';
         }
-        
+
         let category = formData.get('category') || '';
         if (category === 'Other') {
             category = formData.get('categoryOther')?.trim() || '';
         }
-        
+
         let whoCanHelp = formData.get('whoCanHelp') || '';
         if (whoCanHelp === 'Other') {
             whoCanHelp = formData.get('whoCanHelpOther')?.trim() || '';
         }
-        
+
         let how = formData.get('how') || '';
         if (how === 'Other') {
             how = formData.get('how-other')?.trim() || '';
         }
-        
+
         const taskData = {
             text: formData.get('taskText').trim(),
             timeline: timeline,
@@ -1994,18 +2227,18 @@ class GoogleSheetsChecklist {
                 // Generate a temporary ID for the task
                 const tempId = 'temp_' + Date.now();
                 taskData.id = tempId;
-                
+
                 // Add to local tasks array
                 this.tasks.push(taskData);
-                
+
                 // Re-render the tasks to show the new one immediately
                 this.renderTasks();
-                
+
                 // Show success message
                 this.updateSyncStatus('✅ Task Added Locally (Please add to Google Sheet manually)');
                 this.showAddTaskLoading(false);
                 this.hideAddTaskForm();
-                
+
                 // Show instructions to add manually to Google Sheet
                 const sheetUrl = `https://docs.google.com/spreadsheets/d/${this.sheetId}/edit#gid=${this.gid}`;
                 setTimeout(() => {
@@ -2039,7 +2272,7 @@ class GoogleSheetsChecklist {
         const errorDiv = document.getElementById('error-message');
         errorDiv.textContent = message;
         errorDiv.style.display = 'block';
-        
+
         setTimeout(() => {
             errorDiv.style.display = 'none';
         }, 8000);
@@ -2058,7 +2291,7 @@ class GoogleSheetsChecklist {
         if (syncStatusText) {
             syncStatusText.textContent = status;
             syncStatusText.style.display = 'block';
-            
+
             // Hide status text after 3 seconds
             setTimeout(() => {
                 syncStatusText.style.display = 'none';
@@ -2097,7 +2330,7 @@ class GoogleSheetsChecklist {
             const url = `${this.appsScriptUrl}?${params.toString()}`;
             console.log('Sending add task request to:', url);
             console.log('Task data:', taskData);
-            
+
             try {
                 // First try a regular GET request to see if we can read the response
                 const response = await fetch(url, {
@@ -2110,11 +2343,11 @@ class GoogleSheetsChecklist {
                 if (response.ok) {
                     const responseText = await response.text();
                     console.log('Raw response text:', responseText);
-                    
+
                     try {
                         const result = JSON.parse(responseText);
                         console.log('Parsed response:', result);
-                        
+
                         if (result.success) {
                             console.log('Task added successfully via Apps Script');
                             return result;
@@ -2134,7 +2367,7 @@ class GoogleSheetsChecklist {
                 }
             } catch (corsError) {
                 console.log('CORS prevented response reading, trying no-cors mode:', corsError.message);
-                
+
                 // Fallback to no-cors mode - request goes through but we can't read response
                 await fetch(url, {
                     method: 'GET',
@@ -2142,7 +2375,7 @@ class GoogleSheetsChecklist {
                 });
 
                 console.log('Add task request sent (no-cors mode)');
-                
+
                 // Since we can't read the response, just assume it worked and reload after a delay
                 return { success: true, message: 'Request sent (response not readable due to CORS)' };
             }
@@ -2161,14 +2394,14 @@ class GoogleSheetsChecklist {
 
         try {
             this.showLoading(true);
-            
+
             // Use GET request to avoid CORS preflight issues
             const params = new URLSearchParams({
                 action: 'updateTaskDetails',
                 taskId: taskId,
                 updates: JSON.stringify(updates)
             });
-            
+
             const response = await fetch(`${this.appsScriptUrl}?${params.toString()}`, {
                 method: 'GET'
             });
@@ -2178,14 +2411,14 @@ class GoogleSheetsChecklist {
             }
 
             const result = await response.json();
-            
+
             if (!result.success) {
                 throw new Error(result.data?.error || 'Failed to update task');
             }
 
             await this.loadFromSheet();
             this.updateSyncStatus('✅ Task Updated');
-            
+
         } catch (error) {
             console.error('Error updating task details:', error);
             this.showError(`Failed to update task: ${error.message}`);
@@ -2209,7 +2442,7 @@ class GoogleSheetsChecklist {
 
         try {
             this.showLoading(true);
-            
+
             const response = await fetch(this.appsScriptUrl, {
                 method: 'POST',
                 headers: {
@@ -2226,7 +2459,7 @@ class GoogleSheetsChecklist {
             }
 
             const result = await response.json();
-            
+
             if (!result.success) {
                 throw new Error(result.data?.error || 'Failed to delete task');
             }
@@ -2234,7 +2467,7 @@ class GoogleSheetsChecklist {
             // Refresh the data to show the deletion
             await this.loadFromSheet();
             this.updateSyncStatus('✅ Task Deleted');
-            
+
         } catch (error) {
             console.error('Error deleting task:', error);
             this.showError(`Failed to delete task: ${error.message}`);
@@ -2263,7 +2496,7 @@ class GoogleSheetsChecklist {
 
             const cacheData = JSON.parse(cached);
             const cacheAge = Date.now() - new Date(cacheData.timestamp).getTime();
-            
+
             // Use cache if less than 5 minutes old
             if (cacheAge < 5 * 60 * 1000) {
                 this.tasks = cacheData.tasks || [];
@@ -2286,48 +2519,48 @@ class GoogleSheetsChecklist {
 
         // Get unique timeline values from tasks, using display timeline instead of raw timeline
         const timelineValues = [...new Set(this.tasks.map(task => this.getDisplayTimeline(task.timeline)))];
-        
+
         // Sort timeline values similar to how they're displayed
         const sortedTimelines = timelineValues.sort((a, b) => {
             // 'asap' always comes first
             if (a.toLowerCase() === 'asap') return -1;
             if (b.toLowerCase() === 'asap') return 1;
-            
+
             // 'Before Surgery' comes next
             if (a === 'Before Surgery') return -1;
             if (b === 'Before Surgery') return 1;
-            
+
             // Check if strings start with numbers
             const aStartsWithNumber = /^\d/.test(a);
             const bStartsWithNumber = /^\d/.test(b);
-            
+
             // If both start with numbers, sort descending by the number
             if (aStartsWithNumber && bStartsWithNumber) {
                 const aNum = parseInt(a.match(/^\d+/)[0]);
                 const bNum = parseInt(b.match(/^\d+/)[0]);
                 return bNum - aNum; // descending
             }
-            
+
             // If one starts with number and other doesn't, number comes first
             if (aStartsWithNumber && !bStartsWithNumber) return -1;
             if (!aStartsWithNumber && bStartsWithNumber) return 1;
-            
+
             // If neither starts with number, sort alphabetically ascending
             return a.localeCompare(b);
         });
 
         // Generate filter buttons HTML
         let buttonsHtml = '<button class="filter-btn" data-filter="all">All Tasks</button>';
-        
+
         // Add category-based filters
         buttonsHtml += '<button class="filter-btn" data-filter="support-needed">Help Needed</button>';
         buttonsHtml += '<button class="filter-btn" data-filter="dom-needed">Dom Needed</button>';
         buttonsHtml += '<button class="filter-btn" data-filter="team-needed">Team Needed</button>';
         buttonsHtml += '<button class="filter-btn" data-filter="help-offered">Help Offered</button>';
-        
+
         // Add line break before timeline buttons
         buttonsHtml += '<div style="flex-basis: 100%; height: 0;"></div>';
-        
+
         sortedTimelines.forEach(timeline => {
             const safeTimeline = timeline.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase();
             buttonsHtml += `<button class="filter-btn" data-filter="${safeTimeline}">${timeline}</button>`;
@@ -2348,7 +2581,7 @@ class GoogleSheetsChecklist {
 
         // On initial load, always default to 'all'. During data syncs, restore saved filter or current filter
         let activeButton = null;
-        
+
         if (this.isInitialLoad) {
             // On page refresh/initial load, always start with 'all'
             activeButton = filterContainer.querySelector('[data-filter="all"]');
@@ -2359,12 +2592,12 @@ class GoogleSheetsChecklist {
                 activeButton = filterContainer.querySelector(`[data-filter="${filterToRestore}"]`);
             }
         }
-        
+
         // If no active button found, default to 'all'
         if (!activeButton) {
             activeButton = filterContainer.querySelector('[data-filter="all"]');
         }
-        
+
         if (activeButton) {
             activeButton.classList.add('active');
             this.currentFilter = activeButton.dataset.filter;
@@ -2383,7 +2616,7 @@ class GoogleSheetsChecklist {
             // Initialize the checkbox state (default unchecked)
             this.showCompleted = this.showCompleted || false;
             showCompletedCheckbox.checked = this.showCompleted;
-            
+
             showCompletedCheckbox.addEventListener('change', (e) => {
                 this.showCompleted = e.target.checked;
                 this.applyFilter(this.currentFilter);
@@ -2404,7 +2637,7 @@ class GoogleSheetsChecklist {
 
         // Update current filter state
         this.currentFilter = button.dataset.filter;
-        
+
         // Save the current filter so it persists across syncs
         this.saveCurrentFilter();
 
@@ -2495,42 +2728,57 @@ class GoogleSheetsChecklist {
     }
 
     // Date picker initialization and management
-    initializeDatePicker() {
-        // Initialize task form date picker (in modal) with simple configuration
-        this.taskDatePicker = flatpickr("#task-date", {
-            mode: "single",
+
+    // Helper function to get merged Flatpickr configuration
+    getFlatpickrConfig(overrides = {}) {
+        const defaultConfig = {
             dateFormat: "Y-m-d",
             allowInput: false,
             theme: "dark",
             position: "auto",
+            defaultMode: "single"
+        };
+
+        const userConfig = window.CHECKLIST_CONFIG?.flatpickr || {};
+
+        // Merge: defaults < user config < method overrides
+        return {
+            ...defaultConfig,
+            ...userConfig,
+            ...overrides
+        };
+    }
+
+    initializeDatePicker() {
+        // Get merged configuration with onChange handler
+        const config = this.getFlatpickrConfig({
             onChange: (selectedDates, dateStr, instance) => {
                 this.handleTaskDateChange(selectedDates, dateStr, instance);
             }
         });
-        
-        this.taskDateMode = 'single';
-    }
 
-    setDatePickerMode(mode) {
+        // Initialize task form date picker (in modal) with merged configuration
+        this.taskDatePicker = flatpickr("#task-date", config);
+
+        this.taskDateMode = config.defaultMode;
+    } setDatePickerMode(mode) {
         // Update toggle button states for task form picker
         document.getElementById('single-date-btn').classList.toggle('active', mode === 'single');
         document.getElementById('date-range-btn').classList.toggle('active', mode === 'range');
-        
+
         // Update task datepicker mode
         this.taskDatePicker.destroy();
-        this.taskDatePicker = flatpickr("#task-date", {
+
+        // Get merged configuration with mode and onChange handler
+        const config = this.getFlatpickrConfig({
             mode: mode,
-            dateFormat: "Y-m-d",
-            allowInput: false,
-            theme: "dark",
-            position: "auto",
             onChange: (selectedDates, dateStr, instance) => {
                 this.handleTaskDateChange(selectedDates, dateStr, instance);
             }
         });
-        
-        this.taskDateMode = mode;
-        
+
+        this.taskDatePicker = flatpickr("#task-date", config); this.taskDateMode = mode;
+
         // Clear current date value when switching modes
         document.getElementById('task-date').value = '';
     }
@@ -2550,7 +2798,7 @@ class GoogleSheetsChecklist {
 
     formatDateForDisplay(dateStr) {
         if (!dateStr) return '';
-        
+
         // Check if it's a date range
         if (dateStr.includes(' to ')) {
             const [startDate, endDate] = dateStr.split(' to ');
@@ -2558,7 +2806,7 @@ class GoogleSheetsChecklist {
             const end = new Date(endDate);
             const today = new Date();
             today.setHours(0, 0, 0, 0);
-            
+
             // Check if range includes today or is overdue
             if (start <= today && end >= today) {
                 return `<span class="task-date-icon">📅</span><span class="task-date-range task-date-today">${this.formatSingleDate(startDate)} - ${this.formatSingleDate(endDate)}</span>`;
@@ -2573,7 +2821,7 @@ class GoogleSheetsChecklist {
             const today = new Date();
             today.setHours(0, 0, 0, 0);
             date.setHours(0, 0, 0, 0);
-            
+
             if (date.getTime() === today.getTime()) {
                 return `<span class="task-date-icon">🎯</span><span class="task-date-single task-date-today">${this.formatSingleDate(dateStr)}</span>`;
             } else if (date < today) {
@@ -2592,10 +2840,10 @@ class GoogleSheetsChecklist {
 
     formatSingleDate(dateStr) {
         const date = new Date(dateStr);
-        return date.toLocaleDateString('en-US', { 
-            month: 'short', 
-            day: 'numeric', 
-            year: 'numeric' 
+        return date.toLocaleDateString('en-US', {
+            month: 'short',
+            day: 'numeric',
+            year: 'numeric'
         });
     }
 }
@@ -2603,21 +2851,21 @@ class GoogleSheetsChecklist {
 // Handle sync status visibility based on first todo item scroll position
 function handleSyncStatusVisibility() {
     const syncStatus = document.querySelector('.sync-status');
-    
+
     if (!syncStatus) return;
-    
+
     function updateSyncStatusVisibility() {
         const firstTodoItem = document.querySelector('.todo-item');
-        
+
         if (!firstTodoItem) {
             // No todo items yet, hide sync status
             syncStatus.classList.remove('visible');
             return;
         }
-        
+
         const firstItemRect = firstTodoItem.getBoundingClientRect();
         const scrollY = window.scrollY;
-        
+
         // Show sync status when first todo item is scrolled into view or we've scrolled past it
         if (firstItemRect.top <= window.innerHeight || scrollY > 100) {
             syncStatus.classList.add('visible');
@@ -2625,21 +2873,21 @@ function handleSyncStatusVisibility() {
             syncStatus.classList.remove('visible');
         }
     }
-    
+
     // Update on scroll and resize
     window.addEventListener('scroll', updateSyncStatusVisibility);
     window.addEventListener('resize', updateSyncStatusVisibility);
-    
+
     // Also update when tasks are loaded/refreshed
     const observer = new MutationObserver(() => {
         setTimeout(updateSyncStatusVisibility, 100); // Small delay to ensure rendering
     });
-    
+
     const todoList = document.querySelector('#todo-list');
     if (todoList) {
         observer.observe(todoList, { childList: true, subtree: true });
     }
-    
+
     // Initial check
     setTimeout(updateSyncStatusVisibility, 500); // Delay to ensure initial load
 }

@@ -325,60 +325,110 @@ function addTask(taskData) {
  * Update task details (not just completion status)
  */
 function updateTaskDetails(taskId, updates) {
-  const rowIndex = parseInt(taskId.replace('row-', ''));
-  const spreadsheet = SpreadsheetApp.openById(SHEET_ID);
-  const sheet = getSheetByGidOrName(spreadsheet, GID, SHEET_NAME);
-  const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
-  const headerMap = headers.map(h => h.toString().toLowerCase().trim());
-  
-  // Update each field that was provided
-  Object.keys(updates).forEach(field => {
-    let columnIndex = -1;
-    console.log(`Processing field: "${field}" with value: "${updates[field]}"`);
-    
-    switch (field.toLowerCase()) {
-      case 'text':
-      case 'task':
-        columnIndex = findColumnIndex(headerMap, ['task', 'description', 'title']);
-        break;
-      case 'timeline':
-        columnIndex = findColumnIndex(headerMap, ['timeline', 'phase', 'period']);
-        break;
-      case 'priority':
-        columnIndex = findColumnIndex(headerMap, ['priority', 'urgency']);
-        break;
-      case 'category':
-        columnIndex = findColumnIndex(headerMap, ['category', 'type']);
-        break;
-      case 'how':
-        columnIndex = findColumnIndex(headerMap, ['how', 'method', 'instructions']);
-        break;
-      case 'notes':
-        columnIndex = findColumnIndex(headerMap, ['notes', 'comments', 'details']);
-        break;
-      case 'whocanhelp':
-      case 'whoCanHelp':
-      case 'who can help':
-        columnIndex = findColumnIndex(headerMap, ['whocanhelp', 'who can help', 'help', 'contact']);
-        break;
+  try {
+    console.log(`updateTaskDetails called with taskId: ${taskId}, updates:`, updates);
+
+    const rowIndex = parseInt(taskId.replace('row-', ''));
+    console.log(`Parsed row index: ${rowIndex}`);
+
+    const spreadsheet = SpreadsheetApp.openById(SHEET_ID);
+    const sheet = getSheetByGidOrName(spreadsheet, GID, SHEET_NAME);
+    const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+    const headerMap = headers.map(h => h.toString().toLowerCase().trim());
+
+    console.log(`Available headers: ${headerMap.join(', ')}`);
+
+    // Update each field that was provided
+    Object.keys(updates).forEach(field => {
+      let columnIndex = -1;
+      console.log(`Processing field: "${field}" with value: "${updates[field]}"`);
+
+      switch (field.toLowerCase()) {
+        case 'text':
+        case 'task':
+          columnIndex = findColumnIndex(headerMap, ['task', 'description', 'title']);
+          break;
+        case 'timeline':
+          columnIndex = findColumnIndex(headerMap, ['timeline', 'phase', 'period']);
+          break;
+        case 'priority':
+          columnIndex = findColumnIndex(headerMap, ['priority', 'urgency']);
+          break;
+        case 'category':
+          columnIndex = findColumnIndex(headerMap, ['category', 'type']);
+          break;
+        case 'how':
+          columnIndex = findColumnIndex(headerMap, ['how', 'method', 'instructions']);
+          break;
+        case 'notes':
+          columnIndex = findColumnIndex(headerMap, ['notes', 'comments', 'details']);
+          break;
+        case 'whocanhelp':
+        case 'whoCanHelp':
+        case 'who can help':
+          columnIndex = findColumnIndex(headerMap, ['whocanhelp', 'who can help', 'help', 'contact']);
+          break;
+        case 'date':
+        case 'due date':
+        case 'target date':
+        case 'deadline':
+          columnIndex = findColumnIndex(headerMap, ['date', 'due date', 'target date', 'deadline']);
+          console.log(`Date field - searching for columns: ['date', 'due date', 'target date', 'deadline']`);
+          console.log(`Found date column at index: ${columnIndex}`);
+          break;
+      }
+
+      console.log(`Field "${field}" mapped to column index: ${columnIndex}`);
+      if (columnIndex >= 0) {
+        let valueToSet = updates[field];
+
+        // Special handling for date field
+        if (field.toLowerCase() === 'date') {
+          console.log(`Processing date field with original value: "${valueToSet}" (type: ${typeof valueToSet})`);
+          if (valueToSet === '' || valueToSet === null || valueToSet === undefined) {
+            // For empty values, use empty string directly - do NOT call formatDateForSheet
+            valueToSet = '';
+            console.log(`Date field is empty, setting to empty string without formatting`);
+          } else {
+            // Only format non-empty date values
+            console.log(`Date field has value, formatting...`);
+            valueToSet = formatDateForSheet(valueToSet);
+            console.log(`Date field formatted to: "${valueToSet}"`);
+          }
+        }
+
+        console.log(`Updating cell at row ${rowIndex}, column ${columnIndex + 1} with value: "${valueToSet}"`);
+
+        // Get the current value for comparison
+        const currentValue = sheet.getRange(rowIndex, columnIndex + 1).getValue();
+        console.log(`Current cell value: "${currentValue}"`);
+
+        // Update the cell
+        sheet.getRange(rowIndex, columnIndex + 1).setValue(valueToSet);
+
+        // Verify the update
+        const newValue = sheet.getRange(rowIndex, columnIndex + 1).getValue();
+        console.log(`Cell updated. New value: "${newValue}"`);
+
+      } else {
+        console.warn(`Column not found for field: "${field}". Available headers: ${headerMap.join(', ')}`);
+      }
+    });
+
+    // Update last modified timestamp
+    const lastModifiedIndex = findColumnIndex(headerMap, ['lastmodified', 'updated', 'modified']);
+    if (lastModifiedIndex >= 0) {
+      console.log(`Updating last modified timestamp at column ${lastModifiedIndex + 1}`);
+      sheet.getRange(rowIndex, lastModifiedIndex + 1).setValue(new Date());
     }
-    
-    console.log(`Field "${field}" mapped to column index: ${columnIndex}`);
-    if (columnIndex >= 0) {
-      console.log(`Updating cell at row ${rowIndex}, column ${columnIndex + 1} with value: "${updates[field]}"`);
-      sheet.getRange(rowIndex, columnIndex + 1).setValue(updates[field]);
-    } else {
-      console.warn(`Column not found for field: "${field}"`);
-    }
-  });
-  
-  // Update last modified timestamp
-  const lastModifiedIndex = findColumnIndex(headerMap, ['lastmodified', 'updated', 'modified']);
-  if (lastModifiedIndex >= 0) {
-    sheet.getRange(rowIndex, lastModifiedIndex + 1).setValue(new Date());
+
+    console.log(`updateTaskDetails completed successfully`);
+    return { success: true, taskId: taskId, updates: updates };
+
+  } catch (error) {
+    console.error('Error in updateTaskDetails:', error);
+    throw new Error(`Failed to update task details: ${error.message}`);
   }
-  
-  return { success: true, taskId: taskId, updates: updates };
 }
 
 /**
@@ -453,7 +503,11 @@ function findColumnIndex(headers, possibleNames) {
  * Helper function to format date values for display
  */
 function formatDateForSheet(dateValue) {
-  if (!dateValue) return '';
+  // IMPORTANT: Return empty string immediately for empty/null/undefined values
+  if (!dateValue || dateValue === '' || dateValue === null || dateValue === undefined) {
+    console.log('formatDateForSheet: Empty value detected, returning empty string');
+    return '';
+  }
   
   try {
     // If it's already a date object
@@ -463,13 +517,20 @@ function formatDateForSheet(dateValue) {
     
     // If it's a string, try to parse it
     if (typeof dateValue === 'string') {
-      const parsed = new Date(dateValue);
+      // Extra check for empty string after trim
+      const trimmed = dateValue.trim();
+      if (trimmed === '') {
+        console.log('formatDateForSheet: Empty string after trim, returning empty string');
+        return '';
+      }
+
+      const parsed = new Date(trimmed);
       if (!isNaN(parsed.getTime())) {
         return parsed.toISOString().split('T')[0];
       }
       // If it's already in YYYY-MM-DD format, return as is
-      if (/^\d{4}-\d{2}-\d{2}$/.test(dateValue.trim())) {
-        return dateValue.trim();
+      if (/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) {
+        return trimmed;
       }
     }
     
@@ -559,6 +620,124 @@ function testScript() {
       error: error.toString(),
       sheetId: SHEET_ID,
       sheetName: SHEET_NAME
+    };
+  }
+}
+
+/**
+ * Test function specifically for date field updates
+ */
+function testDateUpdate() {
+  console.log('Testing date field update...');
+
+  try {
+    const spreadsheet = SpreadsheetApp.openById(SHEET_ID);
+    const sheet = getSheetByGidOrName(spreadsheet, GID, SHEET_NAME);
+    const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+    const headerMap = headers.map(h => h.toString().toLowerCase().trim());
+
+    console.log('Available headers:', headerMap);
+
+    // Find date column
+    const dateColumnIndex = findColumnIndex(headerMap, ['date', 'due date', 'target date', 'deadline']);
+    console.log('Date column index:', dateColumnIndex);
+
+    if (dateColumnIndex >= 0) {
+      console.log(`Date column found at index ${dateColumnIndex} (column ${dateColumnIndex + 1})`);
+      console.log(`Header name: "${headers[dateColumnIndex]}"`);
+
+      // Get a sample of date values
+      const dataRange = sheet.getDataRange();
+      const numRows = Math.min(5, dataRange.getNumRows());
+      for (let i = 2; i <= numRows; i++) {
+        const cellValue = sheet.getRange(i, dateColumnIndex + 1).getValue();
+        console.log(`Row ${i} date value: "${cellValue}" (type: ${typeof cellValue})`);
+      }
+    } else {
+      console.log('Date column NOT found');
+      console.log('Trying specific header searches:');
+      ['date', 'due date', 'target date', 'deadline'].forEach(searchTerm => {
+        const index = headerMap.findIndex(h => h.includes(searchTerm));
+        console.log(`  Search for "${searchTerm}": ${index >= 0 ? `found at ${index}` : 'not found'}`);
+      });
+    }
+
+    return {
+      success: true,
+      headers: headers,
+      headerMap: headerMap,
+      dateColumnIndex: dateColumnIndex,
+      dateColumnHeader: dateColumnIndex >= 0 ? headers[dateColumnIndex] : null
+    };
+
+  } catch (error) {
+    console.error('Date update test failed:', error);
+    return {
+      success: false,
+      error: error.toString()
+    };
+  }
+}
+
+/**
+ * Test function to verify writing to date column
+ */
+function testDateWrite() {
+  console.log('Testing date column write functionality...');
+
+  try {
+    const spreadsheet = SpreadsheetApp.openById(SHEET_ID);
+    const sheet = getSheetByGidOrName(spreadsheet, GID, SHEET_NAME);
+    const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+    const headerMap = headers.map(h => h.toString().toLowerCase().trim());
+
+    // Find date column
+    const dateColumnIndex = findColumnIndex(headerMap, ['date', 'due date', 'target date', 'deadline']);
+
+    if (dateColumnIndex >= 0) {
+      // Find a row with data to test (row 3 based on the previous test)
+      const testRow = 3;
+      const dateColumn = dateColumnIndex + 1;
+
+      console.log(`Testing write to row ${testRow}, column ${dateColumn}`);
+
+      // Get current value
+      const currentValue = sheet.getRange(testRow, dateColumn).getValue();
+      console.log(`Current value: "${currentValue}" (type: ${typeof currentValue})`);
+
+      // Test clearing the date (set to empty string)
+      console.log('Setting date to empty string...');
+      sheet.getRange(testRow, dateColumn).setValue('');
+
+      // Verify the change
+      const newValue = sheet.getRange(testRow, dateColumn).getValue();
+      console.log(`New value after clearing: "${newValue}" (type: ${typeof newValue})`);
+
+      // Restore original value if it was a date
+      if (currentValue instanceof Date) {
+        console.log('Restoring original date value...');
+        sheet.getRange(testRow, dateColumn).setValue(currentValue);
+        const restoredValue = sheet.getRange(testRow, dateColumn).getValue();
+        console.log(`Restored value: "${restoredValue}" (type: ${typeof restoredValue})`);
+      }
+
+      return {
+        success: true,
+        testRow: testRow,
+        dateColumn: dateColumn,
+        currentValue: currentValue,
+        clearedSuccessfully: newValue === '' || newValue === null
+      };
+
+    } else {
+      throw new Error('Date column not found');
+    }
+
+  } catch (error) {
+    console.error('Date write test failed:', error);
+    return {
+      success: false,
+      error: error.toString()
     };
   }
 }

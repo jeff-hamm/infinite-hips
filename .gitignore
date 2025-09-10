@@ -6,6 +6,7 @@
 .Trashes
 ehthumbs.db
 Thumbs.db
+.history/
 
 # VS Code
 .vscode/
@@ -75,3 +76,4 @@ notes/personal/
 # *.mov
 # *.mp4
 # *.avi
+.history/

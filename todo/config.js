@@ -21,7 +21,25 @@ window.CHECKLIST_CONFIG = {
     refreshInterval: 60000,
     
     // Maximum retry attempts for failed requests
-    maxRetries: 3
+    maxRetries: 3,
+
+    // Flatpickr date picker configuration
+    flatpickr: {
+        // Default date format
+        dateFormat: "m-d-Y",
+
+        // Theme to use (dark matches the site theme)
+        theme: "dark",
+
+        // Whether to allow manual input
+        allowInput: false,
+
+        // Positioning strategy
+        position: "auto",
+
+        // Default mode (single or range)
+        defaultMode: "single",
+    }
 };
 
     // <!-- Option 2: Inline config (uncomment to override config.js) -->

@@ -619,3 +619,29 @@ strong {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
+/* Edit and Clear Icon Styling */
+.edit-icon,
+.clear-icon {
+    font-size: var(--font-size-icon-small);
+    margin-left: 8px;
+    opacity: 0.6;
+    transition: opacity 0.2s ease;
+    cursor: pointer;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.edit-icon:hover,
+.clear-icon:hover {
+    opacity: 1;
+}
+
+.clear-icon {
+    color: var(--color-text);
+    font-weight: bold;
+    margin-left: 4px;
+}
+
+.clear-icon:hover {
+    color: var(--color-pink);
+}
