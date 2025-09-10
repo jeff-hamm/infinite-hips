@@ -672,13 +672,6 @@ class GoogleSheetsChecklist {
                         </div>`;
                     }
                     
-                    // Date detail item
-                    if (task.date) {
-                        html += `<div class="detail-item">
-                            <div class="task-date">${this.formatDateForDisplay(task.date)}</div>
-                        </div>`;
-                    }
-                    
                     if (task.how) {
                         html += `<div class="detail-item">
                             <span class="detail-icon">🔧</span>
@@ -1968,7 +1961,6 @@ class GoogleSheetsChecklist {
             how: how,
             notes: formData.get('notes') || '',
             whoCanHelp: whoCanHelp,
-            date: formData.get('date') || '',
             completed: false
         };
 

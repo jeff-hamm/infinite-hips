@@ -75,19 +75,6 @@
                     </div>
                     
                     <div class="form-group">
-                        <label for="task-date">Date</label>
-                        <div class="date-input-container">
-                            <input type="text" id="task-date" name="date" placeholder="Select date or date range..." readonly>
-                            <div class="date-type-toggle">
-                                <button type="button" id="single-date-btn" class="date-toggle-btn active">Single Date</button>
-                                <button type="button" id="date-range-btn" class="date-toggle-btn">Date Range</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="form-row">
-                    <div class="form-group">
                         <label for="task-priority">Priority</label>
                         <select id="task-priority" name="priority">
                             <option value="">Select priority...</option>
@@ -97,8 +84,10 @@
                             <option value="4 - Low">4 - Low</option>
                         </select>
                     </div>
-                    
-                    <div class="form-group">
+                </div>
+                
+                <div class="form-row">
+                                        <div class="form-group">
                         <label for="task-category">Category</label>
                         <select id="task-category" name="category">
                             <option value="">Select category...</option>
@@ -106,9 +95,8 @@
                         </select>
                         <input type="text" id="task-category-other" name="categoryOther" placeholder="Enter custom category..." style="display: none; margin-top: 8px;">
                     </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
+                    
+                                        <div class="form-group">
                         <label for="task-who-can-help">Helper</label>
                         <select id="task-who-can-help" name="whoCanHelp">
                             <option value="">Select helper...</option>
@@ -169,8 +157,6 @@
     </div>
     </div>
 
-    <!-- Flatpickr JavaScript -->
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="app.js"></script>
 </body>
 </html>

@@ -203,7 +203,6 @@ function getTasksFromSheet(sheet) {
       how: row[howIndex]?.toString().trim() || '',
       notes: row[notesIndex]?.toString().trim() || '',
       whoCanHelp: row[whoCanHelpIndex]?.toString().trim() || '',
-      date: row[dateIndex] ? formatDateForSheet(row[dateIndex]) : '',
       lastModified: row[lastModifiedIndex] ? new Date(row[lastModifiedIndex]).toISOString() : new Date().toISOString()
     };
     
@@ -446,38 +445,6 @@ function findColumnIndex(headers, possibleNames) {
     if (index !== -1) return index;
   }
   return -1;
-}
-
-
-/**
- * Helper function to format date values for display
- */
-function formatDateForSheet(dateValue) {
-  if (!dateValue) return '';
-  
-  try {
-    // If it's already a date object
-    if (dateValue instanceof Date) {
-      return dateValue.toISOString().split('T')[0]; // Return YYYY-MM-DD format
-    }
-    
-    // If it's a string, try to parse it
-    if (typeof dateValue === 'string') {
-      const parsed = new Date(dateValue);
-      if (!isNaN(parsed.getTime())) {
-        return parsed.toISOString().split('T')[0];
-      }
-      // If it's already in YYYY-MM-DD format, return as is
-      if (/^\d{4}-\d{2}-\d{2}$/.test(dateValue.trim())) {
-        return dateValue.trim();
-      }
-    }
-    
-    return dateValue.toString();
-  } catch (error) {
-    console.error('Error formatting date:', error, 'Value:', dateValue);
-    return dateValue.toString();
-  }
 }
 
 /**

@@ -672,13 +672,6 @@ class GoogleSheetsChecklist {
                         </div>`;
                     }
                     
-                    // Date detail item
-                    if (task.date) {
-                        html += `<div class="detail-item">
-                            <div class="task-date">${this.formatDateForDisplay(task.date)}</div>
-                        </div>`;
-                    }
-                    
                     if (task.how) {
                         html += `<div class="detail-item">
                             <span class="detail-icon">🔧</span>
@@ -1968,7 +1961,6 @@ class GoogleSheetsChecklist {
             how: how,
             notes: formData.get('notes') || '',
             whoCanHelp: whoCanHelp,
-            date: formData.get('date') || '',
             completed: false
         };
 
@@ -2492,111 +2484,6 @@ class GoogleSheetsChecklist {
         if (filterContainer) {
             filterContainer.style.display = 'none';
         }
-    }
-
-    // Date picker initialization and management
-    initializeDatePicker() {
-        // Initialize Flatpickr with single date mode as default
-        this.datePicker = flatpickr("#task-date", {
-            mode: "single",
-            dateFormat: "Y-m-d",
-            allowInput: false,
-            theme: "dark",
-            position: "auto",
-            onChange: (selectedDates, dateStr, instance) => {
-                this.handleDateChange(selectedDates, dateStr, instance);
-            }
-        });
-        
-        this.dateMode = 'single';
-    }
-
-    setDatePickerMode(mode) {
-        // Update toggle button states
-        document.getElementById('single-date-btn').classList.toggle('active', mode === 'single');
-        document.getElementById('date-range-btn').classList.toggle('active', mode === 'range');
-        
-        // Update datepicker mode
-        this.datePicker.destroy();
-        this.datePicker = flatpickr("#task-date", {
-            mode: mode,
-            dateFormat: "Y-m-d",
-            allowInput: false,
-            theme: "dark",
-            position: "auto",
-            onChange: (selectedDates, dateStr, instance) => {
-                this.handleDateChange(selectedDates, dateStr, instance);
-            }
-        });
-        
-        this.dateMode = mode;
-        
-        // Clear current date value when switching modes
-        document.getElementById('task-date').value = '';
-    }
-
-    handleDateChange(selectedDates, dateStr, instance) {
-        // Format the display value based on mode
-        if (this.dateMode === 'range' && selectedDates.length === 2) {
-            const startDate = selectedDates[0].toISOString().split('T')[0];
-            const endDate = selectedDates[1].toISOString().split('T')[0];
-            document.getElementById('task-date').value = `${startDate} to ${endDate}`;
-        } else if (this.dateMode === 'single' && selectedDates.length === 1) {
-            document.getElementById('task-date').value = selectedDates[0].toISOString().split('T')[0];
-        } else {
-            document.getElementById('task-date').value = dateStr;
-        }
-    }
-
-    formatDateForDisplay(dateStr) {
-        if (!dateStr) return '';
-        
-        // Check if it's a date range
-        if (dateStr.includes(' to ')) {
-            const [startDate, endDate] = dateStr.split(' to ');
-            const start = new Date(startDate);
-            const end = new Date(endDate);
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-            
-            // Check if range includes today or is overdue
-            if (start <= today && end >= today) {
-                return `<span class="task-date-icon">📅</span><span class="task-date-range task-date-today">${this.formatSingleDate(startDate)} - ${this.formatSingleDate(endDate)}</span>`;
-            } else if (end < today) {
-                return `<span class="task-date-icon">⚠️</span><span class="task-date-range task-date-overdue">${this.formatSingleDate(startDate)} - ${this.formatSingleDate(endDate)}</span>`;
-            } else {
-                return `<span class="task-date-icon">📅</span><span class="task-date-range">${this.formatSingleDate(startDate)} - ${this.formatSingleDate(endDate)}</span>`;
-            }
-        } else {
-            // Single date
-            const date = new Date(dateStr);
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-            date.setHours(0, 0, 0, 0);
-            
-            if (date.getTime() === today.getTime()) {
-                return `<span class="task-date-icon">🎯</span><span class="task-date-single task-date-today">${this.formatSingleDate(dateStr)}</span>`;
-            } else if (date < today) {
-                return `<span class="task-date-icon">⚠️</span><span class="task-date-single task-date-overdue">${this.formatSingleDate(dateStr)}</span>`;
-            } else {
-                const diffTime = date - today;
-                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-                if (diffDays <= 3) {
-                    return `<span class="task-date-icon">⏰</span><span class="task-date-single task-date-upcoming">${this.formatSingleDate(dateStr)}</span>`;
-                } else {
-                    return `<span class="task-date-icon">📅</span><span class="task-date-single">${this.formatSingleDate(dateStr)}</span>`;
-                }
-            }
-        }
-    }
-
-    formatSingleDate(dateStr) {
-        const date = new Date(dateStr);
-        return date.toLocaleDateString('en-US', { 
-            month: 'short', 
-            day: 'numeric', 
-            year: 'numeric' 
-        });
     }
 }
 

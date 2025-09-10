@@ -1,0 +1,39 @@
+# Todo Updates - GET Request Format for Adding Tasks
+# Copy these URLs and open them in a browser to add the tasks to the Google Sheets todo list
+# All tasks are categorized under "Post-Surgery" timeline
+
+# 1. Set up medication organization system
+https://script.google.com/macros/s/AKfycbycobzIubmEzjq0_PhqA34reM4eVnZiFxSpiz9CnLSma48azXvZb5ICpa4N2id2Uyg/exec?action=addTask&text=Set%20up%20medication%20organization%20system&timeline=Post-Surgery&priority=High&category=Medication%20Management&notes=Use%20pillbox%20or%207-day%20organizer%20for%20all%20medications&completed=false
+
+# 2. Arrange locked storage for opioids
+https://script.google.com/macros/s/AKfycbycobzIubmEzjq0_PhqA34reM4eVnZiFxSpiz9CnLSma48azXvZb5ICpa4N2id2Uyg/exec?action=addTask&text=Arrange%20locked%20storage%20for%20opioids&timeline=Post-Surgery&priority=High&category=Medication%20Safety&notes=Secure%20locked%20container%20for%20opioid%20medications&completed=false
+
+# 3. Prepare pain management alternatives
+https://script.google.com/macros/s/AKfycbycobzIubmEzjq0_PhqA34reM4eVnZiFxSpiz9CnLSma48azXvZb5ICpa4N2id2Uyg/exec?action=addTask&text=Prepare%20pain%20management%20alternatives&timeline=Post-Surgery&priority=Medium&category=Pain%20Management&notes=Stock%20ice%20packs%20cloth%20towels%20for%20cold%20therapy&completed=false
+
+# 4. Plan constipation prevention regimen
+https://script.google.com/macros/s/AKfycbycobzIubmEzjq0_PhqA34reM4eVnZiFxSpiz9CnLSma48azXvZb5ICpa4N2id2Uyg/exec?action=addTask&text=Plan%20constipation%20prevention%20regimen&timeline=Post-Surgery&priority=High&category=Post-Op%20Care&notes=Have%20Peri-colace%20Sennokot-S%20Miralax%20and%20Dulcolax%20available&completed=false
+
+# 5. Review blood thinner interactions
+https://script.google.com/macros/s/AKfycbycobzIubmEzjq0_PhqA34reM4eVnZiFxSpiz9CnLSma48azXvZb5ICpa4N2id2Uyg/exec?action=addTask&text=Review%20blood%20thinner%20interactions&timeline=Post-Surgery&priority=High&category=Medication%20Safety&notes=Check%20all%20current%20medications%20supplements%20for%20interactions&completed=false
+
+# 6. Arrange soft-bristle toothbrush
+https://script.google.com/macros/s/AKfycbycobzIubmEzjq0_PhqA34reM4eVnZiFxSpiz9CnLSma48azXvZb5ICpa4N2id2Uyg/exec?action=addTask&text=Arrange%20soft-bristle%20toothbrush&timeline=Post-Surgery&priority=Medium&category=Blood%20Thinner%20Safety&notes=Replace%20regular%20toothbrush%20with%20soft-bristle%20version&completed=false
+
+# 7. Get electric razor
+https://script.google.com/macros/s/AKfycbycobzIubmEzjq0_PhqA34reM4eVnZiFxSpiz9CnLSma48azXvZb5ICpa4N2id2Uyg/exec?action=addTask&text=Get%20electric%20razor&timeline=Post-Surgery&priority=Medium&category=Blood%20Thinner%20Safety&notes=Replace%20blade%20razor%20with%20electric%20for%20safety&completed=false
+
+# 8. Stock healthy recovery foods
+https://script.google.com/macros/s/AKfycbycobzIubmEzjq0_PhqA34reM4eVnZiFxSpiz9CnLSma48azXvZb5ICpa4N2id2Uyg/exec?action=addTask&text=Stock%20healthy%20recovery%20foods&timeline=Post-Surgery&priority=Medium&category=Nutrition&notes=High-fiber%20foods%20fresh%20fruits%20vegetables%20for%20healing&completed=false
+
+# 9. Prepare medication list for emergencies
+https://script.google.com/macros/s/AKfycbycobzIubmEzjq0_PhqA34reM4eVnZiFxSpiz9CnLSma48azXvZb5ICpa4N2id2Uyg/exec?action=addTask&text=Prepare%20medication%20list%20for%20emergencies&timeline=Post-Surgery&priority=High&category=Safety%20Planning&notes=Give%20copy%20to%20family%20member%20or%20close%20friend&completed=false
+
+# 10. Plan opioid disposal method
+https://script.google.com/macros/s/AKfycbycobzIubmEzjq0_PhqA34reM4eVnZiFxSpiz9CnLSma48azXvZb5ICpa4N2id2Uyg/exec?action=addTask&text=Plan%20opioid%20disposal%20method&timeline=Post-Surgery&priority=Medium&category=Medication%20Safety&notes=Research%20approved%20disposal%20sites%20or%20prepare%20coffee%20grounds%2Fkitty%20litter&completed=false
+
+# 11. Schedule follow-up with pharmacist
+https://script.google.com/macros/s/AKfycbycobzIubmEzjq0_PhqA34reM4eVnZiFxSpiz9CnLSma48azXvZb5ICpa4N2id2Uyg/exec?action=addTask&text=Schedule%20follow-up%20with%20pharmacist&timeline=Post-Surgery&priority=Low&category=Medication%20Management&notes=Review%20all%20medications%20and%20get%20fact%20sheets&completed=false
+
+# 12. Prepare questions for Dr. Wilde
+https://script.google.com/macros/s/AKfycbycobzIubmEzjq0_PhqA34reM4eVnZiFxSpiz9CnLSma48azXvZb5ICpa4N2id2Uyg/exec?action=addTask&text=Prepare%20questions%20for%20Dr.%20Wilde&timeline=Post-Surgery&priority=Medium&category=Surgery%20Day&notes=Questions%20about%20pain%20management%20expectations%20and%20tapering%20schedule&completed=false
